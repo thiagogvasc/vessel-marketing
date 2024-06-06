@@ -3,6 +3,10 @@ import Layout from '../components/Layout'
 import { useRouter } from 'next/router';
 import { AuthProvider } from '../contexts/AuthContext';
 import ProtectedRoute from '../components/ProtectedRoute';
+import { QueryClient, QueryClientProvider } from 'react-query';
+
+
+const queryClient = new QueryClient();
  
 export default function MyApp({ Component, pageProps }: AppProps) {
   const router = useRouter();
@@ -12,15 +16,17 @@ export default function MyApp({ Component, pageProps }: AppProps) {
 
   return (
     <AuthProvider>
-      {noLayout ? (
-        <Component {...pageProps} />
-      ) : (
-        <ProtectedRoute>
-          <Layout>
-            <Component {...pageProps} />
-          </Layout>
-        </ProtectedRoute>
-      )}
+      <QueryClientProvider client={queryClient}>
+        {noLayout ? (
+          <Component {...pageProps} />
+        ) : (
+          <ProtectedRoute>
+            <Layout>
+              <Component {...pageProps} />
+            </Layout>
+          </ProtectedRoute>
+        )}
+      </QueryClientProvider>
     </AuthProvider>
   );
 }
