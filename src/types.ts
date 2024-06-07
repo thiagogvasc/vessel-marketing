@@ -23,16 +23,33 @@ export interface Request {
   updated_at?: Date;
 }
 
-// Types for Tasks Collection
 export interface Task {
   id?: string; // auto-generated
-  request_id: string; // reference to Requests
+  board_id: string; // reference to Boards
   title: string;
   description: string;
-  status: 'not_started' | 'in_progress' | 'completed';
+  status: 'To Do' | 'In Progress' | 'Done';
   due_date?: Date;
   assigned_to?: string; // reference to Users
   priority: 'low' | 'medium' | 'high';
+  created_at?: Date;
+  updated_at?: Date;
+}
+
+export interface Column {
+  title: string; // column title
+  taskIds: string[]; // array of task IDs in order
+}
+
+export interface AggregateColumn {
+  title: string; // column title
+  tasks: Task[]; // array of task IDs in order
+}
+
+export interface Board {
+  id: string; // board ID
+  title: string; // board title
+  columns: Column[]; // array of columns
   created_at?: Date;
   updated_at?: Date;
 }

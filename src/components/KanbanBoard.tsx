@@ -1,78 +1,69 @@
-import React, { useState } from 'react';
-import styles from "../styles/KanbanBoard.module.css"
-
-interface Task {
-  id: string;
-  title: string;
-  description: string;
-  status: 'todo' | 'in_progress' | 'done';
-}
+import React, { useEffect, useState } from 'react';
+import { DragDropContext } from 'react-beautiful-dnd';
+import { useBoard, useUpdateTaskOrder } from '../hooks/useTasks';
+import Column from './Column';
+import AddTaskForm from './AddTaskForm';
+import { Column as ColumnType, AggregateColumn } from '../types';
 
 interface KanbanBoardProps {
-  tasks: Task[];
+  boardId: string;
 }
 
-const KanbanBoard: React.FC<KanbanBoardProps> = ({ tasks }) => {
-  const [taskList, setTaskList] = useState<Task[]>(tasks);
+const KanbanBoard: React.FC<KanbanBoardProps> = ({ boardId }) => {
+  const { data, isLoading } = useBoard(boardId);
+  const [columns, setColumns] = useState<AggregateColumn[]>([]);
+  const updateTaskOrderMutation = useUpdateTaskOrder(boardId);
 
-  const handleDragStart = (e: React.DragEvent, taskId: string) => {
-    e.dataTransfer.setData('taskId', taskId);
+  console.warn(columns)
+
+  useEffect(() => {
+    if (data) {
+     setColumns(data.aggregateColumns);
+    }
+  }, [data]);
+
+  const handleDragEnd = (result: any) => {
+    if (!result.destination) return;
+
+    const sourceIndex = result.source.index;
+    const destinationIndex = result.destination.index;
+    const sourceColumnTitle = result.source.droppableId;
+    const destinationColumnTitle = result.destination.droppableId;
+
+    const sourceColumn = columns.find(col => col.title === sourceColumnTitle);
+    const destinationColumn = columns.find(col => col.title === destinationColumnTitle);
+
+    if (sourceColumn && destinationColumn) {
+      const [movedTask] = sourceColumn.tasks.splice(sourceIndex, 1);
+      destinationColumn.tasks.splice(destinationIndex, 0, movedTask);
+
+      setColumns(columns.map(col => {
+        if (col.title === sourceColumnTitle) return sourceColumn;
+        if (col.title === destinationColumnTitle) return destinationColumn;
+        return col;
+      }));
+
+      updateTaskOrderMutation.mutate(
+        columns.map(column => ({
+          title: column.title,
+          taskIds: column.tasks.map(task => task?.id),
+        } as ColumnType))
+      );
+    }
   };
 
-  const handleDrop = (e: React.DragEvent, newStatus: Task['status']) => {
-    const taskId = e.dataTransfer.getData('taskId');
-    const updatedTasks = taskList.map((task) =>
-      task.id === taskId ? { ...task, status: newStatus } : task
-    );
-    setTaskList(updatedTasks);
-  };
+  if (isLoading) return <>Lloding</>
 
-  const allowDrop = (e: React.DragEvent) => {
-    e.preventDefault();
-  };
-
-  const renderTasks = (status: Task['status']) => {
-    return taskList
-      .filter((task) => task.status === status)
-      .map((task) => (
-        <div
-          key={task.id}
-          draggable
-          onDragStart={(e) => handleDragStart(e, task.id)}
-          className="task"
-        >
-          <h3>{task.title}</h3>
-          <p>{task.description}</p>
-        </div>
-      ));
-  };
-  
   return (
-    <div className={styles.kanbanBoard}>
-      <div
-        className={styles.kanbanColumn}
-        onDrop={(e) => handleDrop(e, 'todo')}
-        onDragOver={allowDrop}
-      >
-        <h2>To Do </h2>
-        {renderTasks('todo')}
-      </div>
-      <div
-        className={styles.kanbanColumn}
-        onDrop={(e) => handleDrop(e, 'in_progress')}
-        onDragOver={allowDrop}
-      >
-        <h2>In Progress</h2>
-        {renderTasks('in_progress')}
-      </div>
-      <div
-        className={styles.kanbanColumn}
-        onDrop={(e) => handleDrop(e, 'done')}
-        onDragOver={allowDrop}
-      >
-        <h2>Done</h2>
-        {renderTasks('done')}
-      </div>
+    <div>
+      <AddTaskForm boardId={boardId} />
+      <DragDropContext onDragEnd={handleDragEnd}>
+        <div style={{ display: 'flex', justifyContent: 'space-between' }}>
+          {columns.map(column => (
+            <Column key={column.title} column={column} />
+          ))}
+        </div>
+      </DragDropContext>
     </div>
   );
 };
