@@ -2,8 +2,8 @@ import React, { useEffect, useState } from 'react';
 import { DragDropContext } from 'react-beautiful-dnd';
 import { useBoard, useUpdateTaskOrder } from '../hooks/useTasks';
 import Column from './Column';
-import AddTaskForm from './AddTaskForm';
-import { Column as ColumnType, AggregateColumn } from '../types';
+import { AggregateColumn, Column as ColumnType } from '../types';
+import { Box, CircularProgress, Grid, Fade, Grow } from '@mui/material';
 
 interface KanbanBoardProps {
   boardId: string;
@@ -14,11 +14,9 @@ const KanbanBoard: React.FC<KanbanBoardProps> = ({ boardId }) => {
   const [columns, setColumns] = useState<AggregateColumn[]>([]);
   const updateTaskOrderMutation = useUpdateTaskOrder(boardId);
 
-  console.warn(columns)
-
   useEffect(() => {
     if (data) {
-     setColumns(data.aggregateColumns);
+      setColumns(data.aggregateColumns);
     }
   }, [data]);
 
@@ -52,18 +50,29 @@ const KanbanBoard: React.FC<KanbanBoardProps> = ({ boardId }) => {
     }
   };
 
-  if (isLoading) return <>Lloding</>
+  if (isLoading) return (
+    <Box sx={{ display: 'flex', justifyContent: 'center', alignItems: 'center', height: '100%' }}>
+      <CircularProgress />
+    </Box>
+  );
 
   return (
     <div>
-      <AddTaskForm boardId={boardId} />
-      <DragDropContext onDragEnd={handleDragEnd}>
-        <div style={{ display: 'flex', justifyContent: 'space-between' }}>
-          {columns.map(column => (
-            <Column key={column.title} column={column} />
-          ))}
-        </div>
-      </DragDropContext>
+      <Fade in timeout={500}>
+        <Box>
+          <DragDropContext onDragEnd={handleDragEnd}>
+            <Grid container spacing={2} sx={{ mt: 2 }}>
+              {columns.map(column => (
+                <Grow in timeout={1000} key={column.title}>
+                  <Grid item xs={12} md={4}>
+                    <Column column={column} boardId={boardId} />
+                  </Grid>
+                </Grow>
+              ))}
+            </Grid>
+          </DragDropContext>
+        </Box>
+      </Fade>
     </div>
   );
 };

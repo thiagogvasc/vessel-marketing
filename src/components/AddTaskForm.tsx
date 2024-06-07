@@ -1,6 +1,7 @@
 import React, { useState } from 'react';
 import { useAddTask } from '../hooks/useTasks';
 import { Task } from '../types';
+import { Box, Button, TextField, Grid, MenuItem } from '@mui/material';
 
 interface TaskFormProps {
   boardId: string;
@@ -31,41 +32,72 @@ const AddTaskForm: React.FC<TaskFormProps> = ({ boardId }) => {
   };
 
   return (
-    <form onSubmit={handleSubmit}>
-      <div>
-        <label>
-          Title:
-          <input type="text" value={title} onChange={(e) => setTitle(e.target.value)} required />
-        </label>
-      </div>
-      <div>
-        <label>
-          Description:
-          <input type="text" value={description} onChange={(e) => setDescription(e.target.value)} required />
-        </label>
-      </div>
-      <div>
-        <label>
-          Priority:
-          <select value={priority} onChange={(e) => setPriority(e.target.value as Task['priority'])}>
-            <option value="low">Low</option>
-            <option value="medium">Medium</option>
-            <option value="high">High</option>
-          </select>
-        </label>
-      </div>
-      <div>
-        <label>
-          Status:
-          <select value={status} onChange={(e) => setStatus(e.target.value as Task['status'])}>
-            <option value="To Do">To Do</option>
-            <option value="In Progress">In Progress</option>
-            <option value="Done">Done</option>
-          </select>
-        </label>
-      </div>
-      <button type="submit">Add Task</button>
-    </form>
+    <Box component="form" onSubmit={handleSubmit} sx={{ mt: 2 }}>
+      <Grid container spacing={2}>
+        <Grid item xs={12} sm={6}>
+          <TextField
+            name="title"
+            required
+            fullWidth
+            id="title"
+            label="Title"
+            autoFocus
+            value={title}
+            onChange={(e) => setTitle(e.target.value)}
+          />
+        </Grid>
+        <Grid item xs={12}>
+          <TextField
+            name="description"
+            required
+            fullWidth
+            id="description"
+            label="Description"
+            multiline
+            rows={2}
+            value={description}
+            onChange={(e) => setDescription(e.target.value)}
+          />
+        </Grid>
+        <Grid item xs={12} sm={6}>
+          <TextField
+            name="priority"
+            required
+            fullWidth
+            id="priority"
+            label="Priority"
+            select
+            value={priority}
+            onChange={(e) => setPriority(e.target.value as Task['priority'])}
+          >
+            <MenuItem value="low">Low</MenuItem>
+            <MenuItem value="medium">Medium</MenuItem>
+            <MenuItem value="high">High</MenuItem>
+          </TextField>
+        </Grid>
+        <Grid item xs={12} sm={6}>
+          <TextField
+            name="status"
+            required
+            fullWidth
+            id="status"
+            label="Status"
+            select
+            value={status}
+            onChange={(e) => setStatus(e.target.value as Task['status'])}
+          >
+            <MenuItem value="To Do">To Do</MenuItem>
+            <MenuItem value="In Progress">In Progress</MenuItem>
+            <MenuItem value="Done">Done</MenuItem>
+          </TextField>
+        </Grid>
+        <Grid item xs={12}>
+          <Button type="submit" variant="contained" color="primary">
+            Add Task
+          </Button>
+        </Grid>
+      </Grid>
+    </Box>
   );
 };
 

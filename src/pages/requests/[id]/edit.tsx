@@ -1,8 +1,21 @@
 import { useRouter } from 'next/router';
 import { useState, useEffect } from 'react';
 import useUpdateRequest from '../../../hooks/useUpdateRequestById';
-import ProtectedRoute from '../../../components/ProtectedRoute';
 import useGetRequestById from '@/src/hooks/useGetRequestById';
+import {
+  Box,
+  Button,
+  Container,
+  TextField,
+  Typography,
+  CssBaseline,
+  Paper,
+  MenuItem,
+  Select,
+  InputLabel,
+  FormControl,
+} from '@mui/material';
+
 
 const EditRequest = () => {
   const router = useRouter();
@@ -26,77 +39,102 @@ const EditRequest = () => {
     }
   }, [request]);
 
-  const handleSubmit = (e: React.FormEvent) => {
+  const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
     if (request) {
-      updateRequestMutation.mutateAsync({
-        ...request,
-        title,
-        description,
-        status,
-        priority,
-        updated_at: new Date(),
-      }).then((res) => {
-        console.warn('mutated', res)
-        router.push(`/requests/${request.id}`)
-      });
+      try {
+        await updateRequestMutation.mutateAsync({
+          ...request,
+          title,
+          description,
+          status,
+          priority,
+          updated_at: new Date(),
+        });
+        router.push(`/requests/${request.id}`);
+      } catch (error) {
+        console.warn('Failed to update request', error);
+      }
     }
   };
 
   return (
-    <ProtectedRoute>
-      <div>
-        <h1>Edit Request</h1>
-        <form onSubmit={handleSubmit}>
-          <div>
-            <label htmlFor="title">Title:</label>
-            <input
-              type="text"
+    <Container component="main" maxWidth="sm">
+      <CssBaseline />
+      <Box sx={{ mt: 4 }}>
+        <Paper elevation={3} sx={{ p: 4, borderRadius: 3 }}>
+          <Typography component="h1" variant="h5">
+            Edit Request
+          </Typography>
+          <Box component="form" onSubmit={handleSubmit} noValidate sx={{ mt: 2 }}>
+            <TextField
+              variant="outlined"
+              margin="normal"
+              required
+              fullWidth
               id="title"
+              label="Title"
+              name="title"
+              autoComplete="title"
               value={title}
               onChange={(e) => setTitle(e.target.value)}
-              required
+              autoFocus
             />
-          </div>
-          <div>
-            <label htmlFor="description">Description:</label>
-            <textarea
+            <TextField
+              variant="outlined"
+              margin="normal"
+              required
+              fullWidth
               id="description"
+              label="Description"
+              name="description"
+              autoComplete="description"
+              multiline
+              rows={4}
               value={description}
               onChange={(e) => setDescription(e.target.value)}
-              required
             />
-          </div>
-          <div>
-            <label htmlFor="status">Status:</label>
-            <select
-              id="status"
-              value={status}
-              onChange={(e) => setStatus(e.target.value as 'pending' | 'in_progress' | 'completed')}
-              required
+            <FormControl variant="outlined" margin="normal" fullWidth required>
+              <InputLabel id="status-label">Status</InputLabel>
+              <Select
+                labelId="status-label"
+                id="status"
+                value={status}
+                onChange={(e) => setStatus(e.target.value as 'pending' | 'in_progress' | 'completed')}
+                label="Status"
+              >
+                <MenuItem value="pending">Pending</MenuItem>
+                <MenuItem value="in_progress">In Progress</MenuItem>
+                <MenuItem value="completed">Completed</MenuItem>
+              </Select>
+            </FormControl>
+            <FormControl variant="outlined" margin="normal" fullWidth required>
+              <InputLabel id="priority-label">Priority</InputLabel>
+              <Select
+                labelId="priority-label"
+                id="priority"
+                value={priority}
+                onChange={(e) => setPriority(e.target.value as 'low' | 'medium' | 'high')}
+                label="Priority"
+              >
+                <MenuItem value="low">Low</MenuItem>
+                <MenuItem value="medium">Medium</MenuItem>
+                <MenuItem value="high">High</MenuItem>
+              </Select>
+            </FormControl>
+            <Button
+              type="submit"
+              fullWidth
+              variant="contained"
+              color="primary"
+              sx={{ mt: 3, mb: 2 }}
             >
-              <option value="pending">Pending</option>
-              <option value="in_progress">In Progress</option>
-              <option value="completed">Completed</option>
-            </select>
-          </div>
-          <div>
-            <label htmlFor="priority">Priority:</label>
-            <select
-              id="priority"
-              value={priority}
-              onChange={(e) => setPriority(e.target.value as 'low' | 'medium' | 'high')}
-              required
-            >
-              <option value="low">Low</option>
-              <option value="medium">Medium</option>
-              <option value="high">High</option>
-            </select>
-          </div>
-          <button type="submit">Update Request</button>
-        </form>
-      </div>
-    </ProtectedRoute>
+              Update Request
+            </Button>
+          </Box>
+        </Paper>
+      </Box>
+    </Container>
   );
 };
 

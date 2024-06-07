@@ -18,6 +18,8 @@ export default function MyApp({ Component, pageProps }: AppProps) {
   // Conditionally exclude the layout for the login page
   const noLayout = ['/login', '/register'].includes(router.pathname);
 
+  console.warn(router)
+
   return (
     <AuthProvider>
       <QueryClientProvider client={queryClient}>
@@ -27,7 +29,7 @@ export default function MyApp({ Component, pageProps }: AppProps) {
             {noLayout ? (
               <Component {...pageProps} />
               ) : (
-                <ProtectedRoute>
+              <ProtectedRoute>
                 <Layout>
                   <Component {...pageProps} />
                 </Layout>

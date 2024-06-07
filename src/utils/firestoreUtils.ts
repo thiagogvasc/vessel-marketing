@@ -3,26 +3,13 @@ import { collection, addDoc, getDocs, updateDoc, doc, DocumentData, QuerySnapsho
 import { db } from "../../firebaseConfig";
 import { User, Request, Task, Column } from "../types";
 
-const convertDocs = <T>(querySnapshot: QuerySnapshot<DocumentData>): T[] => {
+export const convertDocs = <T>(querySnapshot: QuerySnapshot<DocumentData>): T[] => {
   return querySnapshot.docs.map((doc) => ({
     id: doc.id,
     ...doc.data(),
   } as T));
 };
 
-export const addUser = async (user: User): Promise<string | undefined> => {
-  try {
-    const docRef = await addDoc(collection(db, "users"), user);
-    return docRef.id;
-  } catch (e) {
-    console.error("Error adding user: ", e);
-  }
-};
-
-export const getUsers = async (): Promise<User[]> => {
-  const querySnapshot = await getDocs(collection(db, "users"));
-  return convertDocs<User>(querySnapshot);
-};
 
 export const addRequest = async (request: Request): Promise<string | undefined> => {
   try {
