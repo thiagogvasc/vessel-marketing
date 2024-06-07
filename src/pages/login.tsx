@@ -12,32 +12,38 @@ import {
   Grid,
   Paper,
   Link as MuiLink,
+  Alert,
 } from '@mui/material';
 import LockOutlinedIcon from '@mui/icons-material/LockOutlined';
 import Link from 'next/link';
-
+import { Formik, Form, Field, ErrorMessage } from 'formik';
+import * as Yup from 'yup';
 
 const Login = () => {
-  const [email, setEmail] = useState('');
-  const [password, setPassword] = useState('');
   const { user, login } = useAuth();
   const router = useRouter();
+  const [loginError, setLoginError] = useState<string | null>(null);
 
   useEffect(() => {
-    user && router.push('/')
-  }, [user])
+    user && router.push('/');
+  }, [user]);
 
-  const handleSubmit = async (event: React.FormEvent) => {
-    event.preventDefault();
-    login(email, password).then(res => {
-    }).catch(err => {
-      console.warn('failed to login')
-    })
+  const handleSubmit = async (values: { email: string, password: string }) => {
+    login(values.email, values.password)
+    .then(res => { console.warn(res)})
+    .catch(err => {
+      console.warn(err)
+      setLoginError(err.message || 'Failed to login');
+    });
   };
+
+  const validationSchema = Yup.object({
+    email: Yup.string().email('Invalid email address').required('Required'),
+    password: Yup.string().required('Required'),
+  });
 
   return (
     <Container component="main" maxWidth="xs">
-      <CssBaseline />
       <Paper elevation={6} sx={{ p: 4, mt: 8, borderRadius: 3 }}>
         <Box
           sx={{
@@ -52,47 +58,58 @@ const Login = () => {
           <Typography component="h1" variant="h5">
             Login
           </Typography>
-          <Box component="form" onSubmit={handleSubmit} noValidate sx={{ mt: 1 }}>
-            <TextField
-              margin="normal"
-              required
-              fullWidth
-              id="email"
-              label="Email Address"
-              name="email"
-              autoComplete="email"
-              autoFocus
-              value={email}
-              onChange={(e) => setEmail(e.target.value)}
-            />
-            <TextField
-              margin="normal"
-              required
-              fullWidth
-              name="password"
-              label="Password"
-              type="password"
-              id="password"
-              autoComplete="current-password"
-              value={password}
-              onChange={(e) => setPassword(e.target.value)}
-            />
-            <Button
-              type="submit"
-              fullWidth
-              variant="contained"
-              sx={{ mt: 3, mb: 2 }}
-            >
-              Login
-            </Button>
-            <Grid container justifyContent="flex-end">
-              <Grid item>
-                <MuiLink component={Link} href="/register" variant="body2">
-                  {"Don't have an account? Register"}
-                </MuiLink>
-              </Grid>
-            </Grid>
-          </Box>
+          {loginError && <Alert severity="error" sx={{ mt: 2, mb: 2 }}>{loginError}</Alert>}
+          <Formik
+            initialValues={{ email: '', password: '' }}
+            validationSchema={validationSchema}
+            onSubmit={handleSubmit}
+          >
+            {({ errors, touched }) => (
+              <Form noValidate>
+                <Field
+                  as={TextField}
+                  margin="normal"
+                  required
+                  fullWidth
+                  id="email"
+                  label="Email Address"
+                  name="email"
+                  autoComplete="email"
+                  autoFocus
+                  error={touched.email && Boolean(errors.email)}
+                  helperText={<ErrorMessage name="email" />}
+                />
+                <Field
+                  as={TextField}
+                  margin="normal"
+                  required
+                  fullWidth
+                  name="password"
+                  label="Password"
+                  type="password"
+                  id="password"
+                  autoComplete="current-password"
+                  error={touched.password && Boolean(errors.password)}
+                  helperText={<ErrorMessage name="password" />}
+                />
+                <Button
+                  type="submit"
+                  fullWidth
+                  variant="contained"
+                  sx={{ mt: 3, mb: 2 }}
+                >
+                  Login
+                </Button>
+                <Grid container justifyContent="flex-end">
+                  <Grid item>
+                    <MuiLink component={Link} href="/register" variant="body2">
+                      {"Don't have an account? Register"}
+                    </MuiLink>
+                  </Grid>
+                </Grid>
+              </Form>
+            )}
+          </Formik>
         </Box>
       </Paper>
     </Container>

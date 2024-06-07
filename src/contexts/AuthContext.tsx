@@ -25,8 +25,7 @@ export const AuthProvider = ({ children }: { children: ReactNode }) => {
   }, []);
 
   const login = async (email: string, password: string) => {
-      signInWithEmailAndPassword(auth, email, password).then(res => {
-    }).catch(err => console.warn('An error occured', err))
+      return signInWithEmailAndPassword(auth, email, password)
   };
 
   const register = async (email: string, password: string) => {
