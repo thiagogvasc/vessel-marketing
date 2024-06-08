@@ -1,15 +1,16 @@
 import { User } from "@/src/types";
-import { addDoc, collection, doc, getDoc, getDocs, updateDoc } from "firebase/firestore";
+import { addDoc, collection, doc, getDoc, getDocs, query, setDoc, updateDoc, where } from "firebase/firestore";
 import { convertDocs } from "../firestoreUtils";
 import { db } from "@/firebaseConfig";
 
-export const addUser = async (user: User): Promise<string | undefined> => {
-  try {
-    const docRef = await addDoc(collection(db, "users"), user);
-    return docRef.id;
-  } catch (e) {
+export const addUser = async (user: User): Promise<void> => {
+  const userId = user.id;
+  if (!userId) return Promise.resolve();
+  setDoc(doc(db, "users", userId), user).then(res => {
+    return userId;
+  }).catch(e => {
     console.error("Error adding user: ", e);
-  }
+  });
 };
 
 export const getUsers = async (): Promise<User[]> => {
@@ -17,10 +18,10 @@ export const getUsers = async (): Promise<User[]> => {
   return convertDocs<User>(querySnapshot);
 };
 
-export const getUserById = async (userId: string): Promise<User | null> => {
-  console.warn('getUserById')
+export const getUserById = async (userId: string | undefined): Promise<User | null> => {
+  if (!userId) return Promise.resolve(null);
+  console.warn('getuserbyid', userId)
   const userDoc = await getDoc(doc(db, "users", userId));
-
   if (userDoc.exists()) {
     return { id: userDoc.id, ...userDoc.data() } as User;
   } else {

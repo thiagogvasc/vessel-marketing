@@ -26,7 +26,7 @@ const Login = () => {
 
   useEffect(() => {
     user && router.push('/');
-  }, [user]);
+  }, [user, router]);
 
   const handleSubmit = async (values: { email: string, password: string }) => {
     login(values.email, values.password)

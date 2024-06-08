@@ -1,12 +1,12 @@
 import { createContext, useContext, useEffect, useState, ReactNode } from 'react';
-import { onAuthStateChanged, signInWithEmailAndPassword, createUserWithEmailAndPassword, signOut, AuthError, User as AuthUser } from 'firebase/auth';
+import { onAuthStateChanged, signInWithEmailAndPassword, createUserWithEmailAndPassword, signOut, AuthError, User as AuthUser, UserCredential } from 'firebase/auth';
 import { auth } from '../../firebaseConfig';
 import { addUser } from '../utils/users/userUtils';
 
 interface AuthContextType {
   user: AuthUser | null;
-  login: (email: string, password: string) => Promise<void>;
-  register: (email: string, password: string) => Promise<void>;
+  login: (email: string, password: string) => Promise<UserCredential>;
+  register: (email: string, password: string, fullName: string, phoneNumber: string) => Promise<void>;
   logout: () => Promise<void>;
 }
 
@@ -24,21 +24,20 @@ export const AuthProvider = ({ children }: { children: ReactNode }) => {
     return () => unsubscribe();
   }, []);
 
-  const login = async (email: string, password: string) => {
-      return signInWithEmailAndPassword(auth, email, password)
+  const login = (email: string, password: string) => {
+    return signInWithEmailAndPassword(auth, email, password)
   };
 
-  const register = async (email: string, password: string) => {
-    try {
-      const userCredential = await createUserWithEmailAndPassword(auth, email, password);
-      const user = userCredential.user;
-
-      await addUser({ id: user.uid, email: user.email ?? '', role: 'cliente'})
-
-    } catch (error) {
-      console.error('Registration error:', (error as AuthError).message);
-      throw error;
-    }
+  const register = (email: string, password: string, fullName: string, phoneNumber: string) => {
+    return createUserWithEmailAndPassword(auth, email, password).then(({ user }) => {
+      return addUser({
+        id: user.uid,
+        email: email,
+        fullname: fullName,
+        phone_number: phoneNumber,
+        role: 'client'
+      });
+    });
   };
 
   const logout = async () => {

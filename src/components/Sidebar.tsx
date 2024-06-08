@@ -58,7 +58,7 @@ const Sidebar = () => {
         <Toolbar />
         <Box sx={{ overflow: 'auto' }}>
           <List>
-            <ListItem button component={Link} href="/">
+            <ListItem button component={Link} href="/" disabled>
               <ListItemIcon>
                 <HomeIcon />
               </ListItemIcon>
@@ -70,13 +70,13 @@ const Sidebar = () => {
               </ListItemIcon>
               <ListItemText primary="Requests" />
             </ListItem>
-            <ListItem button component={Link} href="/meetings">
+            <ListItem button component={Link} href="/meetings" disabled>
               <ListItemIcon>
                 <MeetingRoomIcon />
               </ListItemIcon>
               <ListItemText primary="Meetings" />
             </ListItem>
-            <ListItem button component={Link} href="/planning">
+            <ListItem button component={Link} href="/planning" disabled>
               <ListItemIcon>
                 <EventNoteIcon />
               </ListItemIcon>

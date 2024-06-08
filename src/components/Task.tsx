@@ -3,8 +3,12 @@ import { Draggable } from 'react-beautiful-dnd';
 import { Task as TaskType } from '../types';
 import { Paper, Typography } from '@mui/material';
 
+export interface TaskWithId extends TaskType {
+  id: string;
+}
+
 interface TaskProps {
-  task: TaskType;
+  task: TaskWithId;
   index: number;
 }
 

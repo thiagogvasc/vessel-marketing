@@ -1,34 +1,34 @@
-import { useRouter } from 'next/router';
-import { useState, useEffect } from 'react';
-import useUpdateRequest from '../../../hooks/useUpdateRequestById';
-import useGetRequestById from '@/src/hooks/useGetRequestById';
+import { useEffect, useState } from 'react';
+import { useGetRequestById, useUpdateRequest } from "@/src/hooks/useRequests";
+import { useRouter } from "next/router";
 import {
   Box,
   Button,
   Container,
-  TextField,
-  Typography,
-  CssBaseline,
   Paper,
-  MenuItem,
+  Typography,
+  CircularProgress,
+  Fade,
+  Grid,
+  TextField,
   Select,
-  InputLabel,
-  FormControl,
+  MenuItem,
 } from '@mui/material';
+import ArrowBackIcon from '@mui/icons-material/ArrowBack';
+import SaveIcon from '@mui/icons-material/Save';
+import { RequestStatus, RequestPriority } from '@/src/types';
 
-
-const EditRequest = () => {
+export default function EditRequest() {
   const router = useRouter();
   const { id } = router.query;
 
-  const { data: request } = useGetRequestById(id as string);
-
-  const updateRequestMutation = useUpdateRequest(id as string);
+  const { data: request, isLoading } = useGetRequestById(id as string);
+  const updateRequestMutation = useUpdateRequest();
 
   const [title, setTitle] = useState('');
   const [description, setDescription] = useState('');
-  const [status, setStatus] = useState<'pending' | 'in_progress' | 'completed'>('pending');
-  const [priority, setPriority] = useState<'low' | 'medium' | 'high'>('medium');
+  const [status, setStatus] = useState<RequestStatus>('Pending');
+  const [priority, setPriority] = useState<RequestPriority>('Medium');
 
   useEffect(() => {
     if (request) {
@@ -39,103 +39,104 @@ const EditRequest = () => {
     }
   }, [request]);
 
-  const handleSubmit = async (e: React.FormEvent) => {
-    e.preventDefault();
-    if (request) {
-      try {
-        await updateRequestMutation.mutateAsync({
-          ...request,
-          title,
-          description,
-          status,
-          priority,
-          updated_at: new Date(),
-        });
-        router.push(`/requests/${request.id}`);
-      } catch (error) {
-        console.warn('Failed to update request', error);
+  const handleSaveChanges = () => {
+    updateRequestMutation.mutate({
+      id: id as string,
+      updates: { title, description, status, priority, updated_at: new Date() },
+    }, {
+      onSuccess: () => {
+        router.push(`/requests/${id}`);
       }
-    }
+    });
   };
 
   return (
-    <Container component="main" maxWidth="sm">
-      <CssBaseline />
-      <Box sx={{ mt: 4 }}>
-        <Paper elevation={3} sx={{ p: 4, borderRadius: 3 }}>
-          <Typography component="h1" variant="h5">
-            Edit Request
-          </Typography>
-          <Box component="form" onSubmit={handleSubmit} noValidate sx={{ mt: 2 }}>
-            <TextField
-              variant="outlined"
-              margin="normal"
-              required
-              fullWidth
-              id="title"
-              label="Title"
-              name="title"
-              autoComplete="title"
-              value={title}
-              onChange={(e) => setTitle(e.target.value)}
-              autoFocus
-            />
-            <TextField
-              variant="outlined"
-              margin="normal"
-              required
-              fullWidth
-              id="description"
-              label="Description"
-              name="description"
-              autoComplete="description"
-              multiline
-              rows={4}
-              value={description}
-              onChange={(e) => setDescription(e.target.value)}
-            />
-            <FormControl variant="outlined" margin="normal" fullWidth required>
-              <InputLabel id="status-label">Status</InputLabel>
-              <Select
-                labelId="status-label"
-                id="status"
-                value={status}
-                onChange={(e) => setStatus(e.target.value as 'pending' | 'in_progress' | 'completed')}
-                label="Status"
-              >
-                <MenuItem value="pending">Pending</MenuItem>
-                <MenuItem value="in_progress">In Progress</MenuItem>
-                <MenuItem value="completed">Completed</MenuItem>
-              </Select>
-            </FormControl>
-            <FormControl variant="outlined" margin="normal" fullWidth required>
-              <InputLabel id="priority-label">Priority</InputLabel>
-              <Select
-                labelId="priority-label"
-                id="priority"
-                value={priority}
-                onChange={(e) => setPriority(e.target.value as 'low' | 'medium' | 'high')}
-                label="Priority"
-              >
-                <MenuItem value="low">Low</MenuItem>
-                <MenuItem value="medium">Medium</MenuItem>
-                <MenuItem value="high">High</MenuItem>
-              </Select>
-            </FormControl>
-            <Button
-              type="submit"
-              fullWidth
-              variant="contained"
-              color="primary"
-              sx={{ mt: 3, mb: 2 }}
-            >
-              Update Request
-            </Button>
-          </Box>
-        </Paper>
-      </Box>
+    <Container component="main" maxWidth="lg" sx={{ mt: 4 }}>
+      {isLoading ? (
+        <Box sx={{ display: 'flex', justifyContent: 'center', alignItems: 'center', height: '100%' }}>
+          <CircularProgress />
+        </Box>
+      ) : (
+        request && (
+          <Fade in timeout={500}>
+            <Paper elevation={3} sx={{ p: 4, borderRadius: 3 }}>
+              <Grid container spacing={2} justifyContent="space-between" alignItems="center">
+                <Grid item>
+                  <Button
+                    variant="outlined"
+                    startIcon={<ArrowBackIcon />}
+                    onClick={() => router.back()}
+                  >
+                    Back
+                  </Button>
+                </Grid>
+              </Grid>
+              <Box sx={{ mt: 3 }}>
+                <Typography component="h2" variant="h4" sx={{ fontWeight: 'bold', mb: 2 }}>
+                  Edit
+                </Typography>
+                <TextField
+                  label="Title"
+                  value={title}
+                  onChange={(e) => setTitle(e.target.value)}
+                  fullWidth
+                  margin="normal"
+                />
+                <TextField
+                  label="Description"
+                  value={description}
+                  onChange={(e) => setDescription(e.target.value)}
+                  fullWidth
+                  multiline
+                  rows={4}
+                  margin="normal"
+                />
+                <Box sx={{ mt: 2 }}>
+                  <Typography variant="body1" gutterBottom>
+                    <strong>Status:</strong>
+                  </Typography>
+                  <Select
+                    value={status}
+                    onChange={(e) => setStatus(e.target.value as RequestStatus)}
+                    displayEmpty
+                    fullWidth
+                    sx={{ mt: 1 }}
+                  >
+                    <MenuItem value="pending">Pending</MenuItem>
+                    <MenuItem value="in_progress">In Progress</MenuItem>
+                    <MenuItem value="completed">Completed</MenuItem>
+                  </Select>
+                </Box>
+                <Box sx={{ mt: 2 }}>
+                  <Typography variant="body1" gutterBottom>
+                    <strong>Priority:</strong>
+                  </Typography>
+                  <Select
+                    value={priority}
+                    onChange={(e) => setPriority(e.target.value as RequestPriority)}
+                    displayEmpty
+                    fullWidth
+                    sx={{ mt: 1 }}
+                  >
+                    <MenuItem value="Low">Low</MenuItem>
+                    <MenuItem value="Medium">Medium</MenuItem>
+                    <MenuItem value="High">High</MenuItem>
+                  </Select>
+                </Box>
+                <Box sx={{ mt: 3, display: 'flex', justifyContent: 'flex-end' }}>
+                  <Button
+                    variant="contained"
+                    startIcon={<SaveIcon />}
+                    onClick={handleSaveChanges}
+                  >
+                    Save Changes
+                  </Button>
+                </Box>
+              </Box>
+            </Paper>
+          </Fade>
+        )
+      )}
     </Container>
   );
-};
-
-export default EditRequest;
+}

@@ -15,12 +15,14 @@ import {
   Fade,
   Grow
 } from '@mui/material';
+import { useGetCurrentUser } from '@/src/hooks/useUsers';
 
 const NewRequest = () => {
   const [title, setTitle] = useState('');
   const [description, setDescription] = useState('');
   const [priority, setPriority] = useState('medium');
-  const { user } = useAuth();
+  const { data: user } = useGetCurrentUser();
+  console.warn(user)
   const router = useRouter();
 
   const handleSubmit = async (event: React.FormEvent) => {
@@ -28,7 +30,7 @@ const NewRequest = () => {
 
     try {
       await addDoc(collection(db, 'requests'), {
-        client_id: user?.uid,
+        client_id: user?.id,
         title,
         description,
         status: 'pending',

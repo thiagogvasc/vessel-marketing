@@ -1,6 +1,6 @@
 import React, { useState } from 'react';
 import { Droppable } from 'react-beautiful-dnd';
-import Task from './Task';
+import Task, { TaskWithId } from './Task';
 import { AggregateColumn, Task as TaskType } from '../types';
 import { Box, Paper, Typography, Fab, Dialog, DialogActions, DialogContent, DialogTitle, TextField, Button, MenuItem } from '@mui/material';
 import AddIcon from '@mui/icons-material/Add';
@@ -58,7 +58,7 @@ const Column: React.FC<ColumnProps> = ({ column, boardId }) => {
             sx={{ minHeight: '100px', background: snapshot.isDraggingOver ? 'lightblue' : '#f0f0f0', p: 1, borderRadius: '8px' }}
           >
             {column.tasks.map((task, index) => (
-              <Task key={task.id} task={task} index={index} />
+              task?.id && <Task key={task.id} task={task as TaskWithId} index={index} />
             ))}
             {provided.placeholder}
           </Box>

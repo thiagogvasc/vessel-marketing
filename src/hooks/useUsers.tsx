@@ -7,19 +7,16 @@ import { useAuth } from '../contexts/AuthContext';
 
 export const useGetCurrentUser = () => {
   const { user } = useAuth();
-  if (!user) return;
-
-  const userId = user.uid;
-  return useQuery(['user', userId], () => getUserById(userId)); 
+  const userId = user?.uid;
+  return useQuery(['user', userId], () => userId ? getUserById(userId) : Promise.resolve(null)); 
 }
 
-export const useGetUserById = (userId: string) => {
+export const useGetUserById = (userId: string | undefined) => {
   const queryClient = useQueryClient();
-  return useQuery(['user', userId], async () => {
+  return useQuery(['userById', userId], () => {
     return getUserById(userId).then(res => {
-      console.warn(res)
       return res
-    }).catch(err => console.warn(err))
+    }).catch(err => Promise.reject(err))
   });
 };
 
