@@ -26,7 +26,7 @@ const Register = () => {
 
   useEffect(() => {
     if (user) {
-      router.push('/');
+      router.push('/login');
     }
   }, [user, router]);
 

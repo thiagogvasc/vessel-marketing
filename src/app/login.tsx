@@ -25,7 +25,7 @@ const Login = () => {
   const [loginError, setLoginError] = useState<string | null>(null);
 
   useEffect(() => {
-    user && router.push('/client/dashboard');
+    user && router.push('/');
   }, [user, router]);
 
   const handleSubmit = async (values: { email: string, password: string }) => {

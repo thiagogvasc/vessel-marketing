@@ -1,3 +1,5 @@
+'use client'
+
 import { useGetRequestById } from "@/src/hooks/useRequests";
 import { useRouter } from "next/router";
 import {

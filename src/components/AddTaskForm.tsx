@@ -1,3 +1,5 @@
+'use client'
+
 import React, { useState } from 'react';
 import { useAddTask } from '../hooks/useTasks';
 import { Task } from '../types';

@@ -1,3 +1,5 @@
+'use client'
+
 import { createContext, useContext, useEffect, useState, ReactNode } from 'react';
 import { onAuthStateChanged, signInWithEmailAndPassword, createUserWithEmailAndPassword, signOut, AuthError, User as AuthUser, UserCredential } from 'firebase/auth';
 import { auth } from '../../firebaseConfig';
@@ -5,6 +7,7 @@ import { addUser } from '../utils/users/userUtils';
 
 interface AuthContextType {
   user: AuthUser | null;
+  loading: boolean;
   login: (email: string, password: string) => Promise<UserCredential>;
   register: (email: string, password: string, fullName: string, phoneNumber: string) => Promise<void>;
   logout: () => Promise<void>;
@@ -45,7 +48,7 @@ export const AuthProvider = ({ children }: { children: ReactNode }) => {
   };
 
   return (
-    <AuthContext.Provider value={{ user, login, register, logout }}>
+    <AuthContext.Provider value={{ user, login, register, logout, loading }}>
       {!loading && children}
     </AuthContext.Provider>
   );

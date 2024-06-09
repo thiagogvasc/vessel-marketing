@@ -1,3 +1,5 @@
+'use client'
+
 import { useEffect, useState } from "react";
 import { useGetRequests } from "@/src/hooks/useRequests";
 import Link from "next/link";
@@ -28,6 +30,7 @@ import SearchIcon from "@mui/icons-material/Search";
 import HomeIcon from '@mui/icons-material/Home';
 import NavigateNextIcon from '@mui/icons-material/NavigateNext';
 import { useRouter } from "next/router";
+import { withAuth } from "@/src/components/withAuth";
 
 interface Request {
   id: string;
@@ -39,7 +42,7 @@ interface Request {
   updated_at: string;
 }
 
-const Requests = () => {
+const Requests = withAuth(() => {
   const router = useRouter();
   const { data: requests, isLoading } = useGetRequests();
   const [showRequests, setShowRequests] = useState(false);
@@ -264,6 +267,6 @@ const Requests = () => {
       </Box>
     </Container>
   );
-};
+}, ['client']);
 
 export default Requests;

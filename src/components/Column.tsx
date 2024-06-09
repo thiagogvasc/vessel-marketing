@@ -1,3 +1,5 @@
+'use client'
+
 import React, { useState } from 'react';
 import { Droppable } from 'react-beautiful-dnd';
 import Task, { TaskWithId } from './Task';
