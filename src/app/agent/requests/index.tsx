@@ -74,12 +74,20 @@ const Requests = () => {
   );
 
   const sortedRequests = filteredRequests?.sort((a, b) => {
+    if (!a[orderBy] || !b[orderBy]) return 0; // Handle cases where the value is undefined
+  
     if (orderBy === "created_at" || orderBy === "updated_at") {
-      return (new Date(a[orderBy]) as any) < (new Date(b[orderBy]) as any)
-        ? -1
-        : 1;
+      const aDate = a[orderBy]?.toDate();
+      const bDate = b[orderBy]?.toDate();
+      
+      if (aDate && bDate) {
+        return aDate < bDate ? -1 : 1;
+      } else {
+        return 0;
+      }
     }
-    return a[orderBy] < b[orderBy] ? -1 : 1;
+  
+    return a[orderBy]! < b[orderBy]! ? -1 : 1;
   });
 
   const sortedAndPaginatedRequests = sortedRequests?.slice(
@@ -202,8 +210,8 @@ const Requests = () => {
                         <TableCell>{request.description.substring(0, 50)}...</TableCell>
                         <TableCell>{request.status}</TableCell>
                         <TableCell>{request.priority}</TableCell>
-                        <TableCell>{new Date(request.created_at).toLocaleString()}</TableCell>
-                        <TableCell>{new Date(request.updated_at).toLocaleString()}</TableCell>
+                        <TableCell>{request.created_at?.toDate().toLocaleString()}</TableCell>
+                        <TableCell>{request.updated_at?.toDate().toLocaleString()}</TableCell>
                         <TableCell>
                           <Button variant="outlined" component={Link} href={`/requests/${request.id}`}>
                             View

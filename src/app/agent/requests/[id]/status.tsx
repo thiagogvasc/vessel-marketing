@@ -93,7 +93,7 @@ export default function RequestStatus() {
                         <React.Fragment key={index}>
                           <ListItem alignItems="flex-start">
                             <ListItemText
-                              primary={new Date(update?.update_date?.toDate()).toLocaleString()}
+                              primary={update.updated_at?.toDate().toLocaleString()}
                               secondary={
                                 <Typography
                                   component="span"

@@ -97,7 +97,7 @@ const Requests = () => {
       }
     }
   
-    return a[orderBy] < b[orderBy] ? -1 : 1;
+    return a[orderBy]! < b[orderBy]! ? -1 : 1;
   });
 
   const sortedAndPaginatedRequests = sortedRequests?.slice(
