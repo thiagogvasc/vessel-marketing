@@ -5,15 +5,15 @@ import { useRouter } from 'next/router';
 import {
   Drawer,
   List,
-  ListItem,
   ListItemIcon,
   ListItemText,
   Toolbar,
-  IconButton,
   Typography,
   Box,
   Divider,
   AppBar,
+  CssBaseline,
+  ListItemButton,
 } from '@mui/material';
 import HomeIcon from '@mui/icons-material/Home';
 import ListAltIcon from '@mui/icons-material/ListAlt';
@@ -22,7 +22,7 @@ import EventNoteIcon from '@mui/icons-material/EventNote';
 import LoginIcon from '@mui/icons-material/Login';
 import AppRegistrationIcon from '@mui/icons-material/AppRegistration';
 import LogoutIcon from '@mui/icons-material/Logout';
-import MenuIcon from '@mui/icons-material/Menu';
+import { styled } from '@mui/system';
 
 const drawerWidth = 240;
 
@@ -35,16 +35,36 @@ const Sidebar = () => {
     router.push('/');
   };
 
+  const isActive = (path: string) => {
+    return router.pathname === path;
+  };
+
+  const getIsActiveStyleProps = (path: string) => {
+    if (isActive(path)) {
+      return {
+        background: ''
+      }
+    } else {
+      return 'adfs'
+    }
+  }
+
+
   return (
     <>
-      <AppBar position="fixed" sx={{ zIndex: (theme) => theme.zIndex.drawer + 1 }}>
+      <CssBaseline />
+      <AppBar
+        position="fixed"
+        sx={{
+          width: `calc(100% - ${drawerWidth}px)`,
+          ml: `${drawerWidth}px`,
+          bgcolor: 'white',
+          color: 'black',
+        }}
+        elevation={0}
+      >
         <Toolbar>
-          <IconButton edge="start" color="inherit" aria-label="menu" sx={{ mr: 2 }}>
-            <MenuIcon />
-          </IconButton>
-          <Typography variant="h6" noWrap>
-            My App
-          </Typography>
+          {/* This empty space is for alignment purposes */}
         </Toolbar>
       </AppBar>
       <Drawer
@@ -52,62 +72,66 @@ const Sidebar = () => {
         sx={{
           width: drawerWidth,
           flexShrink: 0,
-          [`& .MuiDrawer-paper`]: { width: drawerWidth, boxSizing: 'border-box' },
+          [`& .MuiDrawer-paper`]: { width: drawerWidth, boxSizing: 'border-box', bgcolor: 'white' },
         }}
       >
-        <Toolbar />
+        <Toolbar>
+          <Typography variant="h6" noWrap component="div">
+            Vessel Marketing
+          </Typography>
+        </Toolbar>
         <Box sx={{ overflow: 'auto' }}>
           <List>
-            <ListItem button component={Link} href="/" disabled>
+            <ListItemButton LinkComponent={Link} href="/">
               <ListItemIcon>
                 <HomeIcon />
               </ListItemIcon>
-              <ListItemText primary="Home" />
-            </ListItem>
-            <ListItem button component={Link} href="/requests">
+              <ListItemText primary="Home"/>
+            </ListItemButton>
+            <ListItemButton LinkComponent={Link} href="/requests">
               <ListItemIcon>
                 <ListAltIcon />
               </ListItemIcon>
               <ListItemText primary="Requests" />
-            </ListItem>
-            <ListItem button component={Link} href="/meetings" disabled>
+            </ListItemButton>
+            <ListItemButton LinkComponent={Link} href="/meetings" disabled>
               <ListItemIcon>
                 <MeetingRoomIcon />
               </ListItemIcon>
               <ListItemText primary="Meetings" />
-            </ListItem>
-            <ListItem button component={Link} href="/planning" disabled>
+            </ListItemButton>
+            <ListItemButton LinkComponent={Link} href="/planning" disabled>
               <ListItemIcon>
                 <EventNoteIcon />
               </ListItemIcon>
               <ListItemText primary="Planning" />
-            </ListItem>
+            </ListItemButton>
             {!user && (
               <>
-                <ListItem button component={Link} href="/login">
+                <ListItemButton LinkComponent={Link} href="/login">
                   <ListItemIcon>
                     <LoginIcon />
                   </ListItemIcon>
                   <ListItemText primary="Login" />
-                </ListItem>
-                <ListItem button component={Link} href="/register">
+                </ListItemButton>
+                <ListItemButton LinkComponent={Link} href="/register">
                   <ListItemIcon>
                     <AppRegistrationIcon />
                   </ListItemIcon>
                   <ListItemText primary="Register" />
-                </ListItem>
+                </ListItemButton>
               </>
             )}
           </List>
           <Divider />
           {user && (
             <List>
-              <ListItem button onClick={handleLogout}>
+              <ListItemButton onClick={handleLogout}>
                 <ListItemIcon>
                   <LogoutIcon />
                 </ListItemIcon>
                 <ListItemText primary="Logout" />
-              </ListItem>
+              </ListItemButton>
             </List>
           )}
         </Box>

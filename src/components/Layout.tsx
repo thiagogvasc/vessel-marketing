@@ -22,6 +22,8 @@ export default function Layout({
         sx={{
           flexGrow: 1,
           p: 3,
+          background: 'rgb(243 244 246)',
+          height: '100vh'
         }}
       >
         <Toolbar />
