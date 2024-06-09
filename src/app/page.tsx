@@ -1,6 +1,6 @@
+import { redirect } from "next/navigation";
+
 export default function MyApp() {
-  return (
-    <>Home</>
-  );
+  redirect('/client/dashboard');
 }
 

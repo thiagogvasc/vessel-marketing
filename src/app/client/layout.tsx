@@ -1,13 +1,14 @@
 'use client'
+import { withAuth } from '@/src/components/withAuth';
 import Sidebar from '../../components/Sidebar';
 import { Box, Toolbar } from '@mui/material';
 
 
-export default function ClientLayout({
+const ClientLayout = ({
   children,
 }: Readonly<{
   children: React.ReactNode;
-}>) {
+}>) => {
   return (
     <Box sx={{ display: 'flex' }}>
       <Sidebar />
@@ -26,3 +27,5 @@ export default function ClientLayout({
     </Box>
   );
 }
+
+export default withAuth(ClientLayout, ['client'])

@@ -1,7 +1,7 @@
 'use client'
 
 import { useGetRequestById } from "@/src/hooks/useRequests";
-import { useRouter } from "next/router";
+import { useParams, useRouter } from "next/navigation";
 import {
   Box,
   Container,
@@ -28,7 +28,7 @@ const statusSteps = ['Pending', 'In Progress', 'Completed'];
 
 export default function Request() {
   const router = useRouter();
-  const { id } = router.query;
+  const { id } = useParams();
 
   const { data: request, isLoading } = useGetRequestById(id as string);
 

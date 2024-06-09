@@ -1,10 +1,10 @@
-'use client'
+'use client';
 
 import { useState } from 'react';
-import { useRouter } from 'next/router';
+import { useRouter } from 'next/navigation';
 import { collection, addDoc, Timestamp } from 'firebase/firestore';
-import { db } from '../../../../firebaseConfig';
-import { useAuth } from '../../../contexts/AuthContext';
+import { db } from '../../../../../firebaseConfig';
+import { useAuth } from '../../../../contexts/AuthContext';
 import {
   Box,
   Button,
@@ -13,17 +13,18 @@ import {
   Typography,
   Paper,
   Grid,
-  MenuItem,
+  Breadcrumbs,
+  Link as MuiLink,
   Fade,
-  Grow
+  Grow,
 } from '@mui/material';
 import { useGetCurrentUser } from '@/src/hooks/useUsers';
+import Link from 'next/link';
 
 const NewRequest = () => {
   const [title, setTitle] = useState('');
   const [description, setDescription] = useState('');
   const { data: user } = useGetCurrentUser();
-  console.warn(user)
   const router = useRouter();
 
   const handleSubmit = async (event: React.FormEvent) => {
@@ -47,12 +48,27 @@ const NewRequest = () => {
 
   return (
     <Fade in timeout={500}>
-      <Container component="main" maxWidth="sm">
-        <Grow in timeout={1000}>
-          <Paper elevation={3} sx={{ p: 4, mt: 8, borderRadius: 3 }}>
-            <Typography component="h1" variant="h5" align="center" gutterBottom>
+      <Container component="main" maxWidth="xl" sx={{ mt: 4 }}>
+        <Grid container justifyContent="space-between" alignItems="center" sx={{ mb: 2 }}>
+          <Grid item>
+            <Typography component="h1" variant="h5">
               Add Request
             </Typography>
+          </Grid>
+          <Grid item>
+            <Breadcrumbs aria-label="breadcrumb">
+              <MuiLink component={Link} color="inherit" href="/client/dashboard">
+                Dashboard
+              </MuiLink>
+              <MuiLink component={Link} color="inherit" href="/client/requests">
+                Requests
+              </MuiLink>
+              <Typography color="textPrimary">Add Request</Typography>
+            </Breadcrumbs>
+          </Grid>
+        </Grid>
+        <Grow in timeout={1000}>
+          <Paper elevation={0} sx={{ px: 4, py: 2, borderRadius: 3 }}>
             <Box component="form" onSubmit={handleSubmit} noValidate sx={{ mt: 2 }}>
               <TextField
                 variant="outlined"
@@ -66,6 +82,7 @@ const NewRequest = () => {
                 autoFocus
                 value={title}
                 onChange={(e) => setTitle(e.target.value)}
+                sx={{ mb: 3 }}
               />
               <TextField
                 variant="outlined"
@@ -77,7 +94,7 @@ const NewRequest = () => {
                 name="description"
                 autoComplete="description"
                 multiline
-                rows={4}
+                rows={6}
                 value={description}
                 onChange={(e) => setDescription(e.target.value)}
               />
@@ -89,7 +106,7 @@ const NewRequest = () => {
                     color="primary"
                     sx={{ mt: 3, mb: 2 }}
                   >
-                    Add Request
+                    Submit
                   </Button>
                 </Grid>
               </Grid>

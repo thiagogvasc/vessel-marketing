@@ -1,6 +1,6 @@
 
 export default function AgentDashboard() {
   
-    return (<>Agent Dashboard</>);
+    return (<>Coming soon...</>);
   }
   

@@ -1,6 +1,8 @@
+'use client'
+
 import { useEffect, useState } from 'react';
-import { useRouter } from 'next/router';
-import { useAuth } from '../contexts/AuthContext';
+import { useRouter } from 'next/navigation';
+import { useAuth } from '../../contexts/AuthContext';
 import {
   Box,
   Button,
