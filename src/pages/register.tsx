@@ -172,7 +172,7 @@ const Register = () => {
                 <Grid container justifyContent="flex-end">
                   <Grid item>
                     <MuiLink component={Link} href="/login" variant="body2">
-                      {"Don't have an account? Register"}
+                      {"Already have an account? Login"}
                     </MuiLink>
                   </Grid>
                 </Grid>

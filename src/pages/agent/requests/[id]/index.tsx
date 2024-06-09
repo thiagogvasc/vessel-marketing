@@ -82,10 +82,10 @@ export default function RequestDetails() {
                     <strong>Priority:</strong> {request.priority}
                   </Typography>
                   <Typography variant="body1" gutterBottom>
-                    <strong>Created At:</strong> {request?.created_at && new Date(request.created_at).toLocaleString()}
+                    <strong>Created At:</strong> {request.created_at?.toDate().toLocaleString()}
                   </Typography>
                   <Typography variant="body1" gutterBottom>
-                    <strong>Updated At:</strong> {request?.updated_at && new Date(request.updated_at).toLocaleString()}
+                    <strong>Updated At:</strong> {request.updated_at?.toDate().toLocaleString()}
                   </Typography>
                   <Box sx={{ mt: 3 }}>
                     <Typography variant="h6" gutterBottom>
@@ -113,7 +113,7 @@ export default function RequestDetails() {
                           <React.Fragment key={index}>
                             <ListItem alignItems="flex-start">
                               <ListItemText
-                                primary={new Date(update?.update_date?.toDate()).toLocaleString()}
+                                primary={update.updated_at?.toDate().toLocaleString()}
                                 secondary={
                                   <Typography
                                     component="span"

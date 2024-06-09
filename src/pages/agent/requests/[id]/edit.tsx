@@ -28,21 +28,21 @@ export default function EditRequest() {
   const [title, setTitle] = useState('');
   const [description, setDescription] = useState('');
   const [status, setStatus] = useState<RequestStatus>('Pending');
-  const [priority, setPriority] = useState<RequestPriority>('Medium');
+  const [priority, setPriority] = useState<RequestPriority | undefined>(undefined);
 
   useEffect(() => {
     if (request) {
       setTitle(request.title);
       setDescription(request.description);
       setStatus(request.status);
-      setPriority(request.priority);
+      setPriority(request?.priority);
     }
   }, [request]);
 
   const handleSaveChanges = () => {
     updateRequestMutation.mutate({
       id: id as string,
-      updates: { title, description, status, priority, updated_at: new Date() },
+      updates: { title, description, status, priority },
     }, {
       onSuccess: () => {
         router.push(`/requests/${id}`);

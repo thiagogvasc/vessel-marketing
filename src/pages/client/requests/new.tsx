@@ -1,8 +1,8 @@
 import { useState } from 'react';
 import { useRouter } from 'next/router';
-import { collection, addDoc } from 'firebase/firestore';
-import { db } from '../../../firebaseConfig';
-import { useAuth } from '../../contexts/AuthContext';
+import { collection, addDoc, Timestamp } from 'firebase/firestore';
+import { db } from '../../../../firebaseConfig';
+import { useAuth } from '../../../contexts/AuthContext';
 import {
   Box,
   Button,
@@ -20,7 +20,6 @@ import { useGetCurrentUser } from '@/src/hooks/useUsers';
 const NewRequest = () => {
   const [title, setTitle] = useState('');
   const [description, setDescription] = useState('');
-  const [priority, setPriority] = useState('medium');
   const { data: user } = useGetCurrentUser();
   console.warn(user)
   const router = useRouter();
@@ -34,11 +33,10 @@ const NewRequest = () => {
         title,
         description,
         status: 'pending',
-        priority,
-        created_at: new Date(),
-        updated_at: new Date(),
+        created_at: Timestamp.fromDate(new Date()),
+        updated_at: Timestamp.fromDate(new Date()),
       });
-      router.push('/requests');
+      router.push('/client/requests');
     } catch (error) {
       console.error('Error adding request: ', error);
       alert('Failed to add request');
@@ -81,21 +79,6 @@ const NewRequest = () => {
                 value={description}
                 onChange={(e) => setDescription(e.target.value)}
               />
-              <TextField
-                variant="outlined"
-                margin="normal"
-                required
-                fullWidth
-                select
-                id="priority"
-                label="Priority"
-                value={priority}
-                onChange={(e) => setPriority(e.target.value)}
-              >
-                <MenuItem value="low">Low</MenuItem>
-                <MenuItem value="medium">Medium</MenuItem>
-                <MenuItem value="high">High</MenuItem>
-              </TextField>
               <Grid container justifyContent="flex-end">
                 <Grid item>
                   <Button

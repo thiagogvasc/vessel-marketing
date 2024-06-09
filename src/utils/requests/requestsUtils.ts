@@ -1,4 +1,4 @@
-import { collection, addDoc, getDocs, updateDoc, doc, getDoc, Timestamp, writeBatch, arrayUnion } from "firebase/firestore";
+import { collection, addDoc, getDocs, updateDoc, doc, getDoc, Timestamp, writeBatch, arrayUnion, serverTimestamp } from "firebase/firestore";
 import { db } from "@/firebaseConfig"; 
 import { Request, RequestUpdate } from "@/src/types"; 
 
@@ -6,8 +6,8 @@ import { Request, RequestUpdate } from "@/src/types";
 export const createRequest = async (request: Omit<Request, 'id'>): Promise<string> => {
   const docRef = await addDoc(collection(db, 'requests'), {
     ...request,
-    created_at: Timestamp.now(),
-    updated_at: Timestamp.now(),
+    created_at: serverTimestamp(),
+    updated_at: serverTimestamp(),
   });
   return docRef.id;
 };
@@ -34,19 +34,15 @@ export const updateRequest = async (id: string, data: Partial<Request>): Promise
   const docRef = doc(db, 'requests', id);
   await updateDoc(docRef, {
     ...data,
-    updated_at: Timestamp.now(),
+    updated_at: serverTimestamp(),
   });
 };
 
 // Add an update to a request
-export const addRequestUpdate = async (id: string, update: Omit<RequestUpdate, 'id' | 'update_date'>): Promise<void> => {
+export const addRequestUpdate = async (id: string, update: Omit<RequestUpdate, 'id' | 'updated_at'>): Promise<void> => {
   const docRef = doc(db, 'requests', id);
-  const updateWithTimestamp: RequestUpdate = {
-    ...update,
-    updated_at: Timestamp.now(),
-  };
   await updateDoc(docRef, {
-    updates: arrayUnion(updateWithTimestamp),
-    updated_at: Timestamp.now(),
+    updates: arrayUnion({...update, updated_at: serverTimestamp()}),
+    updated_at: serverTimestamp(),
   });
 };

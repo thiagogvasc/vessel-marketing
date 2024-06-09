@@ -8,8 +8,8 @@ export interface User {
   email: string;
   role: UserRole;
   fullname: string;
-  created_at?: Date;
-  updated_at?: Date;
+  created_at?: Timestamp;
+  updated_at?: Timestamp;
   profile_picture?: string;
   phone_number?: string;
 }
@@ -24,11 +24,11 @@ export interface Request {
   title: string;
   description: string;
   status: RequestStatus;
-  priority: RequestPriority;
-  due_date?: Date;
+  priority?: RequestPriority;
+  due_date?: Timestamp;
   assigned_to?: string; // reference to Users
-  created_at?: Date;
-  updated_at?: Date;
+  created_at?: Timestamp;
+  updated_at?: Timestamp;
   updates: RequestUpdate[];
 }
 
@@ -48,8 +48,8 @@ export interface Task {
   due_date?: Date;
   assigned_to?: string; // reference to Users
   priority: 'low' | 'medium' | 'high';
-  created_at?: Date;
-  updated_at?: Date;
+  created_at?: Timestamp;
+  updated_at?: Timestamp;
 }
 
 export interface Column {
@@ -66,8 +66,8 @@ export interface Board {
   id: string; // board ID
   title: string; // board title
   columns: Column[]; // array of columns
-  created_at?: Date;
-  updated_at?: Date;
+  created_at?: Timestamp;
+  updated_at?: Timestamp;
 }
 
 // Types for Task_Notes Subcollection (within Tasks)
@@ -75,7 +75,7 @@ export interface TaskNote {
   id?: string; // auto-generated
   user_id: string; // reference to Users
   note: string;
-  created_at?: Date;
+  created_at?: Timestamp;
 }
 
 // Types for Meetings Collection
