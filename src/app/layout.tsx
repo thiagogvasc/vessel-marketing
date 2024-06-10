@@ -1,4 +1,5 @@
 import { ContextProviders } from "../components/ContextProviders";
+import "@/styles/globals.css"
 
 export const metadata = {
   title: 'Create Next App',
