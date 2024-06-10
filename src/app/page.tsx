@@ -1,6 +1,8 @@
-import { redirect } from "next/navigation";
+import Redirector from "../components/Redirector";
 
 export default function MyApp() {
-  redirect('/client/dashboard');
+  return (
+    <Redirector />
+  )
 }
 

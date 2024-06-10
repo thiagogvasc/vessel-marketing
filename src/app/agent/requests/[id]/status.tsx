@@ -21,12 +21,13 @@ import {
 } from '@mui/material';
 import InfoIcon from '@mui/icons-material/Info';
 import React from "react";
+import { useParams } from "next/navigation";
 
 const statusSteps = ['Pending', 'In Progress', 'Completed'];
 
 export default function RequestStatus() {
   const router = useRouter();
-  const { id } = router.query;
+  const { id } = useParams();
 
   const { data: request, isLoading } = useGetRequestById(id as string);
 

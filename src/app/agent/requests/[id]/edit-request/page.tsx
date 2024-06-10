@@ -1,6 +1,8 @@
+'use client'
+
 import { useEffect, useState } from 'react';
 import { useGetRequestById, useUpdateRequest } from "@/src/hooks/useRequests";
-import { useRouter } from "next/router";
+import { useParams, useRouter } from "next/navigation";
 import {
   Box,
   Button,
@@ -20,7 +22,7 @@ import { RequestStatus, RequestPriority } from '@/src/types';
 
 export default function EditRequest() {
   const router = useRouter();
-  const { id } = router.query;
+  const { id } = useParams();
 
   const { data: request, isLoading } = useGetRequestById(id as string);
   const updateRequestMutation = useUpdateRequest();
@@ -45,7 +47,7 @@ export default function EditRequest() {
       updates: { title, description, status, priority },
     }, {
       onSuccess: () => {
-        router.push(`/requests/${id}`);
+        router.push(`/agent/requests/${id}`);
       }
     });
   };

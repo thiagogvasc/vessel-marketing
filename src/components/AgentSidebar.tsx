@@ -38,7 +38,7 @@ import { Dashboard } from '@mui/icons-material';
 
 const drawerWidth = 240;
 
-const Sidebar = () => {
+const AgentSidebar = () => {
   const { user, logout } = useAuth();
   const router = useRouter();
   const [anchorEl, setAnchorEl] = useState<null | HTMLElement>(null);
@@ -107,6 +107,7 @@ const Sidebar = () => {
           ml: `${drawerWidth}px`,
           bgcolor: 'white',
           color: 'black',
+          boxShadow: 'rgba(0, 0, 0, 0) 0px 0px 0px 0px, rgba(0, 0, 0, 0) 0px 0px 0px 0px, rgba(84, 87, 118, 0.15) 0px 2px 3px 0px'
         }}
         elevation={0}
       >
@@ -148,25 +149,25 @@ const Sidebar = () => {
         </Toolbar>
         <Box sx={{ overflow: 'auto' }}>
           <List>
-            <ListItemButton LinkComponent={Link} href="/client/dashboard">
+            <ListItemButton LinkComponent={Link} href="/agent/dashboard">
               <ListItemIcon>
                 <Dashboard />
               </ListItemIcon>
               <ListItemText primary="Dashboard"/>
             </ListItemButton>
-            <ListItemButton LinkComponent={Link} href="/client/requests">
+            <ListItemButton LinkComponent={Link} href="/agent/requests">
               <ListItemIcon>
                 <ListAltIcon />
               </ListItemIcon>
               <ListItemText primary="Requests" />
             </ListItemButton>
-            <ListItemButton LinkComponent={Link} href="/client/meetings" disabled>
+            <ListItemButton LinkComponent={Link} href="/agent/meetings" disabled>
               <ListItemIcon>
                 <MeetingRoomIcon />
               </ListItemIcon>
               <ListItemText primary="Meetings" />
             </ListItemButton>
-            <ListItemButton LinkComponent={Link} href="/client/planning" disabled>
+            <ListItemButton LinkComponent={Link} href="/agent/planning" disabled>
               <ListItemIcon>
                 <EventNoteIcon />
               </ListItemIcon>
@@ -206,4 +207,4 @@ const Sidebar = () => {
   );
 };
 
-export default Sidebar;
+export default AgentSidebar;

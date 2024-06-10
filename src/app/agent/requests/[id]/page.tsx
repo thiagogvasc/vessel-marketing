@@ -1,6 +1,8 @@
+'use client'
+
 import { useGetRequestById } from "@/src/hooks/useRequests";
 import Link from "next/link";
-import { useRouter } from "next/router";
+import { useParams, useRouter } from "next/navigation";
 import {
   Box,
   Button,
@@ -23,7 +25,7 @@ import { useGetCurrentUser, useGetUserById } from "@/src/hooks/useUsers";
 
 export default function RequestDetails() {
   const router = useRouter();
-  const { id } = router.query;
+  const { id } = useParams();
 
   const { data: request, isLoading } = useGetRequestById(id as string | null | undefined);
   console.warn(request)
@@ -57,7 +59,7 @@ export default function RequestDetails() {
                       variant="contained"
                       startIcon={<EditIcon />}
                       component={Link}
-                      href={`/requests/${request.id}/edit`}
+                      href={`/agent/requests/${request.id}/edit-request`}
                     >
                       Edit Request
                     </Button>

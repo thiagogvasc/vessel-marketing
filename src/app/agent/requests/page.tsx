@@ -1,3 +1,5 @@
+'use client'
+
 import { useEffect, useState } from "react";
 import { useGetRequests } from "@/src/hooks/useRequests";
 import Link from "next/link";
@@ -104,16 +106,6 @@ const Requests = () => {
               Requests
             </Typography>
           </Grid>
-          <Grid item>
-            <Button
-              variant="contained"
-              startIcon={<AddCircleOutlineIcon />}
-              component={Link}
-              href="/requests/new"
-            >
-              New Request
-            </Button>
-          </Grid>
         </Grid>
         <TextField
           variant="outlined"
@@ -213,7 +205,7 @@ const Requests = () => {
                         <TableCell>{request.created_at?.toDate().toLocaleString()}</TableCell>
                         <TableCell>{request.updated_at?.toDate().toLocaleString()}</TableCell>
                         <TableCell>
-                          <Button variant="outlined" component={Link} href={`/requests/${request.id}`}>
+                          <Button variant="outlined" component={Link} href={`/agent/requests/${request.id}`}>
                             View
                           </Button>
                         </TableCell>
