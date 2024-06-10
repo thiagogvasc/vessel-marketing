@@ -1,7 +1,6 @@
 'use client'
 
 import { useGetRequestById } from "@/src/hooks/useRequests";
-import Link from "next/link";
 import { useParams, useRouter } from "next/navigation";
 import {
   Box,
@@ -17,11 +16,14 @@ import {
   ListItem,
   ListItemText,
   Divider,
+  Breadcrumbs,
 } from '@mui/material';
+import MuiLink from '@mui/material/Link'
 import ArrowBackIcon from '@mui/icons-material/ArrowBack';
 import EditIcon from '@mui/icons-material/Edit';
 import React from "react";
 import { useGetCurrentUser, useGetUserById } from "@/src/hooks/useUsers";
+import { Home, NavigateNext } from "@mui/icons-material";
 
 export default function RequestDetails() {
   const router = useRouter();
@@ -34,7 +36,7 @@ export default function RequestDetails() {
 
 
   return (
-    <Container component="main" maxWidth="lg" sx={{ mt: 4 }}>
+    <Container component="main" maxWidth="xl" sx={{ mt: 4 }}>
       {isLoading || isUserLoading ? (
         <Box sx={{ display: 'flex', justifyContent: 'center', alignItems: 'center', height: '100%' }}>
           <CircularProgress />
@@ -43,30 +45,42 @@ export default function RequestDetails() {
         request && (
           <Fade in timeout={500}>
             <Box sx={{ borderRadius: 3, p: 0 }}>
-              <Grow in timeout={1000}>
-                <Grid container spacing={2} justifyContent="space-between" alignItems="center" sx={{ mb: 2 }}>
-                  <Grid item>
-                    <Button
-                      variant="outlined"
-                      startIcon={<ArrowBackIcon />}
-                      onClick={() => router.back()}
-                    >
-                      Back
-                    </Button>
-                  </Grid>
-                  <Grid item>
-                    <Button
-                      variant="contained"
-                      startIcon={<EditIcon />}
-                      component={Link}
-                      href={`/agent/requests/${request.id}/edit-request`}
-                    >
-                      Edit Request
-                    </Button>
-                  </Grid>
+            <Grid container spacing={2} alignItems="center" sx={{ mb: 2 }}>
+                <Grid item xs>
+                  <Typography component="h1" variant="h5" noWrap>
+                    Edit Request
+                  </Typography>
                 </Grid>
-              </Grow>
-              <Paper elevation={3} sx={{ p: 4, borderRadius: 3 }}>
+                <Grid item>
+                  <Breadcrumbs aria-label="breadcrumb" separator={<NavigateNext fontSize="small" />} sx={{ whiteSpace: 'nowrap' }}>
+                    <MuiLink
+                      color="inherit"
+                      href="/agent/dashboard"
+                      onClick={(e) => {
+                        e.preventDefault();
+                        router.push('/agent/dashboard');
+                      }}
+                      noWrap
+                    >
+                      <Home sx={{ mr: 0.5 }} fontSize="inherit" />
+                      Dashboard
+                    </MuiLink>
+                    <MuiLink
+                      color="inherit"
+                      href="/agent/requests"
+                      onClick={(e) => {
+                        e.preventDefault();
+                        router.push('/agent/requests');
+                      }}
+                      noWrap
+                    >
+                      Requests
+                    </MuiLink>
+                    <Typography color="textPrimary" noWrap>Request Details</Typography>
+                  </Breadcrumbs>
+                </Grid>
+              </Grid>
+              <Paper elevation={0} sx={{ p: 4, borderRadius: 3 }}>
                 <Typography component="h2" variant="h4" sx={{ fontWeight: 'bold' }}>
                   {request.title}
                 </Typography>

@@ -15,7 +15,11 @@ import {
   TextField,
   Select,
   MenuItem,
+  Breadcrumbs,
 } from '@mui/material';
+import MuiLink from '@mui/material/Link'
+
+import { Home, NavigateNext } from '@mui/icons-material';
 import ArrowBackIcon from '@mui/icons-material/ArrowBack';
 import SaveIcon from '@mui/icons-material/Save';
 import { RequestStatus, RequestPriority } from '@/src/types';
@@ -53,7 +57,7 @@ export default function EditRequest() {
   };
 
   return (
-    <Container component="main" maxWidth="lg" sx={{ mt: 4 }}>
+    <Container component="main" maxWidth="xl" sx={{ mt: 4 }}>
       {isLoading ? (
         <Box sx={{ display: 'flex', justifyContent: 'center', alignItems: 'center', height: '100%' }}>
           <CircularProgress />
@@ -61,27 +65,50 @@ export default function EditRequest() {
       ) : (
         request && (
           <Fade in timeout={500}>
-            <Paper elevation={3} sx={{ p: 4, borderRadius: 3 }}>
-              <Grid container spacing={2} justifyContent="space-between" alignItems="center">
+              <Box sx={{ mt: 3 }}>
+              <Grid container spacing={2} alignItems="center" sx={{ mb: 2 }}>
+                <Grid item xs>
+                  <Typography component="h1" variant="h5" noWrap>
+                    Edit Request
+                  </Typography>
+                </Grid>
                 <Grid item>
-                  <Button
-                    variant="outlined"
-                    startIcon={<ArrowBackIcon />}
-                    onClick={() => router.back()}
-                  >
-                    Back
-                  </Button>
+                  <Breadcrumbs aria-label="breadcrumb" separator={<NavigateNext fontSize="small" />} sx={{ whiteSpace: 'nowrap' }}>
+                    <MuiLink
+                      color="inherit"
+                      href="/agent/dashboard"
+                      onClick={(e) => {
+                        e.preventDefault();
+                        router.push('/agent/dashboard');
+                      }}
+                      noWrap
+                    >
+                      <Home sx={{ mr: 0.5 }} fontSize="inherit" />
+                      Dashboard
+                    </MuiLink>
+                    <MuiLink
+                      color="inherit"
+                      href="/agent/requests"
+                      onClick={(e) => {
+                        e.preventDefault();
+                        router.push('/agent/requests');
+                      }}
+                      noWrap
+                    >
+                      Requests
+                    </MuiLink>
+                    <Typography color="textPrimary" noWrap>Request Details</Typography>
+                  </Breadcrumbs>
                 </Grid>
               </Grid>
-              <Box sx={{ mt: 3 }}>
-                <Typography component="h2" variant="h4" sx={{ fontWeight: 'bold', mb: 2 }}>
-                  Edit
-                </Typography>
+            
+            <Paper elevation={0} sx={{ p: 4, borderRadius: 3 }}>
                 <TextField
                   label="Title"
                   value={title}
                   onChange={(e) => setTitle(e.target.value)}
                   fullWidth
+                  disabled
                   margin="normal"
                 />
                 <TextField
@@ -90,6 +117,7 @@ export default function EditRequest() {
                   onChange={(e) => setDescription(e.target.value)}
                   fullWidth
                   multiline
+                  disabled
                   rows={4}
                   margin="normal"
                 />
@@ -134,8 +162,8 @@ export default function EditRequest() {
                     Save Changes
                   </Button>
                 </Box>
-              </Box>
             </Paper>
+              </Box>
           </Fade>
         )
       )}
