@@ -19,15 +19,19 @@ import {
   ListItemText,
   Divider,
   Breadcrumbs,
-  Chip
+  Chip,
+  Select,
+  MenuItem,
+  SelectChangeEvent,
 } from '@mui/material';
 import EditIcon from '@mui/icons-material/Edit';
-import { RequestStatus } from '@/src/types';
-import React from 'react';
+import { RequestStatus, RequestPriority } from '@/src/types';
+import React, { useState } from 'react';
 import { useGetUserById } from '@/src/hooks/useUsers';
 import NextMuiLink from "@/src/components/NextMuiLink";
 import NextMuiButton from "@/src/components/NextMuiButton";
 import { Home, NavigateNext } from "@mui/icons-material";
+import ConfirmStatusChangeDialog from '@/src/components/ConfirmStatusChangeDialog';
 
 const statusSteps = ['Pending', 'In Progress', 'Completed'];
 
@@ -50,6 +54,41 @@ export default function RequestDetails() {
 
   const { data: request, isLoading } = useGetRequestById(id as string);
   const { data: requestorData } = useGetUserById(request?.client_id);
+  // const updateRequestStatusMutation = useUpdateRequestStatus();
+  // const updateRequestPriorityMutation = useUpdateRequestPriority();
+
+  const [status, setStatus] = useState<RequestStatus>(request?.status || 'Pending');
+  const [priority, setPriority] = useState<RequestPriority>(request?.priority || 'Low');
+  const [openDialog, setOpenDialog] = useState(false);
+  const [notifyClient, setNotifyClient] = useState(false);
+
+  const handleStatusChange = (event: SelectChangeEvent<RequestStatus>) => {
+    const newStatus = event.target.value as RequestStatus;
+    setStatus(newStatus);
+    setOpenDialog(true);
+  };
+
+  const handlePriorityChange = (event: SelectChangeEvent<RequestPriority>) => {
+    const newPriority = event.target.value as RequestPriority;
+    setPriority(newPriority);
+    // updateRequestPriorityMutation.mutate({
+    //   id: id as string,
+    //   priority: newPriority,
+    // });
+  };
+
+  const handleDialogClose = (confirm: boolean) => {
+    setOpenDialog(false);
+    if (confirm) {
+      // updateRequestStatusMutation.mutate({
+      //   id: id as string,
+      //   status: status,
+      //   notify: notifyClient,
+      // });
+    } else {
+      setStatus(request?.status || 'Pending');
+    }
+  };
 
   const getStatusStep = (status: string) => {
     switch (status) {
@@ -119,21 +158,30 @@ export default function RequestDetails() {
                     <Grid item xs={12} sm={6}>
                       <Typography variant="body1"><strong>Requester:</strong> {requestorData?.fullname}</Typography>
                       <Typography variant="body1"><strong>Email:</strong> {requestorData?.email}</Typography>
+                      <Typography variant="body1"><strong>Phone number:</strong> {requestorData?.phone_number}</Typography>
                     </Grid>
                     <Grid item xs={12} sm={6}>
                       <Typography variant="body1"><strong>Status:</strong> 
-                        <Chip 
-                          label={request.status} 
-                          color={getStatusChipColor(request.status)} 
-                          sx={{ ml: 1 }} 
-                        />
+                        <Select
+                          value={status}
+                          onChange={handleStatusChange}
+                          sx={{ ml: 1 }}
+                        >
+                          <MenuItem value="Pending">Pending</MenuItem>
+                          <MenuItem value="In Progress">In Progress</MenuItem>
+                          <MenuItem value="Completed">Completed</MenuItem>
+                        </Select>
                       </Typography>
                       <Typography variant="body1"><strong>Priority:</strong> 
-                        <Chip 
-                          label={request.priority ?? 'None'} 
-                          color={request.priority === 'High' ? 'error' : request.priority === 'Medium' ? 'warning' : 'default'} 
-                          sx={{ ml: 1 }} 
-                        />
+                        <Select
+                          value={priority}
+                          onChange={handlePriorityChange}
+                          sx={{ ml: 1 }}
+                        >
+                          <MenuItem value="Low">Low</MenuItem>
+                          <MenuItem value="Medium">Medium</MenuItem>
+                          <MenuItem value="High">High</MenuItem>
+                        </Select>
                       </Typography>
                       <Typography variant="body1"><strong>Created At:</strong> {request.created_at?.toDate().toLocaleString()}</Typography>
                       <Typography variant="body1"><strong>Updated At:</strong> {request.updated_at?.toDate().toLocaleString()}</Typography>
@@ -204,21 +252,19 @@ export default function RequestDetails() {
                   </Button>
                   {/* Display the list of uploaded files here */}
                 </Box>
-                <Box sx={{ display: 'flex', justifyContent: 'flex-end' }}>
-                  <NextMuiButton
-                    variant="contained"
-                    startIcon={<EditIcon />}
-                    href={`/agent/requests/${request.id}/edit-request`}
-                    sx={{ mt: 3 }}
-                  >
-                    Edit Request
-                  </NextMuiButton>
-                </Box>
               </Paper>
             </Box>
           </Fade>
         )
       )}
+      <ConfirmStatusChangeDialog
+        open={openDialog}
+        status={status}
+        notifyClient={notifyClient}
+        onConfirm={handleDialogClose}
+        onCancel={() => setOpenDialog(false)}
+        setNotifyClient={setNotifyClient}
+      />
     </Container>
   );
 }
