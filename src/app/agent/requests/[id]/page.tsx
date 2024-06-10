@@ -18,8 +18,8 @@ import {
   ListItem,
   ListItemText,
   Divider,
-  Link,
   Breadcrumbs,
+  Chip
 } from '@mui/material';
 import EditIcon from '@mui/icons-material/Edit';
 import { RequestStatus } from '@/src/types';
@@ -31,21 +31,25 @@ import { Home, NavigateNext } from "@mui/icons-material";
 
 const statusSteps = ['Pending', 'In Progress', 'Completed'];
 
+const getStatusChipColor = (status: string) => {
+  switch (status) {
+    case 'pending':
+      return 'warning';
+    case 'in_progress':
+      return 'info';
+    case 'completed':
+      return 'success';
+    default:
+      return 'default';
+  }
+};
+
 export default function RequestDetails() {
   const router = useRouter();
   const { id } = useParams();
 
-
   const { data: request, isLoading } = useGetRequestById(id as string);
   const { data: requestorData } = useGetUserById(request?.client_id);
-  // const updateRequestStatusMutation = useUpdateRequestStatus();
-
-  const handleStatusChange = (newStatus: RequestStatus) => {
-    // updateRequestStatusMutation.mutate({
-    //   id: id as string,
-    //   status: newStatus,
-    // });
-  };
 
   const getStatusStep = (status: string) => {
     switch (status) {
@@ -70,10 +74,10 @@ export default function RequestDetails() {
         request && (
           <Fade in timeout={500}>
             <Box sx={{ borderRadius: 3, p: 0 }}>
-            <Grid container spacing={2} alignItems="center" sx={{ mb: 2 }}>
+              <Grid container spacing={2} alignItems="center" sx={{ mb: 2 }}>
                 <Grid item xs>
                   <Typography component="h1" variant="h5" noWrap>
-                    Edit Request
+                    {request.title}
                   </Typography>
                 </Grid>
                 <Grid item>
@@ -106,79 +110,110 @@ export default function RequestDetails() {
                 </Grid>
               </Grid>
               <Paper elevation={0} sx={{ p: 4, borderRadius: 3 }}>
-                <Typography variant="h6" gutterBottom>
-                <strong>Title:</strong> {request.title}
-                </Typography>
                 <Box sx={{ mb: 3 }}>
-                  <Typography variant="body1"><strong>Requester:</strong> {requestorData?.fullname}</Typography>
-                  <Typography variant="body1"><strong>Email:</strong> {requestorData?.email}</Typography>
-                  <Typography variant="body1"><strong>Status:</strong> {request.status}</Typography>
-                  <Typography variant="body1"><strong>Priority:</strong> {request.priority}</Typography>
-                  <Typography variant="body1"><strong>Created At:</strong> {request.created_at?.toDate().toLocaleString()}</Typography>
-                  <Typography variant="body1"><strong>Updated At:</strong> {request.updated_at?.toDate().toLocaleString()}</Typography>
+                  <Typography variant="h6" gutterBottom>
+                    General Information
+                  </Typography>
+                  <Divider sx={{ mb: 2 }} />
+                  <Grid container spacing={2}>
+                    <Grid item xs={12} sm={6}>
+                      <Typography variant="body1"><strong>Requester:</strong> {requestorData?.fullname}</Typography>
+                      <Typography variant="body1"><strong>Email:</strong> {requestorData?.email}</Typography>
+                    </Grid>
+                    <Grid item xs={12} sm={6}>
+                      <Typography variant="body1"><strong>Status:</strong> 
+                        <Chip 
+                          label={request.status} 
+                          color={getStatusChipColor(request.status)} 
+                          sx={{ ml: 1 }} 
+                        />
+                      </Typography>
+                      <Typography variant="body1"><strong>Priority:</strong> 
+                        <Chip 
+                          label={request.priority ?? 'None'} 
+                          color={request.priority === 'High' ? 'error' : request.priority === 'Medium' ? 'warning' : 'default'} 
+                          sx={{ ml: 1 }} 
+                        />
+                      </Typography>
+                      <Typography variant="body1"><strong>Created At:</strong> {request.created_at?.toDate().toLocaleString()}</Typography>
+                      <Typography variant="body1"><strong>Updated At:</strong> {request.updated_at?.toDate().toLocaleString()}</Typography>
+                    </Grid>
+                  </Grid>
                 </Box>
-                <Typography variant="h6" gutterBottom>
-                  Description
-                </Typography>
                 <Box sx={{ mb: 3 }}>
+                  <Typography variant="h6" gutterBottom>
+                    Description
+                  </Typography>
+                  <Divider sx={{ mb: 2 }} />
                   <Typography variant="body1">{request.description}</Typography>
                 </Box>
-                <Typography variant="h6" gutterBottom>
-                  Status Progress
-                </Typography>
-                <Stepper activeStep={getStatusStep(request.status)} alternativeLabel sx={{ mb: 3 }}>
-                  {statusSteps.map((label) => (
-                    <Step key={label}>
-                      <StepLabel>{label}</StepLabel>
-                    </Step>
-                  ))}
-                </Stepper>
-                <NextMuiButton
-                  variant="contained"
-                  startIcon={<EditIcon />}
-                  href={`/agent/requests/${request.id}/edit-request`}
-                  sx={{ mb: 3 }}
-                >
-                  Edit Request
-                </NextMuiButton>
-                <Typography variant="h6" gutterBottom>
-                  Update History
-                </Typography>
-                <List>
-                  {request.updates && request.updates.length > 0 ? (
-                    request.updates.map((update, index) => (
-                      <React.Fragment key={index}>
-                        <ListItem alignItems="flex-start">
-                          <ListItemText
-                            primary={update.updated_at?.toDate().toLocaleString()}
-                            secondary={
-                              <Typography
-                                component="span"
-                                variant="body2"
-                                color="text.primary"
-                              >
-                                {update.update_description}
-                              </Typography>
-                            }
-                          />
-                        </ListItem>
-                        {index < request.updates.length - 1 && <Divider component="li" />}
-                      </React.Fragment>
-                    ))
-                  ) : (
-                    <Typography variant="body2" color="text.secondary">
-                      No updates available
-                    </Typography>
-                  )}
-                </List>
-                <Typography variant="h6" gutterBottom>
-                  Attachments
-                </Typography>
-                <Button variant="contained" component="label">
-                  Upload File
-                  <input type="file" hidden />
-                </Button>
-                {/* Display the list of uploaded files here */}
+                <Box sx={{ mb: 3 }}>
+                  <Typography variant="h6" gutterBottom>
+                    Status Progress
+                  </Typography>
+                  <Divider sx={{ mb: 2 }} />
+                  <Stepper activeStep={getStatusStep(request.status)} alternativeLabel>
+                    {statusSteps.map((label) => (
+                      <Step key={label}>
+                        <StepLabel>{label}</StepLabel>
+                      </Step>
+                    ))}
+                  </Stepper>
+                </Box>
+                <Box sx={{ mb: 3 }}>
+                  <Typography variant="h6" gutterBottom>
+                    Update History
+                  </Typography>
+                  <Divider sx={{ mb: 2 }} />
+                  <List>
+                    {request.updates && request.updates.length > 0 ? (
+                      request.updates.map((update, index) => (
+                        <React.Fragment key={index}>
+                          <ListItem alignItems="flex-start">
+                            <ListItemText
+                              primary={update.updated_at?.toDate().toLocaleString()}
+                              secondary={
+                                <Typography
+                                  component="span"
+                                  variant="body2"
+                                  color="text.primary"
+                                >
+                                  {update.update_description}
+                                </Typography>
+                              }
+                            />
+                          </ListItem>
+                          {index < request.updates.length - 1 && <Divider component="li" />}
+                        </React.Fragment>
+                      ))
+                    ) : (
+                      <Typography variant="body2" color="text.secondary">
+                        No updates available
+                      </Typography>
+                    )}
+                  </List>
+                </Box>
+                <Box sx={{ mb: 3 }}>
+                  <Typography variant="h6" gutterBottom>
+                    Attachments
+                  </Typography>
+                  <Divider sx={{ mb: 2 }} />
+                  <Button variant="contained" component="label">
+                    Upload File
+                    <input type="file" hidden />
+                  </Button>
+                  {/* Display the list of uploaded files here */}
+                </Box>
+                <Box sx={{ display: 'flex', justifyContent: 'flex-end' }}>
+                  <NextMuiButton
+                    variant="contained"
+                    startIcon={<EditIcon />}
+                    href={`/agent/requests/${request.id}/edit-request`}
+                    sx={{ mt: 3 }}
+                  >
+                    Edit Request
+                  </NextMuiButton>
+                </Box>
               </Paper>
             </Box>
           </Fade>
