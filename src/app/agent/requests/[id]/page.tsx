@@ -8,36 +8,61 @@ import {
   Container,
   Paper,
   Typography,
-  Grid,
   CircularProgress,
   Fade,
-  Grow,
+  Grid,
+  Stepper,
+  Step,
+  StepLabel,
   List,
   ListItem,
   ListItemText,
   Divider,
+  Link,
   Breadcrumbs,
 } from '@mui/material';
-import MuiLink from '@mui/material/Link'
-import ArrowBackIcon from '@mui/icons-material/ArrowBack';
 import EditIcon from '@mui/icons-material/Edit';
-import React from "react";
-import { useGetCurrentUser, useGetUserById } from "@/src/hooks/useUsers";
+import { RequestStatus } from '@/src/types';
+import React from 'react';
+import { useGetUserById } from '@/src/hooks/useUsers';
+import NextMuiLink from "@/src/components/NextMuiLink";
+import NextMuiButton from "@/src/components/NextMuiButton";
 import { Home, NavigateNext } from "@mui/icons-material";
+
+const statusSteps = ['Pending', 'In Progress', 'Completed'];
 
 export default function RequestDetails() {
   const router = useRouter();
   const { id } = useParams();
 
-  const { data: request, isLoading } = useGetRequestById(id as string | null | undefined);
-  console.warn(request)
-  const { data: user, isLoading: isUserLoading } = useGetUserById(request?.client_id);
-  console.warn(user)
 
+  const { data: request, isLoading } = useGetRequestById(id as string);
+  const { data: requestorData } = useGetUserById(request?.client_id);
+  // const updateRequestStatusMutation = useUpdateRequestStatus();
+
+  const handleStatusChange = (newStatus: RequestStatus) => {
+    // updateRequestStatusMutation.mutate({
+    //   id: id as string,
+    //   status: newStatus,
+    // });
+  };
+
+  const getStatusStep = (status: string) => {
+    switch (status) {
+      case 'pending':
+        return 0;
+      case 'in_progress':
+        return 1;
+      case 'completed':
+        return 2;
+      default:
+        return 0;
+    }
+  };
 
   return (
     <Container component="main" maxWidth="xl" sx={{ mt: 4 }}>
-      {isLoading || isUserLoading ? (
+      {isLoading ? (
         <Box sx={{ display: 'flex', justifyContent: 'center', alignItems: 'center', height: '100%' }}>
           <CircularProgress />
         </Box>
@@ -53,7 +78,7 @@ export default function RequestDetails() {
                 </Grid>
                 <Grid item>
                   <Breadcrumbs aria-label="breadcrumb" separator={<NavigateNext fontSize="small" />} sx={{ whiteSpace: 'nowrap' }}>
-                    <MuiLink
+                    <NextMuiLink
                       color="inherit"
                       href="/agent/dashboard"
                       onClick={(e) => {
@@ -64,8 +89,8 @@ export default function RequestDetails() {
                     >
                       <Home sx={{ mr: 0.5 }} fontSize="inherit" />
                       Dashboard
-                    </MuiLink>
-                    <MuiLink
+                    </NextMuiLink>
+                    <NextMuiLink
                       color="inherit"
                       href="/agent/requests"
                       onClick={(e) => {
@@ -75,83 +100,85 @@ export default function RequestDetails() {
                       noWrap
                     >
                       Requests
-                    </MuiLink>
+                    </NextMuiLink>
                     <Typography color="textPrimary" noWrap>Request Details</Typography>
                   </Breadcrumbs>
                 </Grid>
               </Grid>
               <Paper elevation={0} sx={{ p: 4, borderRadius: 3 }}>
-                <Typography component="h2" variant="h4" sx={{ fontWeight: 'bold' }}>
-                  {request.title}
+                <Typography variant="h6" gutterBottom>
+                <strong>Title:</strong> {request.title}
                 </Typography>
-                <Typography variant="body1" sx={{ mt: 2 }}>
-                  <strong>Description:</strong> {request.description}
-                </Typography>
-                <Box sx={{ mt: 3 }}>
-                  <Typography variant="h6" gutterBottom>
-                    Current Status
-                  </Typography>
-                  <Typography variant="body1" gutterBottom>
-                    <strong>Status:</strong> {request.status}
-                  </Typography>
-                  <Typography variant="body1" gutterBottom>
-                    <strong>Priority:</strong> {request.priority}
-                  </Typography>
-                  <Typography variant="body1" gutterBottom>
-                    <strong>Created At:</strong> {request.created_at?.toDate().toLocaleString()}
-                  </Typography>
-                  <Typography variant="body1" gutterBottom>
-                    <strong>Updated At:</strong> {request.updated_at?.toDate().toLocaleString()}
-                  </Typography>
-                  <Box sx={{ mt: 3 }}>
-                    <Typography variant="h6" gutterBottom>
-                      User Information
-                    </Typography>
-                    {user && (
-                      <Box sx={{ mb: 3 }}>
-                        <Typography variant="body1">
-                          <strong>Submitted By:</strong> {user.fullname}
-                        </Typography>
-                        <Typography variant="body1">
-                          <strong>Email:</strong> {user.email}
-                        </Typography>
-                        <Typography variant="body1">
-                          <strong>Phone Number:</strong> {user.phone_number}
-                        </Typography>
-                      </Box>
-                    )}
-                    <Typography variant="h6" gutterBottom>
-                      Update History
-                    </Typography>
-                    <List>
-                      {request.updates && request.updates.length > 0 ? (
-                        request.updates.map((update, index) => (
-                          <React.Fragment key={index}>
-                            <ListItem alignItems="flex-start">
-                              <ListItemText
-                                primary={update.updated_at?.toDate().toLocaleString()}
-                                secondary={
-                                  <Typography
-                                    component="span"
-                                    variant="body2"
-                                    color="text.primary"
-                                  >
-                                    {update.update_description}
-                                  </Typography>
-                                }
-                              />
-                            </ListItem>
-                            {index < request.updates.length - 1 && <Divider component="li" />}
-                          </React.Fragment>
-                        ))
-                      ) : (
-                        <Typography variant="body2" color="text.secondary">
-                          No updates available
-                        </Typography>
-                      )}
-                    </List>
-                  </Box>
+                <Box sx={{ mb: 3 }}>
+                  <Typography variant="body1"><strong>Requester:</strong> {requestorData?.fullname}</Typography>
+                  <Typography variant="body1"><strong>Email:</strong> {requestorData?.email}</Typography>
+                  <Typography variant="body1"><strong>Status:</strong> {request.status}</Typography>
+                  <Typography variant="body1"><strong>Priority:</strong> {request.priority}</Typography>
+                  <Typography variant="body1"><strong>Created At:</strong> {request.created_at?.toDate().toLocaleString()}</Typography>
+                  <Typography variant="body1"><strong>Updated At:</strong> {request.updated_at?.toDate().toLocaleString()}</Typography>
                 </Box>
+                <Typography variant="h6" gutterBottom>
+                  Description
+                </Typography>
+                <Box sx={{ mb: 3 }}>
+                  <Typography variant="body1">{request.description}</Typography>
+                </Box>
+                <Typography variant="h6" gutterBottom>
+                  Status Progress
+                </Typography>
+                <Stepper activeStep={getStatusStep(request.status)} alternativeLabel sx={{ mb: 3 }}>
+                  {statusSteps.map((label) => (
+                    <Step key={label}>
+                      <StepLabel>{label}</StepLabel>
+                    </Step>
+                  ))}
+                </Stepper>
+                <NextMuiButton
+                  variant="contained"
+                  startIcon={<EditIcon />}
+                  href={`/agent/requests/${request.id}/edit-request`}
+                  sx={{ mb: 3 }}
+                >
+                  Edit Request
+                </NextMuiButton>
+                <Typography variant="h6" gutterBottom>
+                  Update History
+                </Typography>
+                <List>
+                  {request.updates && request.updates.length > 0 ? (
+                    request.updates.map((update, index) => (
+                      <React.Fragment key={index}>
+                        <ListItem alignItems="flex-start">
+                          <ListItemText
+                            primary={update.updated_at?.toDate().toLocaleString()}
+                            secondary={
+                              <Typography
+                                component="span"
+                                variant="body2"
+                                color="text.primary"
+                              >
+                                {update.update_description}
+                              </Typography>
+                            }
+                          />
+                        </ListItem>
+                        {index < request.updates.length - 1 && <Divider component="li" />}
+                      </React.Fragment>
+                    ))
+                  ) : (
+                    <Typography variant="body2" color="text.secondary">
+                      No updates available
+                    </Typography>
+                  )}
+                </List>
+                <Typography variant="h6" gutterBottom>
+                  Attachments
+                </Typography>
+                <Button variant="contained" component="label">
+                  Upload File
+                  <input type="file" hidden />
+                </Button>
+                {/* Display the list of uploaded files here */}
               </Paper>
             </Box>
           </Fade>
