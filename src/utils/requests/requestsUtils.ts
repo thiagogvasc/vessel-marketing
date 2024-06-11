@@ -38,11 +38,27 @@ export const updateRequest = async (id: string, data: Partial<Request>): Promise
   });
 };
 
-// Add an update to a request
 export const addRequestUpdate = async (id: string, update: Omit<RequestUpdate, 'id' | 'updated_at'>): Promise<void> => {
   const docRef = doc(db, 'requests', id);
-  await updateDoc(docRef, {
-    updates: arrayUnion({...update, updated_at: serverTimestamp()}),
-    updated_at: serverTimestamp(),
-  });
+
+  // Perform the update in two steps
+  const updateTimestamp = async () => {
+    // Set the updated_at field to the server timestamp
+    await updateDoc(docRef, {
+      updated_at: serverTimestamp(),
+    });
+
+    // Fetch the document to get the updated server timestamp
+    const updatedDoc = await getDoc(docRef);
+
+    // Retrieve the server timestamp from the updated document
+    const updatedAt = updatedDoc.data()?.updated_at;
+
+    // Perform the update with the array union
+    await updateDoc(docRef, {
+      updates: arrayUnion({ ...update, updated_at: updatedAt }),
+    });
+  };
+
+  await updateTimestamp();
 };

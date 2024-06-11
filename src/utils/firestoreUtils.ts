@@ -1,5 +1,5 @@
 // src/utils/firestoreUtils.ts
-import { collection, addDoc, getDocs, updateDoc, doc, DocumentData, QuerySnapshot, getDoc, where, query, Timestamp, writeBatch } from "firebase/firestore";
+import { collection, addDoc, getDocs, updateDoc, doc, DocumentData, QuerySnapshot, getDoc, where, query, Timestamp, writeBatch, serverTimestamp } from "firebase/firestore";
 import { db } from "../../firebaseConfig";
 import { User, Request, Task, Column } from "../types";
 
@@ -41,8 +41,8 @@ export const addTask = async (task: Omit<Task, 'id' | 'created_at' | 'updated_at
   const tasksCollection = collection(db, 'tasks');
   const taskDoc = await addDoc(tasksCollection, {
     ...task,
-    created_at: Timestamp.now(),
-    updated_at: Timestamp.now(),
+    created_at: serverTimestamp(),
+    updated_at: serverTimestamp(),
   });
   return taskDoc.id;
 };
@@ -52,7 +52,7 @@ export const updateTask = async (id: string, updatedTask: Partial<Omit<Task, 'id
   const taskDoc = doc(db, 'tasks', id);
   await updateDoc(taskDoc, {
     ...updatedTask,
-    updated_at: Timestamp.now(),
+    updated_at: serverTimestamp(),
   });
 };
 
@@ -61,6 +61,6 @@ export const updateTaskOrder = async (boardId: string, columns: Column[]): Promi
   const boardDoc = doc(db, 'boards', boardId);
   await updateDoc(boardDoc, {
     columns,
-    updated_at: Timestamp.now(),
+    updated_at: serverTimestamp(),
   });
 };

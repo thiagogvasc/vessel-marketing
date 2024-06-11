@@ -41,7 +41,7 @@ export const useUpdateRequest = () => {
 export const useAddRequestUpdate = () => {
   const queryClient = useQueryClient();
 
-  return useMutation(({ id, update }: { id: string; update: Omit<RequestUpdate, 'id' | 'update_date'> }) => addRequestUpdate(id, update), {
+  return useMutation(({ id, update }: { id: string; update: Omit<RequestUpdate, 'id' | 'updated_at'> }) => addRequestUpdate(id, update), {
     onSuccess: (_, { id }) => {
       queryClient.invalidateQueries("requests");
       queryClient.invalidateQueries(["request", id]);

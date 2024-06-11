@@ -1,6 +1,6 @@
 'use client'
 
-import { useGetRequestById } from "@/src/hooks/useRequests";
+import { useAddRequestUpdate, useGetRequestById, useUpdateRequest } from "@/src/hooks/useRequests";
 import { useParams, useRouter } from "next/navigation";
 import {
   Box,
@@ -25,37 +25,26 @@ import {
   SelectChangeEvent,
 } from '@mui/material';
 import EditIcon from '@mui/icons-material/Edit';
-import { RequestStatus, RequestPriority } from '@/src/types';
+import { RequestStatus, RequestPriority, RequestUpdate } from '@/src/types';
 import React, { useState } from 'react';
-import { useGetUserById } from '@/src/hooks/useUsers';
+import { useGetCurrentUser, useGetUserById } from '@/src/hooks/useUsers';
 import NextMuiLink from "@/src/components/NextMuiLink";
 import NextMuiButton from "@/src/components/NextMuiButton";
 import { Home, NavigateNext } from "@mui/icons-material";
 import ConfirmStatusChangeDialog from '@/src/components/ConfirmStatusChangeDialog';
 
-const statusSteps = ['Pending', 'In Progress', 'Completed'];
 
-const getStatusChipColor = (status: string) => {
-  switch (status) {
-    case 'pending':
-      return 'warning';
-    case 'in_progress':
-      return 'info';
-    case 'completed':
-      return 'success';
-    default:
-      return 'default';
-  }
-};
 
 export default function RequestDetails() {
   const router = useRouter();
   const { id } = useParams();
 
+  const { data: user } = useGetCurrentUser();
+
   const { data: request, isLoading } = useGetRequestById(id as string);
   const { data: requestorData } = useGetUserById(request?.client_id);
-  // const updateRequestStatusMutation = useUpdateRequestStatus();
-  // const updateRequestPriorityMutation = useUpdateRequestPriority();
+  const addRequestUpdateMutation = useAddRequestUpdate();
+  const updateRequestMutation = useUpdateRequest();
 
   const [status, setStatus] = useState<RequestStatus>(request?.status || 'Pending');
   const [priority, setPriority] = useState<RequestPriority>(request?.priority || 'Low');
@@ -69,39 +58,28 @@ export default function RequestDetails() {
     setOpenDialog(true);
   };
 
-  const handlePriorityChange = (event: SelectChangeEvent<RequestPriority>) => {
+  const handlePriorityChange = async (event: SelectChangeEvent<RequestPriority>) => {
     const newPriority = event.target.value as RequestPriority;
     setPriority(newPriority);
-    // updateRequestPriorityMutation.mutate({
-    //   id: id as string,
-    //   priority: newPriority,
-    // });
+    await updateRequestMutation.mutate({
+      id: request?.id as string,
+      updates: { priority: newPriority }
+    })
+    console.warn('updated priority')
   };
 
-  const handleDialogClose = (confirm: boolean) => {
+  const handleDialogClose = async (confirm: boolean) => {
     setOpenDialog(false);
     if (confirm) {
-      // updateRequestStatusMutation.mutate({
-      //   id: id as string,
-      //   status: status,
-      //   notify: notifyClient,
-      //   comment: comment,
-      // });
+      await addRequestUpdateMutation.mutate({
+        id: request?.id as string,
+        update: {
+          update_description: comment,
+          updated_by: user?.id as string
+        }
+      })
     } else {
       setStatus(request?.status || 'Pending');
-    }
-  };
-
-  const getStatusStep = (status: string) => {
-    switch (status) {
-      case 'pending':
-        return 0;
-      case 'in_progress':
-        return 1;
-      case 'completed':
-        return 2;
-      default:
-        return 0;
     }
   };
 
