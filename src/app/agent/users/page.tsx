@@ -78,8 +78,8 @@ const Users = () => {
     if (!a[orderBy] || !b[orderBy]) return 0; // Handle cases where the value is undefined
   
     if (orderBy === "created_at") {
-      const aDate = a[orderBy].toDate();
-      const bDate = b[orderBy].toDate();
+      const aDate = a![orderBy]!.toDate();
+      const bDate = b[orderBy]!.toDate();
       
       if (aDate && bDate) {
         return aDate < bDate ? -1 : 1;
