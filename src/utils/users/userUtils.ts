@@ -13,7 +13,7 @@ export const addUser = async (user: User): Promise<void> => {
   });
 };
 
-export const getUsers = async (): Promise<User[]> => {
+export const getAllUsers = async (): Promise<User[]> => {
   const querySnapshot = await getDocs(collection(db, "users"));
   return convertDocs<User>(querySnapshot);
 };

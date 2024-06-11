@@ -1,9 +1,14 @@
 import { useQuery, useMutation, useQueryClient } from 'react-query';
 import { fetchTasks, addTask, updateTask, fetchBoard, updateTaskOrder } from '../utils/firestoreUtils';
 import { Task, Column, AggregateColumn, User } from '../types';
-import { getUserById } from '../utils/users/userUtils';
+import { getAllUsers, getUserById } from '../utils/users/userUtils';
 import { useAuth } from '../contexts/AuthContext';
 
+
+// Hook to get all requests
+export const useGetAllUsers = () => {
+  return useQuery("users", getAllUsers);
+};
 
 export const useGetCurrentUser = () => {
   const { user } = useAuth();
