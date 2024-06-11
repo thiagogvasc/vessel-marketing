@@ -2,10 +2,11 @@
 
 import React, { useEffect, useState } from 'react';
 import { DragDropContext } from 'react-beautiful-dnd';
-import { useBoard, useUpdateTaskOrder } from '../hooks/useTasks';
+import { useBoard, useUpdateTaskOrder, /*useAddColumn*/ } from '../hooks/useTasks';
 import Column from './Column';
 import { AggregateColumn, Column as ColumnType } from '../types';
-import { Box, CircularProgress, Grid, Fade, Grow } from '@mui/material';
+import { Box, CircularProgress, Grid, Fade, Grow, IconButton, TextField } from '@mui/material';
+import AddIcon from '@mui/icons-material/Add';
 
 interface KanbanBoardProps {
   boardId: string;
@@ -14,7 +15,10 @@ interface KanbanBoardProps {
 const KanbanBoard: React.FC<KanbanBoardProps> = ({ boardId }) => {
   const { data, isLoading } = useBoard(boardId);
   const [columns, setColumns] = useState<AggregateColumn[]>([]);
+  const [newColumnTitle, setNewColumnTitle] = useState('');
+  const [isAddingColumn, setIsAddingColumn] = useState(false);
   const updateTaskOrderMutation = useUpdateTaskOrder(boardId);
+  // const addColumnMutation = useAddColumn(boardId);
 
   useEffect(() => {
     if (data) {
@@ -52,6 +56,31 @@ const KanbanBoard: React.FC<KanbanBoardProps> = ({ boardId }) => {
     }
   };
 
+  const handleAddColumn = () => {
+    if (newColumnTitle.trim() === '') return;
+    // addColumnMutation.mutateAsync({ title: newColumnTitle }).then(newColumn => {
+    //   setColumns([...columns, newColumn]);
+    //   setNewColumnTitle('');
+    //   setIsAddingColumn(false);
+    // });
+  };
+
+  const handleColumnTitleBlur = () => {
+    if (newColumnTitle.trim() !== '') {
+      handleAddColumn();
+    } else {
+      setIsAddingColumn(false);
+    }
+  };
+
+  const handleColumnTitleKeyDown = (e: React.KeyboardEvent) => {
+    if (e.key === 'Enter') {
+      handleAddColumn();
+    } else if (e.key === 'Escape') {
+      setIsAddingColumn(false);
+    }
+  };
+
   if (isLoading) return (
     <Box sx={{ display: 'flex', justifyContent: 'center', alignItems: 'center', height: '100%' }}>
       <CircularProgress />
@@ -71,6 +100,30 @@ const KanbanBoard: React.FC<KanbanBoardProps> = ({ boardId }) => {
                   </Grid>
                 </Grow>
               ))}
+              <Grid item xs={12} md={4}>
+                {isAddingColumn ? (
+                  <Box sx={{ display: 'flex', alignItems: 'center' }}>
+                    <TextField
+                      placeholder="Column title"
+                      value={newColumnTitle}
+                      onChange={(e) => setNewColumnTitle(e.target.value)}
+                      onBlur={handleColumnTitleBlur}
+                      onKeyDown={handleColumnTitleKeyDown}
+                      variant="outlined"
+                      size="small"
+                      sx={{ flex: 1 }}
+                      autoFocus
+                    />
+                    <IconButton color="primary" onClick={handleAddColumn}>
+                      <AddIcon />
+                    </IconButton>
+                  </Box>
+                ) : (
+                  <IconButton color="primary" onClick={() => setIsAddingColumn(true)}>
+                    <AddIcon />
+                  </IconButton>
+                )}
+              </Grid>
             </Grid>
           </DragDropContext>
         </Box>

@@ -4,7 +4,7 @@ import React, { useState } from 'react';
 import { Droppable } from 'react-beautiful-dnd';
 import Task, { TaskWithId } from './Task';
 import { AggregateColumn, Task as TaskType } from '../types';
-import { Box, Paper, Typography, Fab, Dialog, DialogActions, DialogContent, DialogTitle, TextField, Button, MenuItem } from '@mui/material';
+import { Box, Paper, Typography, IconButton, TextField } from '@mui/material';
 import AddIcon from '@mui/icons-material/Add';
 import { useAddTask } from '../hooks/useTasks';
 
@@ -15,36 +15,38 @@ interface ColumnProps {
 
 const Column: React.FC<ColumnProps> = ({ column, boardId }) => {
   const addTaskMutation = useAddTask(boardId);
-  const [open, setOpen] = useState(false);
-  const [title, setTitle] = useState('');
-  const [description, setDescription] = useState('');
-  const [priority, setPriority] = useState<TaskType['priority']>('medium');
+  const [newTaskTitle, setNewTaskTitle] = useState('');
+  const [isAddingTask, setIsAddingTask] = useState(false);
 
-  const handleClickOpen = () => {
-    setOpen(true);
-  };
-
-  const handleClose = () => {
-    setOpen(false);
-  };
-
-  const handleSubmit = (e: React.FormEvent) => {
-    e.preventDefault();
+  const handleAddTask = () => {
+    if (newTaskTitle.trim() === '') {
+      setIsAddingTask(false);
+      return;
+    }
     addTaskMutation.mutateAsync({
       board_id: boardId,
-      title,
-      description,
-      priority,
+      title: newTaskTitle,
+      description: '',
+      priority: 'medium',
       status: column.title as 'To Do' | 'In Progress' | 'Done',
       columnTitle: column.title,
       assigned_to: '', // Add assigned_to if necessary
-    }).then(res => {
-      console.warn('mutated')
+    }).then(() => {
+      setNewTaskTitle('');
+      setIsAddingTask(false);
     });
-    setTitle('');
-    setDescription('');
-    setPriority('medium');
-    handleClose();
+  };
+
+  const handleTaskTitleBlur = () => {
+    handleAddTask();
+  };
+
+  const handleTaskTitleKeyDown = (e: React.KeyboardEvent) => {
+    if (e.key === 'Enter') {
+      handleAddTask();
+    } else if (e.key === 'Escape') {
+      setIsAddingTask(false);
+    }
   };
 
   return (
@@ -62,66 +64,28 @@ const Column: React.FC<ColumnProps> = ({ column, boardId }) => {
             {column.tasks.map((task, index) => (
               task?.id && <Task key={task.id} task={task as TaskWithId} index={index} />
             ))}
+            {isAddingTask && (
+              <Box sx={{ p: 2, mb: 2, background: '#fff', borderRadius: '8px', boxShadow: '0 1px 3px rgba(0, 0, 0, 0.2)' }}>
+                <TextField
+                  placeholder="Task title"
+                  value={newTaskTitle}
+                  onChange={(e) => setNewTaskTitle(e.target.value)}
+                  onBlur={handleTaskTitleBlur}
+                  onKeyDown={handleTaskTitleKeyDown}
+                  variant="outlined"
+                  size="small"
+                  fullWidth
+                  autoFocus
+                />
+              </Box>
+            )}
             {provided.placeholder}
           </Box>
         )}
       </Droppable>
-      <Fab size="small" color="primary" aria-label="add" sx={{ position: 'absolute', top: 8, right: 8 }} onClick={handleClickOpen}>
+      <IconButton color="primary" onClick={() => setIsAddingTask(true)} sx={{ mt: 2 }}>
         <AddIcon />
-      </Fab>
-      <Dialog open={open} onClose={handleClose}>
-        <DialogTitle>Add Task</DialogTitle>
-        <DialogContent>
-          <Box component="form" onSubmit={handleSubmit} sx={{ mt: 2 }}>
-            <TextField
-              name="title"
-              required
-              fullWidth
-              id="title"
-              label="Title"
-              autoFocus
-              value={title}
-              onChange={(e) => setTitle(e.target.value)}
-              margin="dense"
-            />
-            <TextField
-              name="description"
-              required
-              fullWidth
-              id="description"
-              label="Description"
-              multiline
-              rows={2}
-              value={description}
-              onChange={(e) => setDescription(e.target.value)}
-              margin="dense"
-            />
-            <TextField
-              name="priority"
-              required
-              fullWidth
-              id="priority"
-              label="Priority"
-              select
-              value={priority}
-              onChange={(e) => setPriority(e.target.value as TaskType['priority'])}
-              margin="dense"
-            >
-              <MenuItem value="low">Low</MenuItem>
-              <MenuItem value="medium">Medium</MenuItem>
-              <MenuItem value="high">High</MenuItem>
-            </TextField>
-            <DialogActions>
-              <Button onClick={handleClose} color="primary">
-                Cancel
-              </Button>
-              <Button type="submit" color="primary">
-                Add
-              </Button>
-            </DialogActions>
-          </Box>
-        </DialogContent>
-      </Dialog>
+      </IconButton>
     </Paper>
   );
 };
