@@ -5,17 +5,13 @@ import Link from 'next/link';
 import { useAuth } from '../contexts/AuthContext';
 import { useRouter } from 'next/navigation';
 import {
-  Drawer,
-  List,
   ListItemIcon,
-  ListItemText,
   Toolbar,
   Typography,
   Box,
   Divider,
   AppBar,
   CssBaseline,
-  ListItemButton,
   IconButton,
   Menu,
   MenuItem,
@@ -23,18 +19,13 @@ import {
   Avatar,
   Tooltip,
 } from '@mui/material';
-import Image from 'next/image';
-import HomeIcon from '@mui/icons-material/Home';
 import ListAltIcon from '@mui/icons-material/ListAlt';
-import MeetingRoomIcon from '@mui/icons-material/MeetingRoom';
-import EventNoteIcon from '@mui/icons-material/EventNote';
-import LoginIcon from '@mui/icons-material/Login';
-import AppRegistrationIcon from '@mui/icons-material/AppRegistration';
 import LogoutIcon from '@mui/icons-material/Logout';
 import NotificationsIcon from '@mui/icons-material/Notifications';
 import SettingsIcon from '@mui/icons-material/Settings';
-import { styled } from '@mui/system';
-import { Dashboard } from '@mui/icons-material';
+import { Assignment, Dashboard, Group, ViewKanban } from '@mui/icons-material';
+import MyDrawer from './MyDrawer';
+import { useGetCurrentUser } from '../hooks/useUsers';
 
 const drawerWidth = 240;
 
@@ -42,7 +33,15 @@ const AgentSidebar = () => {
   const { user, logout } = useAuth();
   const router = useRouter();
   const [anchorEl, setAnchorEl] = useState<null | HTMLElement>(null);
-  const [settingsAnchorEl, setSettingsAnchorEl] = useState<null | HTMLElement>(null);
+
+  const { data: userData } = useGetCurrentUser();
+
+  const links = [
+    { text: 'Dashboard', iconComponent: Dashboard, disabled: false, href: '/agent/dashboard'},
+    { text: 'Users', iconComponent: Group, disabled: false, href: '/agent/users'},
+    { text: 'Requests', iconComponent: ListAltIcon, disabled: false, href: '/agent/requests'},
+    { text: 'Test Board (test)', iconComponent: ViewKanban, disabled: false, href: '/agent/board'},
+  ]
 
   const handleLogout = async () => {
     await logout();
@@ -128,81 +127,13 @@ const AgentSidebar = () => {
               onClick={handleProfileMenuOpen}
               color="inherit"
             >
-              <Avatar alt={user?.displayName || user?.email || ''} src="/broken-image.jpg" />
+              <Avatar alt={user?.displayName || user?.email || ''} />
             </IconButton>
           </Tooltip>
         </Toolbar>
       </AppBar>
       {renderMenu}
-      <Drawer
-        variant="permanent"
-        sx={{
-          width: drawerWidth,
-          flexShrink: 0,
-          [`& .MuiDrawer-paper`]: { width: drawerWidth, boxSizing: 'border-box', bgcolor: 'white' },
-        }}
-      >
-        <Toolbar>
-          <Typography variant="h6" noWrap component="div">
-            Vessel Marketing
-          </Typography>
-        </Toolbar>
-        <Box sx={{ overflow: 'auto' }}>
-          <List>
-            <ListItemButton LinkComponent={Link} href="/agent/dashboard">
-              <ListItemIcon>
-                <Dashboard />
-              </ListItemIcon>
-              <ListItemText primary="Dashboard"/>
-            </ListItemButton>
-            <ListItemButton LinkComponent={Link} href="/agent/requests">
-              <ListItemIcon>
-                <ListAltIcon />
-              </ListItemIcon>
-              <ListItemText primary="Requests" />
-            </ListItemButton>
-            <ListItemButton LinkComponent={Link} href="/agent/meetings" disabled>
-              <ListItemIcon>
-                <MeetingRoomIcon />
-              </ListItemIcon>
-              <ListItemText primary="Meetings" />
-            </ListItemButton>
-            <ListItemButton LinkComponent={Link} href="/agent/planning" disabled>
-              <ListItemIcon>
-                <EventNoteIcon />
-              </ListItemIcon>
-              <ListItemText primary="Planning" />
-            </ListItemButton>
-            {!user && (
-              <>
-                <ListItemButton LinkComponent={Link} href="/login">
-                  <ListItemIcon>
-                    <LoginIcon />
-                  </ListItemIcon>
-                  <ListItemText primary="Login" />
-                </ListItemButton>
-                <ListItemButton LinkComponent={Link} href="/register">
-                  <ListItemIcon>
-                    <AppRegistrationIcon />
-                  </ListItemIcon>
-                  <ListItemText primary="Register" />
-                </ListItemButton>
-              </>
-            )}
-          </List>
-          <Divider />
-          {user && (
-            <List>
-              <ListItemButton onClick={handleLogout}>
-                <ListItemIcon>
-                  <LogoutIcon />
-                </ListItemIcon>
-                <ListItemText primary="Logout" />
-              </ListItemButton>
-            </List>
-          )}
-        </Box>
-      </Drawer>
+      {userData && <MyDrawer drawerWidth={drawerWidth} links={links} title='' handleLogout={handleLogout} user={userData} />}
     </>
   );
 };

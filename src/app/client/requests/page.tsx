@@ -184,15 +184,6 @@ const Requests = () => {
                       Status
                     </TableSortLabel>
                   </TableCell>
-                  <TableCell sortDirection={orderBy === "priority" ? order : false}>
-                    <TableSortLabel
-                      active={orderBy === "priority"}
-                      direction={orderBy === "priority" ? order : "asc"}
-                      onClick={() => handleRequestSort("priority")}
-                    >
-                      Priority
-                    </TableSortLabel>
-                  </TableCell>
                   <TableCell sortDirection={orderBy === "created_at" ? order : false}>
                     <TableSortLabel
                       active={orderBy === "created_at"}
@@ -226,7 +217,6 @@ const Requests = () => {
                       <TableCell>{request.title}</TableCell>
                       <TableCell>{request.description.substring(0, 50)}...</TableCell>
                       <TableCell>{request.status}</TableCell>
-                      <TableCell>{request.priority}</TableCell>
                       <TableCell>{request.created_at?.toDate().toLocaleString()}</TableCell>
                       <TableCell>{request.updated_at?.toDate().toLocaleString()}</TableCell>
                       <TableCell>

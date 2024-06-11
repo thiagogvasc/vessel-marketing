@@ -30,17 +30,9 @@ import SearchIcon from "@mui/icons-material/Search";
 import HomeIcon from '@mui/icons-material/Home';
 import NavigateNextIcon from '@mui/icons-material/NavigateNext';
 import { useRouter } from "next/navigation";
+import { Request } from "@/src/types";
 
-interface Request {
-  id: string;
-  title: string;
-  description: string;
-  status: string;
-  priority: string;
-  created_at: string;
-  updated_at: string;
-}
-
+ 
 const Requests = () => {
   const router = useRouter();
   const { data: requests, isLoading } = useGetRequests();
@@ -50,6 +42,7 @@ const Requests = () => {
   const [rowsPerPage, setRowsPerPage] = useState(5);
   const [order, setOrder] = useState<"asc" | "desc">("asc");
   const [orderBy, setOrderBy] = useState<keyof Request>("title");
+  console.warn(requests)
 
   useEffect(() => {
     if (!isLoading && requests) {
