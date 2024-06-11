@@ -61,6 +61,7 @@ export default function RequestDetails() {
   const [priority, setPriority] = useState<RequestPriority>(request?.priority || 'Low');
   const [openDialog, setOpenDialog] = useState(false);
   const [notifyClient, setNotifyClient] = useState(false);
+  const [comment, setComment] = useState('');
 
   const handleStatusChange = (event: SelectChangeEvent<RequestStatus>) => {
     const newStatus = event.target.value as RequestStatus;
@@ -84,6 +85,7 @@ export default function RequestDetails() {
       //   id: id as string,
       //   status: status,
       //   notify: notifyClient,
+      //   comment: comment,
       // });
     } else {
       setStatus(request?.status || 'Pending');
@@ -150,44 +152,57 @@ export default function RequestDetails() {
               </Grid>
               <Paper elevation={0} sx={{ p: 4, borderRadius: 3 }}>
                 <Box sx={{ mb: 3 }}>
-                  <Typography variant="h6" gutterBottom>
-                    General Information
-                  </Typography>
-                  <Divider sx={{ mb: 2 }} />
-                  <Grid container spacing={2}>
-                    <Grid item xs={12} sm={6}>
-                      <Typography variant="body1"><strong>Requester:</strong> {requestorData?.fullname}</Typography>
-                      <Typography variant="body1"><strong>Email:</strong> {requestorData?.email}</Typography>
-                      <Typography variant="body1"><strong>Phone number:</strong> {requestorData?.phone_number}</Typography>
-                    </Grid>
-                    <Grid item xs={12} sm={6}>
-                      <Typography variant="body1"><strong>Status:</strong> 
-                        <Select
-                          value={status}
-                          onChange={handleStatusChange}
-                          sx={{ ml: 1 }}
-                        >
-                          <MenuItem value="Pending">Pending</MenuItem>
-                          <MenuItem value="In Progress">In Progress</MenuItem>
-                          <MenuItem value="Completed">Completed</MenuItem>
-                        </Select>
-                      </Typography>
-                      <Typography variant="body1"><strong>Priority:</strong> 
-                        <Select
-                          value={priority}
-                          onChange={handlePriorityChange}
-                          sx={{ ml: 1 }}
-                        >
-                          <MenuItem value="Low">Low</MenuItem>
-                          <MenuItem value="Medium">Medium</MenuItem>
-                          <MenuItem value="High">High</MenuItem>
-                        </Select>
-                      </Typography>
-                      <Typography variant="body1"><strong>Created At:</strong> {request.created_at?.toDate().toLocaleString()}</Typography>
-                      <Typography variant="body1"><strong>Updated At:</strong> {request.updated_at?.toDate().toLocaleString()}</Typography>
-                    </Grid>
-                  </Grid>
-                </Box>
+    <Typography variant="h6" gutterBottom>
+      General Information
+    </Typography>
+    <Divider sx={{ mb: 2 }} />
+    <Grid container spacing={2}>
+      <Grid item xs={12} sm={6}>
+        <Typography variant="body1" sx={{ mb: 1 }}>
+          <strong>Submitted by:</strong> {requestorData?.fullname}
+        </Typography>
+        <Typography variant="body1" sx={{ mb: 1 }}>
+          <strong>Email:</strong> {requestorData?.email}
+        </Typography>
+        <Typography variant="body1" sx={{ mb: 1 }}>
+          <strong>Phone Number:</strong> {requestorData?.phone_number}
+        </Typography>
+      </Grid>
+      <Grid item xs={12} sm={6}>
+        <Typography variant="body1" sx={{ display: 'flex', alignItems: 'center', mb: 1 }}>
+          <strong>Status:</strong>
+          <Select
+            value={status}
+            onChange={handleStatusChange}
+            sx={{ ml: 1, minWidth: 120 }}
+          >
+            <MenuItem value="Pending">Pending</MenuItem>
+            <MenuItem value="In Progress">In Progress</MenuItem>
+            <MenuItem value="Completed">Completed</MenuItem>
+          </Select>
+        </Typography>
+        <Typography variant="body1" sx={{ display: 'flex', alignItems: 'center', mb: 1 }}>
+          <strong>Priority:</strong>
+          <Select
+            value={priority}
+            onChange={handlePriorityChange}
+            sx={{ ml: 1, minWidth: 120 }}
+          >
+            <MenuItem value="Low">Low</MenuItem>
+            <MenuItem value="Medium">Medium</MenuItem>
+            <MenuItem value="High">High</MenuItem>
+          </Select>
+        </Typography>
+        <Typography variant="body1" sx={{ mb: 1 }}>
+          <strong>Created At:</strong> {request.created_at?.toDate().toLocaleString()}
+        </Typography>
+        <Typography variant="body1">
+          <strong>Updated At:</strong> {request.updated_at?.toDate().toLocaleString()}
+        </Typography>
+      </Grid>
+    </Grid>
+  </Box>
+
                 <Box sx={{ mb: 3 }}>
                   <Typography variant="h6" gutterBottom>
                     Description
@@ -195,19 +210,7 @@ export default function RequestDetails() {
                   <Divider sx={{ mb: 2 }} />
                   <Typography variant="body1">{request.description}</Typography>
                 </Box>
-                <Box sx={{ mb: 3 }}>
-                  <Typography variant="h6" gutterBottom>
-                    Status Progress
-                  </Typography>
-                  <Divider sx={{ mb: 2 }} />
-                  <Stepper activeStep={getStatusStep(request.status)} alternativeLabel>
-                    {statusSteps.map((label) => (
-                      <Step key={label}>
-                        <StepLabel>{label}</StepLabel>
-                      </Step>
-                    ))}
-                  </Stepper>
-                </Box>
+               
                 <Box sx={{ mb: 3 }}>
                   <Typography variant="h6" gutterBottom>
                     Update History
@@ -241,30 +244,21 @@ export default function RequestDetails() {
                     )}
                   </List>
                 </Box>
-                <Box sx={{ mb: 3 }}>
-                  <Typography variant="h6" gutterBottom>
-                    Attachments
-                  </Typography>
-                  <Divider sx={{ mb: 2 }} />
-                  <Button variant="contained" component="label">
-                    Upload File
-                    <input type="file" hidden />
-                  </Button>
-                  {/* Display the list of uploaded files here */}
-                </Box>
               </Paper>
+            <ConfirmStatusChangeDialog
+              open={openDialog}
+              status={status}
+              notifyClient={notifyClient}
+              onConfirm={handleDialogClose}
+              onCancel={() => setOpenDialog(false)}
+              setNotifyClient={setNotifyClient}
+              comment={comment}
+              setComment={setComment}
+            />
             </Box>
           </Fade>
         )
       )}
-      <ConfirmStatusChangeDialog
-        open={openDialog}
-        status={status}
-        notifyClient={notifyClient}
-        onConfirm={handleDialogClose}
-        onCancel={() => setOpenDialog(false)}
-        setNotifyClient={setNotifyClient}
-      />
     </Container>
   );
 }

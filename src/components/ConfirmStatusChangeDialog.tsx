@@ -1,22 +1,25 @@
-import React, { useState } from 'react';
-import {
-  Dialog,
-  DialogActions,
-  DialogContent,
-  DialogContentText,
-  DialogTitle,
-  Button,
-  Checkbox,
-  FormControlLabel,
+import React from 'react';
+import { 
+  Dialog, 
+  DialogActions, 
+  DialogContent, 
+  DialogContentText, 
+  DialogTitle, 
+  Button, 
+  Checkbox, 
+  FormControlLabel, 
+  TextField 
 } from '@mui/material';
 
 interface ConfirmStatusChangeDialogProps {
   open: boolean;
   status: string;
   notifyClient: boolean;
-  onConfirm: (confirm: boolean, notifyClient: boolean) => void;
+  onConfirm: (confirm: boolean) => void;
   onCancel: () => void;
-  setNotifyClient: (value: boolean) => void;
+  setNotifyClient: (notify: boolean) => void;
+  comment: string;
+  setComment: (comment: string) => void;
 }
 
 const ConfirmStatusChangeDialog: React.FC<ConfirmStatusChangeDialogProps> = ({
@@ -26,34 +29,42 @@ const ConfirmStatusChangeDialog: React.FC<ConfirmStatusChangeDialogProps> = ({
   onConfirm,
   onCancel,
   setNotifyClient,
+  comment,
+  setComment,
 }) => {
   return (
-    <Dialog
-      open={open}
-      onClose={onCancel}
-      aria-labelledby="alert-dialog-title"
-      aria-describedby="alert-dialog-description"
-    >
-      <DialogTitle id="alert-dialog-title">{"Change Request Status"}</DialogTitle>
+    <Dialog open={open} onClose={() => onConfirm(false)}>
+      <DialogTitle>Confirm Status Change</DialogTitle>
       <DialogContent>
-        <DialogContentText id="alert-dialog-description">
-          Are you sure you want to change the status of this request to `{status}`?
+        <DialogContentText>
+          Are you sure you want to change the status to `{status}`?
         </DialogContentText>
         <FormControlLabel
           control={
             <Checkbox
               checked={notifyClient}
               onChange={(e) => setNotifyClient(e.target.checked)}
+              color="primary"
             />
           }
-          label="Notify client by email"
+          label="Notify client via email"
+        />
+        <TextField
+          autoFocus
+          margin="dense"
+          id="comment"
+          label="Comment"
+          type="text"
+          fullWidth
+          multiline
+          rows={4}
+          value={comment}
+          onChange={(e) => setComment(e.target.value)}
         />
       </DialogContent>
       <DialogActions>
-        <Button onClick={() => onConfirm(false, notifyClient)} color="primary">
-          Cancel
-        </Button>
-        <Button onClick={() => onConfirm(true, notifyClient)} color="primary" autoFocus>
+        <Button onClick={() => onCancel()}>Cancel</Button>
+        <Button onClick={() => onConfirm(true)} color="primary">
           Confirm
         </Button>
       </DialogActions>
