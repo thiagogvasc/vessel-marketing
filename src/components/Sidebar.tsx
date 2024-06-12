@@ -28,7 +28,7 @@ import { Dashboard } from '@mui/icons-material';
 import { useGetCurrentUser } from '../hooks/useUsers';
 import MyDrawer from './MyDrawer';
 
-const drawerWidth = 240;
+const drawerWidth = 280;
 
 const Sidebar = () => {
   const { user, logout } = useAuth();
@@ -132,7 +132,7 @@ const Sidebar = () => {
         </Toolbar>
       </AppBar>
       {renderMenu}
-      {userData && <MyDrawer drawerWidth={drawerWidth} links={links} title='' handleLogout={handleLogout} user={userData} />}
+      {userData && <MyDrawer drawerWidth={drawerWidth} links={links} handleLogout={handleLogout} user={userData} />}
     </>
   );
 };

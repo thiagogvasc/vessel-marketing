@@ -27,7 +27,7 @@ import { Assignment, Dashboard, Group, ViewKanban } from '@mui/icons-material';
 import MyDrawer from './MyDrawer';
 import { useGetCurrentUser } from '../hooks/useUsers';
 
-const drawerWidth = 240;
+const drawerWidth = 280;
 
 const AgentSidebar = () => {
   const { user, logout } = useAuth();
@@ -133,7 +133,7 @@ const AgentSidebar = () => {
         </Toolbar>
       </AppBar>
       {renderMenu}
-      {userData && <MyDrawer drawerWidth={drawerWidth} links={links} title='' handleLogout={handleLogout} user={userData} />}
+      {userData && <MyDrawer drawerWidth={drawerWidth} links={links} handleLogout={handleLogout} user={userData} />}
     </>
   );
 };

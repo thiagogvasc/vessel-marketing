@@ -8,16 +8,36 @@ import {
   Drawer,
   List,
   ListItemButton,
+  ListItemButtonProps,
   ListItemIcon,
   ListItemText,
+  styled,
   Toolbar,
   Typography,
 } from '@mui/material';
 import { Logout } from '@mui/icons-material'
 import Link from 'next/link';
 import { User } from '../types';
+import { usePathname } from 'next/navigation';
+import { inherits } from 'util';
+
+const StyledListItemButton = styled(ListItemButton, {
+  shouldForwardProp: (prop) => prop !== 'active',
+})<ListItemButtonProps & { active: number; href: string }>(({ theme, active }) => ({
+  color: active ? theme.palette.primary.main : 'inherit',
+  backgroundColor: active ? (theme.palette.primary[50]) : 'inherit',
+  '& .MuiListItemIcon-root': {
+    color: active ? theme.palette.primary.main : 'inherit',
+  },
+  '&:hover': {
+    backgroundColor: active && theme.palette.primary[50] 
+  },
+}));
+
 
 const MyDrawer = ({ drawerWidth, links, user, handleLogout }: { drawerWidth: number, links: {text: string, href: string, iconComponent: any, disabled: boolean}[], user: User, handleLogout: any}) => {
+  const pathname = usePathname();
+  const isLinkActive = (href: string) => pathname === href ? 1 : 0;
   return (
     <Drawer
       variant="permanent"
@@ -33,11 +53,13 @@ const MyDrawer = ({ drawerWidth, links, user, handleLogout }: { drawerWidth: num
         </Typography>
       </Toolbar>
       <Box sx={{ overflow: 'auto' }}>
-        <List>
+        <List sx={{px: 2, gap: 2}}>
           {links.map((link) => (
-            <ListItemButton
+            <StyledListItemButton
+            sx={{py: 0.5, my:1, borderRadius: 2}}
               key={link.text}
               LinkComponent={Link}
+              active={isLinkActive(link.href)}
               href={link.href}
               disabled={link.disabled}
             >
@@ -45,7 +67,7 @@ const MyDrawer = ({ drawerWidth, links, user, handleLogout }: { drawerWidth: num
                 {React.createElement(link.iconComponent)}
               </ListItemIcon>
               <ListItemText primary={link.text} />
-            </ListItemButton>
+            </StyledListItemButton>
           ))}
         </List>
         <Divider />
@@ -66,22 +88,16 @@ const MyDrawer = ({ drawerWidth, links, user, handleLogout }: { drawerWidth: num
 
 MyDrawer.propTypes = {
   drawerWidth: PropTypes.number.isRequired,
-  title: PropTypes.string.isRequired,
   links: PropTypes.arrayOf(
     PropTypes.shape({
       text: PropTypes.string.isRequired,
       href: PropTypes.string.isRequired,
-      icon: PropTypes.elementType.isRequired,
+      iconComponent: PropTypes.elementType.isRequired,
       disabled: PropTypes.bool,
-    })
+    }).isRequired,
   ).isRequired,
   user: PropTypes.object,
   handleLogout: PropTypes.func,
-};
-
-MyDrawer.defaultProps = {
-  user: null,
-  handleLogout: () => {},
-};
+}
 
 export default MyDrawer;
