@@ -25,12 +25,12 @@ const StyledListItemButton = styled(ListItemButton, {
   shouldForwardProp: (prop) => prop !== 'active',
 })<ListItemButtonProps & { active: number; href: string }>(({ theme, active }) => ({
   color: active ? theme.palette.primary.main : 'inherit',
-  backgroundColor: active ? (theme.palette.primary[50]) : 'inherit',
+  backgroundColor: active ? ((theme.palette.primary as any)[50]) : 'inherit',
   '& .MuiListItemIcon-root': {
     color: active ? theme.palette.primary.main : 'inherit',
   },
   '&:hover': {
-    backgroundColor: active && theme.palette.primary[50] 
+    backgroundColor: active && ((theme.palette.primary as any)[50])
   },
 }));
 
