@@ -4,7 +4,7 @@ export default function Planning() {
     return (
       <div>
         <h1>Kanban Board - Test</h1>
-        {/* <KanbanBoard boardId='b34VLvMGePOdsnUdolFN'/> */}
+        <KanbanBoard boardId='b34VLvMGePOdsnUdolFN'/>
       </div>
     );
   }

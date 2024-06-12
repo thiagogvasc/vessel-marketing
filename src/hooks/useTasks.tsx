@@ -1,24 +1,25 @@
 import { useQuery, useMutation, useQueryClient } from 'react-query';
-import { fetchTasks, addTask, updateTask, fetchBoard, updateTaskOrder } from '../utils/firestoreUtils';
-import { Task, Column, AggregateColumn } from '../types';
+import { fetchTasks, addTask, updateTask, fetchBoard, updateTaskOrder, fetchAggregateBoard } from '../utils/firestoreUtils';
+import { Task, Column, AggregateColumn, AggregateBoard } from '../types';
 
 // Fetch all tasks for a board
 export const useBoard = (boardId: string) => {
   const queryClient = useQueryClient();
 
   return useQuery(['board', boardId], async () => {
-    const board = await fetchBoard(boardId);
-    const aggregateColumns: AggregateColumn[] = [];
+    console.warn('start fetching board')
+    const board = await fetchAggregateBoard(boardId) as AggregateBoard;
+    // const aggregateColumns: AggregateColumn[] = [];
 
-    for (const column of board.columns) {
-      const tasks = await fetchTasks(column.taskIds);
-      aggregateColumns.push({
-        title: column.title,
-        tasks
-      })
-    }
+    // for (const column of board.columns) {
+    //   const tasks = await fetchTasks(column.taskIds);
+    //   aggregateColumns.push({
+    //     title: column.title,
+    //     tasks
+    //   })
+    // }
 
-    return { board, aggregateColumns };
+    return { board } ;
   });
 };
 

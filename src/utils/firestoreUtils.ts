@@ -1,7 +1,7 @@
 // src/utils/firestoreUtils.ts
-import { collection, addDoc, getDocs, updateDoc, doc, DocumentData, QuerySnapshot, getDoc, where, query, Timestamp, writeBatch, serverTimestamp } from "firebase/firestore";
+import { collection, addDoc, getDocs, updateDoc, doc, DocumentData, QuerySnapshot, getDoc, where, query, Timestamp, writeBatch, serverTimestamp, documentId } from "firebase/firestore";
 import { db } from "../../firebaseConfig";
-import { User, Request, Task, Column } from "../types";
+import { User, Request, Task, Column, AggregateBoard, AggregateColumn } from "../types";
 
 export const convertDocs = <T>(querySnapshot: QuerySnapshot<DocumentData>): T[] => {
   return querySnapshot.docs.map((doc) => ({
@@ -14,15 +14,19 @@ export const convertDocs = <T>(querySnapshot: QuerySnapshot<DocumentData>): T[] 
 // Fetch all tasks for a board
 export const fetchTasks = async (taskIds: string[]): Promise<Task[]> => {
   const tasksCollection = collection(db, 'tasks');
-  const tasks: Task[] = [];
-
-  for (const taskId of taskIds) {
-    const taskDoc = await getDoc(doc(tasksCollection, taskId));
-    if (taskDoc.exists()) {
-      tasks.push({ id: taskDoc.id, ...taskDoc.data() } as Task);
-    }
-  }
-
+  
+  // Create a query to fetch tasks with IDs in the taskIds array
+  const q = query(tasksCollection, where(documentId(), 'in', taskIds));
+  
+  // Execute the query and get the documents
+  const querySnapshot = await getDocs(q);
+  
+  // Map the results to an array of Task objects
+  const tasks: Task[] = querySnapshot.docs.map(doc => ({
+    id: doc.id,
+    ...doc.data()
+  } as Task));
+  
   return tasks;
 };
 
@@ -35,6 +39,45 @@ export const fetchBoard = async (boardId: string): Promise<any> => {
     throw new Error('Board not found');
   }
 };
+
+export const fetchAggregateBoard = async (boardId: string): Promise<any> => {
+  // Fetch the board document
+  const boardDoc = await getDoc(doc(db, 'boards', boardId));
+  
+  if (!boardDoc.exists()) {
+    throw new Error('Board not found');
+  }
+  
+  const boardData = boardDoc.data();
+  const columns = boardData.columns || [];
+  
+  // Extract all task IDs from the columns
+  const taskIds: string[] = columns.reduce((acc: string[], column: Column) => {
+    return acc.concat(column.taskIds || []);
+  }, []);
+
+  // If no task IDs, return the board as is
+  if (taskIds.length === 0) {
+    return { id: boardDoc.id, ...boardData, columns };
+  }
+
+  // Perform a batched read for all tasks in a single query
+  const tasksCollection = collection(db, 'tasks');
+  const q = query(tasksCollection, where('__name__', 'in', taskIds));
+  const querySnapshot = await getDocs(q);
+  
+  const tasks = querySnapshot.docs.map(doc => ({ id: doc.id, ...doc.data() }));
+
+  // Map tasks to their corresponding columns
+  const columnsWithTasks = columns.map((column: Column) => ({
+    title: column.title,
+    tasks: column.taskIds.map(columnTask => tasks.find(task => task.id === columnTask)),
+  } as AggregateColumn));
+
+  return { id: boardDoc.id, ...boardData, columns: columnsWithTasks } as AggregateBoard;
+};
+
+
 
 // Add a new task
 export const addTask = async (task: Omit<Task, 'id' | 'created_at' | 'updated_at'>): Promise<string> => {

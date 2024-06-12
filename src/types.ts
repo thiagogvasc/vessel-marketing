@@ -62,13 +62,14 @@ export interface AggregateColumn {
   tasks: Task[]; // array of task IDs in order
 }
 
-export interface Board {
+export interface AggregateBoard {
   id: string; // board ID
   title: string; // board title
-  columns: Column[]; // array of columns
+  columns: AggregateColumn[]; // array of columns
   created_at?: Timestamp;
   updated_at?: Timestamp;
 }
+
 
 // Types for Task_Notes Subcollection (within Tasks)
 export interface TaskNote {

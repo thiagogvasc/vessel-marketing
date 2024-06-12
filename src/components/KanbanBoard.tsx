@@ -22,7 +22,7 @@ const KanbanBoard: React.FC<KanbanBoardProps> = ({ boardId }) => {
 
   useEffect(() => {
     if (data) {
-      setColumns(data.aggregateColumns);
+      setColumns(data.board.columns);
     }
   }, [data]);
 

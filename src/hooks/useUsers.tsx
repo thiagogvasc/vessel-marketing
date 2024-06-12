@@ -13,7 +13,7 @@ export const useGetAllUsers = () => {
 export const useGetCurrentUser = () => {
   const { user } = useAuth();
   const userId = user?.uid;
-  return useQuery(['user', userId], () => userId ? getUserById(userId) : Promise.resolve(null)); 
+  return useQuery(['userById', userId], () => getUserById(userId), { enabled: !!userId }); 
 }
 
 export const useGetUserById = (userId: string | undefined) => {
@@ -22,7 +22,7 @@ export const useGetUserById = (userId: string | undefined) => {
     return getUserById(userId).then(res => {
       return res
     }).catch(err => Promise.reject(err))
-  });
+  }, { enabled: !!userId});
 };
 
 

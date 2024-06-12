@@ -1,3 +1,5 @@
+'use client'
+
 import { useRouter } from 'next/navigation';
 import { useAuth } from '../contexts/AuthContext';
 import { useEffect } from 'react';
@@ -9,8 +11,6 @@ export const withAuth = (Component: React.FC<any>, allowedRoles: string[]) => {
     const router = useRouter();
     const { data: userData, isLoading } = useGetCurrentUser();
     const role = userData?.role;
-
-    console.warn(userData)
 
     useEffect(() => {
       if (loading || isLoading) return;
