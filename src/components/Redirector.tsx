@@ -9,6 +9,8 @@ export default function Redirector() {
 		router.push('/agent/dashboard');
 	} else if (userData?.role === 'client') {
 		router.push('/client/dashboard');
+	} else {
+		router.push('/login')
 	}
   return (
     <>Redirecting...</>
