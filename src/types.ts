@@ -50,6 +50,8 @@ export interface Task {
   priority: 'low' | 'medium' | 'high';
   created_at?: Timestamp;
   updated_at?: Timestamp;
+  start_at?: Timestamp;
+  end_at?: Timestamp;
 }
 
 export interface Column {

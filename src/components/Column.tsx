@@ -11,11 +11,11 @@ import { useAddTask } from '../hooks/useTasks';
 
 interface ColumnProps {
   column: AggregateColumn;
-  boardId: string;
+  // boardId: string;
 }
 
-const Column: React.FC<ColumnProps> = ({ column, boardId }) => {
-  const addTaskMutation = useAddTask(boardId);
+const Column: React.FC<ColumnProps> = ({ column }) => {
+  // const addTaskMutation = useAddTask(boardId);
   const [newTaskTitle, setNewTaskTitle] = useState('');
   const [isAddingTask, setIsAddingTask] = useState(false);
   const [selectedTask, setSelectedTask] = useState<TaskWithId | null>(null);
@@ -26,18 +26,18 @@ const Column: React.FC<ColumnProps> = ({ column, boardId }) => {
       setIsAddingTask(false);
       return;
     }
-    addTaskMutation.mutateAsync({
-      board_id: boardId,
-      title: newTaskTitle,
-      description: '',
-      priority: 'medium',
-      status: column.title as 'To Do' | 'In Progress' | 'Done',
-      columnTitle: column.title,
-      assigned_to: '', // Add assigned_to if necessary
-    }).then(() => {
-      setNewTaskTitle('');
-      setIsAddingTask(false);
-    });
+    // addTaskMutation.mutateAsync({
+    //   board_id: boardId,
+    //   title: newTaskTitle,
+    //   description: '',
+    //   priority: 'medium',
+    //   status: column.title as 'To Do' | 'In Progress' | 'Done',
+    //   columnTitle: column.title,
+    //   assigned_to: '', // Add assigned_to if necessary
+    // }).then(() => {
+    //   setNewTaskTitle('');
+    //   setIsAddingTask(false);
+    // });
   };
 
   const handleTaskTitleBlur = () => {
