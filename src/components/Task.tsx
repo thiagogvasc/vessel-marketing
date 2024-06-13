@@ -1,9 +1,7 @@
-'use client'
-
 import React from 'react';
 import { Draggable } from 'react-beautiful-dnd';
+import { Card, CardContent, Typography } from '@mui/material';
 import { Task as TaskType } from '../types';
-import { Paper, Typography } from '@mui/material';
 
 export interface TaskWithId extends TaskType {
   id: string;
@@ -12,22 +10,24 @@ export interface TaskWithId extends TaskType {
 interface TaskProps {
   task: TaskWithId;
   index: number;
+  onClick: (task: TaskWithId) => void;
 }
 
-const Task: React.FC<TaskProps> = ({ task, index }) => {
+const Task: React.FC<TaskProps> = ({ task, index, onClick }) => {
   return (
     <Draggable draggableId={task.id} index={index}>
       {(provided) => (
-        <Paper
+        <Card
           ref={provided.innerRef}
           {...provided.draggableProps}
           {...provided.dragHandleProps}
-          sx={{ p: 2, mb: 2, background: '#fff', borderRadius: '8px', boxShadow: '0 1px 3px rgba(0, 0, 0, 0.2)' }}
+          sx={{ mb: 2, cursor: 'pointer' }}
+          onClick={() => onClick(task)}
         >
-          <Typography variant="h6">{task.title}</Typography>
-          <Typography variant="body2">{task.description}</Typography>
-          <Typography variant="body2">{task.priority} priority</Typography>
-        </Paper>
+          <CardContent>
+            <Typography variant="body1">{task.title}</Typography>
+          </CardContent>
+        </Card>
       )}
     </Draggable>
   );
