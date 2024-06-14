@@ -19,18 +19,29 @@ import { Logout } from '@mui/icons-material'
 import Link from 'next/link';
 import { User } from '../types';
 import { usePathname } from 'next/navigation';
-import { inherits } from 'util';
 
 const StyledListItemButton = styled(ListItemButton, {
   shouldForwardProp: (prop) => prop !== 'active',
 })<ListItemButtonProps & { active: number; href: string }>(({ theme, active }) => ({
-  color: active ? theme.palette.primary.main : 'inherit',
   backgroundColor: active ? ((theme.palette.primary as any)[50]) : 'inherit',
-  '& .MuiListItemIcon-root': {
-    color: active ? theme.palette.primary.main : 'inherit',
+  
+  '&:hover, .MuiListItemText-root > .MuiTypography-root':{
+    color: active ? theme.palette.primary.main : 'rgb(75 85 99)',
   },
+
+  '& .MuiListItemIcon-root': {
+    color: active ? theme.palette.primary.main : 'rgb(75 85 99)',
+  },
+  
   '&:hover': {
-    backgroundColor: active && ((theme.palette.primary as any)[50])
+    backgroundColor: active && ((theme.palette.primary as any)[50]),
+    
+    '.MuiListItemText-root > .MuiTypography-root': {
+      color: theme.palette.primary.main
+    },
+    '& .MuiListItemIcon-root': {
+      color: theme.palette.primary.main
+    },
   },
 }));
 

@@ -1,7 +1,7 @@
 'use client';
 import { Roboto } from 'next/font/google';
 import { createTheme } from '@mui/material/styles';
-import { deepPurple, purple } from '@mui/material/colors';
+import { blue, deepPurple, purple } from '@mui/material/colors';
 
 const roboto = Roboto({
   weight: ['300', '400', '500', '700'],
@@ -12,6 +12,9 @@ const roboto = Roboto({
 const theme = createTheme({
   typography: {
     fontFamily: roboto.style.fontFamily,
+    body1: {
+      color: 'rgb(75 85 99)',
+    },
   },
   palette: {
     primary: {

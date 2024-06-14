@@ -1,6 +1,7 @@
 import DatabaseView from "@/src/components/DatabaseView";
 import KanbanBoard from "@/src/components/KanbanBoard";
 import { Task } from "@/src/types";
+import { Container, Typography } from "@mui/material";
 import { Timestamp } from "firebase/firestore";
 
 const tasks: Task[] = [
@@ -41,10 +42,9 @@ const tasks: Task[] = [
 
 export default function Planning() {
     return (
-      <div>
-        <h1>Kanban Board - Test</h1>
-        {/* <KanbanBoard boardId='b34VLvMGePOdsnUdolFN'/> */}
+      <Container component="main" maxWidth="xl" sx={{ mt: 4 }}>
+        <Typography component="h1" variant="h5">Kanban Board - Test</Typography>
         <DatabaseView tasks={tasks.map(task => ({ ...task, start_date: task.start_at?.toDate(), end_date: task.end_at?.toDate()}))}/>
-      </div>
+      </Container>
     );
   }
