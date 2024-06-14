@@ -39,6 +39,49 @@ export interface RequestUpdate {
   update_description: string;
 }
 
+export enum PropertyType {
+  Text = 'Text',
+  Number = 'Number',
+  Date = 'Date',
+  Select = 'Select',
+  // MultiSelect = 'Multi-select',
+  // Checkbox = 'Checkbox',
+  // User = 'User'
+}
+
+export interface PropertyValidation {
+  allowedValues?: string[];
+  allowDecimals?: boolean;
+  precision?: number;
+}
+
+export interface PropertyMetadata {
+  maxLength?: number;
+  isRequired?: boolean;
+  placeholder?: string;
+  defaultValue?: string | number | string[] | number[];
+  tooltip?: string;
+  displayFormat?: string;
+  min?: number;
+  max?: number;
+  validation?: PropertyValidation;
+  multiple?: boolean;
+  options?: string[]; // applicable for Select and Multi-select types
+}
+
+export interface DatabaseProperty {
+  name: string;
+  type: PropertyType;
+  metadata: PropertyMetadata;
+}
+
+export interface Database {
+  id?: string;
+  name: string;
+  // workspaceId: string;
+  properties: DatabaseProperty[];
+}
+
 export interface Task {
   id?: string; // auto-generated
   board_id: string; // reference to Boards

@@ -33,7 +33,7 @@ const tasks: Task[] = [
     description: 'description 3',
     title: 'task3',
     priority: 'high',
-    status:'To Do',
+    status:'Done',
     start_at: Timestamp.fromDate(new Date(1999, 2, 3)),
     end_at: Timestamp.fromDate(new Date(1999, 2, 4))
   }
