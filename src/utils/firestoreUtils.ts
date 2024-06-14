@@ -1,7 +1,7 @@
 // src/utils/firestoreUtils.ts
 import { collection, addDoc, getDocs, updateDoc, doc, DocumentData, QuerySnapshot, getDoc, where, query, Timestamp, writeBatch, serverTimestamp, documentId } from "firebase/firestore";
 import { db } from "../../firebaseConfig";
-import { User, Request, Task, Column, AggregateBoard, AggregateColumn } from "../types";
+import { User, Request, Task, Column, AggregateBoard, AggregateColumn, Database } from "../types";
 
 export const convertDocs = <T>(querySnapshot: QuerySnapshot<DocumentData>): T[] => {
   return querySnapshot.docs.map((doc) => ({
@@ -39,6 +39,54 @@ export const fetchBoard = async (boardId: string): Promise<any> => {
     throw new Error('Board not found');
   }
 };
+
+export const getDatabaseById = async (id: string): Promise<Database | null> => {
+  const docRef = doc(db, 'databases', id);
+  const docSnap = await getDoc(docRef);
+  if (!docSnap.exists()) {
+    return null;
+  }
+  return { id: docSnap.id, ...docSnap.data() } as Database;
+};
+
+export async function getDatabaseTasks(databaseId: string) {
+  try {
+    // Fetch the database document
+    const databaseDocRef = doc(db, 'databases', databaseId);
+    console.warn('getting datbase')
+    const databaseDocSnap = await getDoc(databaseDocRef);
+    
+    if (!databaseDocSnap.exists()) {
+      throw new Error('Database not found');
+    }
+    
+    // Fetch all tasks related to the database
+    const tasksCollectionRef = collection(db, 'tasks');
+    const tasksQuery = query(tasksCollectionRef, where('database_id', '==', databaseId));
+    const tasksSnapshot = await getDocs(tasksQuery);
+    const tasks = tasksSnapshot.docs.map(doc => ({
+      id: doc.id,
+      ...doc.data()
+    } as Task));
+
+
+    // Combine database data with tasks
+    const databaseData = databaseDocSnap.data() as Database;
+    console.warn({
+      id: databaseDocSnap.id,
+      ...databaseData,
+      tasks
+    })
+    return {
+      id: databaseDocSnap.id,
+      ...databaseData,
+      tasks
+    };
+  } catch (error) {
+    console.error('Error fetching database and tasks:', error);
+    throw error;
+  }
+}
 
 export const fetchAggregateBoard = async (boardId: string): Promise<any> => {
   // Fetch the board document

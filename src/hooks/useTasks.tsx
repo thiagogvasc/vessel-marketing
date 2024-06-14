@@ -1,27 +1,24 @@
 import { useQuery, useMutation, useQueryClient } from 'react-query';
-import { fetchTasks, addTask, updateTask, fetchBoard, updateTaskOrder, fetchAggregateBoard } from '../utils/firestoreUtils';
+import { fetchTasks, addTask, updateTask, fetchBoard, updateTaskOrder, fetchAggregateBoard, getDatabaseTasks, getDatabaseById } from '../utils/firestoreUtils';
 import { Task, Column, AggregateColumn, AggregateBoard } from '../types';
 
 // Fetch all tasks for a board
-export const useBoard = (boardId: string) => {
+export const useGetDatabaseTasks = (databaseId: string | null | undefined) => {
   const queryClient = useQueryClient();
 
-  return useQuery(['board', boardId], async () => {
-    console.warn('start fetching board')
-    const board = await fetchAggregateBoard(boardId) as AggregateBoard;
-    // const aggregateColumns: AggregateColumn[] = [];
+  return useQuery([databaseId, 'tasks'], () => {
+    console.warn('start fetching database', databaseId)
+    return databaseId ? getDatabaseTasks(databaseId) : Promise.resolve(null);;
+  }, { enabled: !!databaseId });
+};
 
-    // for (const column of board.columns) {
-    //   const tasks = await fetchTasks(column.taskIds);
-    //   aggregateColumns.push({
-    //     title: column.title,
-    //     tasks
-    //   })
-    // }
 
-    return { board } ;
+export const useGetDatabaseById = (databaseId: string) => {
+  return useQuery(["database", databaseId], () => getDatabaseById(databaseId), {
+    enabled: !!databaseId, // only run the query if id is truthy
   });
 };
+
 
 // Add a new task
 // Add a new task
@@ -57,7 +54,7 @@ export const useUpdateTask = () => {
     ({ id, updatedTask }: { id: string; updatedTask: Partial<Omit<Task, 'id' | 'created_at'>> }) => updateTask(id, updatedTask),
     {
       onSuccess: (_, variables) => {
-        queryClient.invalidateQueries(['board', variables.updatedTask.board_id]);
+        queryClient.invalidateQueries(['board', variables.updatedTask.database_id]);
       },
     }
   );

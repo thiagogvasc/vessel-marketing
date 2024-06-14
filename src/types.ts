@@ -69,7 +69,7 @@ export interface PropertyMetadata {
   options?: string[]; // applicable for Select and Multi-select types
 }
 
-export interface DatabaseProperty {
+export interface DatabasePropertyDefinition {
   name: string;
   type: PropertyType;
   metadata: PropertyMetadata;
@@ -79,22 +79,19 @@ export interface Database {
   id?: string;
   name: string;
   // workspaceId: string;
-  properties: DatabaseProperty[];
+  propertyDefinitions: DatabasePropertyDefinition[];
 }
 
 export interface Task {
   id?: string; // auto-generated
-  board_id: string; // reference to Boards
+  database_id: string;
   title: string;
   description: string;
-  status: 'To Do' | 'In Progress' | 'Done';
-  due_date?: Date;
-  assigned_to?: string; // reference to Users
-  priority: 'low' | 'medium' | 'high';
-  created_at?: Timestamp;
-  updated_at?: Timestamp;
-  start_at?: Timestamp;
-  end_at?: Timestamp;
+  created_at?: string; // ISO string format for timestamp
+  updated_at?: string; // ISO string format for timestamp
+  properties: {
+    [key: string]: any; // key is propertyId, value can be any type depending on the property type
+  };
 }
 
 export interface Column {

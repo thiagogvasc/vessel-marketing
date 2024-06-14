@@ -1,5 +1,4 @@
 import DatabaseView from "@/src/components/DatabaseView";
-import KanbanBoard from "@/src/components/KanbanBoard";
 import { Task } from "@/src/types";
 import { Container, Typography } from "@mui/material";
 import { Timestamp } from "firebase/firestore";
@@ -7,7 +6,7 @@ import { Timestamp } from "firebase/firestore";
 const tasks: Task[] = [
   {
     id: '1',
-    board_id: '',
+    database_id: '',
     description: 'description 1',
     title: 'task1',
     priority: 'high',
@@ -18,7 +17,7 @@ const tasks: Task[] = [
   },
   {
     id: '2',
-    board_id: '',
+    database_id: '',
     description: 'description 2',
     title: 'task2',
     priority: 'high',
@@ -29,7 +28,7 @@ const tasks: Task[] = [
   },
   {
     id: '3',
-    board_id: '',
+    database_id: '',
     description: 'description 3',
     title: 'task3',
     priority: 'high',

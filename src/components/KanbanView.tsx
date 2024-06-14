@@ -2,35 +2,43 @@
 
 import React, { useEffect, useState } from 'react';
 import { DragDropContext } from 'react-beautiful-dnd';
-import { useBoard, useUpdateTaskOrder } from '../hooks/useTasks';
+import { useGetDatabaseById, useGetDatabaseTasks, useUpdateTaskOrder } from '../hooks/useTasks';
 import Column from './Column';
-import { AggregateColumn, Column as ColumnType } from '../types';
-import { Box, CircularProgress, Grid, Fade, Grow, IconButton, TextField } from '@mui/material';
+import { AggregateColumn, Column as ColumnType, Task } from '../types';
+import { Box, Grid, IconButton, TextField } from '@mui/material';
 import AddIcon from '@mui/icons-material/Add';
-import { Task } from '../types';
 
 interface KanbanViewProps {
-  tasks: Task[];
+  databaseId: string;
 }
 
-const KanbanView: React.FC<KanbanViewProps> = ({ tasks }) => {
+const KanbanView: React.FC<KanbanViewProps> = ({ databaseId }) => {
   const [columns, setColumns] = useState<AggregateColumn[]>([]);
   const [newColumnTitle, setNewColumnTitle] = useState('');
   const [isAddingColumn, setIsAddingColumn] = useState(false);
-//   const updateTaskOrderMutation = useUpdateTaskOrder();
+  const { data: databaseWithTasks, isLoading: isTasksLoading } = useGetDatabaseTasks(databaseId);
+  // const updateTaskOrderMutation = useUpdateTaskOrder();
+console.warn(columns)
 
   useEffect(() => {
-    const initialColumns = tasks.reduce((acc: AggregateColumn[], task) => {
-      const column = acc.find(col => col.title === task.status);
-      if (column) {
-        column.tasks.push(task);
-      } else {
-        acc.push({ title: task.status, tasks: [task] });
-      }
-      return acc;
-    }, []);
-    setColumns(initialColumns);
-  }, [tasks]);
+    if (databaseWithTasks) {
+      const initialColumns = databaseWithTasks.tasks.reduce((acc: AggregateColumn[], task) => {
+        const statusProperty = databaseWithTasks.propertyDefinitions.find(prop => prop.name.toLowerCase() === 'status');
+        console.warn(statusProperty)
+        if (statusProperty) {
+          const columnTitle = task.properties[statusProperty.name];
+          const column = acc.find(col => col.title === columnTitle);
+          if (column) {
+            column.tasks.push(task);
+          } else {
+            acc.push({ title: columnTitle, tasks: [task] });
+          }
+        }
+        return acc;
+      }, []);
+      setColumns(initialColumns);
+    }
+  }, [databaseWithTasks]);
 
   const handleDragEnd = (result: any) => {
     if (!result.destination) return;
@@ -53,12 +61,12 @@ const KanbanView: React.FC<KanbanViewProps> = ({ tasks }) => {
         return col;
       }));
 
-    //   updateTaskOrderMutation.mutate(
-    //     columns.map(column => ({
-    //       title: column.title,
-    //       taskIds: column.tasks.map(task => task.id),
-    //     } as ColumnType))
-    //   );
+      // updateTaskOrderMutation.mutate(
+      //   columns.map(column => ({
+      //     title: column.title,
+      //     taskIds: column.tasks.map(task => task.id),
+      //   } as ColumnType))
+      // );
     }
   };
 
@@ -85,23 +93,24 @@ const KanbanView: React.FC<KanbanViewProps> = ({ tasks }) => {
     }
   };
 
+  if (isTasksLoading) return <div>Loading...</div>;
+
   return (
     <div>
-        
-    <Box>
+      <Box>
         <DragDropContext onDragEnd={handleDragEnd}>
-        <Grid container spacing={2} sx={{ mt: 2 }}>
+          <Grid container spacing={2} sx={{ mt: 2 }}>
             {columns.map(column => (
-            <React.Fragment key={column.title}>
+              <React.Fragment key={column.title}>
                 <Grid item xs={12} md={4}>
-                <Column column={column} />
+                  <Column column={column} />
                 </Grid>
-            </React.Fragment>
+              </React.Fragment>
             ))}
             <Grid item xs={12} md={4}>
-            {isAddingColumn ? (
+              {isAddingColumn ? (
                 <Box sx={{ display: 'flex', alignItems: 'center' }}>
-                <TextField
+                  <TextField
                     placeholder="Column title"
                     value={newColumnTitle}
                     onChange={(e) => setNewColumnTitle(e.target.value)}
@@ -111,21 +120,20 @@ const KanbanView: React.FC<KanbanViewProps> = ({ tasks }) => {
                     size="small"
                     sx={{ flex: 1 }}
                     autoFocus
-                />
-                <IconButton color="primary" onClick={handleAddColumn}>
+                  />
+                  <IconButton color="primary" onClick={handleAddColumn}>
                     <AddIcon />
-                </IconButton>
+                  </IconButton>
                 </Box>
-            ) : (
+              ) : (
                 <IconButton color="primary" onClick={() => setIsAddingColumn(true)}>
-                <AddIcon />
+                  <AddIcon />
                 </IconButton>
-            )}
+              )}
             </Grid>
-        </Grid>
+          </Grid>
         </DragDropContext>
-    </Box>
-    
+      </Box>
     </div>
   );
 };
