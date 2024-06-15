@@ -1,5 +1,5 @@
 // src/utils/firestoreUtils.ts
-import { collection, addDoc, getDocs, updateDoc, doc, DocumentData, QuerySnapshot, getDoc, where, query, Timestamp, writeBatch, serverTimestamp, documentId } from "firebase/firestore";
+import { collection, addDoc, getDocs, updateDoc, doc, DocumentData, QuerySnapshot, getDoc, where, query, Timestamp, writeBatch, serverTimestamp, documentId, runTransaction } from "firebase/firestore";
 import { db } from "../../firebaseConfig";
 import { User, Request, Task, Column, AggregateBoard, AggregateColumn, Database } from "../types";
 
@@ -125,17 +125,37 @@ export const fetchAggregateBoard = async (boardId: string): Promise<any> => {
   return { id: boardDoc.id, ...boardData, columns: columnsWithTasks } as AggregateBoard;
 };
 
+interface NewTask extends Omit<Task, 'id' | 'created_at' | 'updated_at'> {}
 
-
-// Add a new task
-export const addTask = async (task: Omit<Task, 'id' | 'created_at' | 'updated_at'>): Promise<string> => {
+export const addTask = async (newTask: NewTask): Promise<Task> => {
   const tasksCollection = collection(db, 'tasks');
-  const taskDoc = await addDoc(tasksCollection, {
-    ...task,
-    created_at: serverTimestamp(),
-    updated_at: serverTimestamp(),
+
+  // Use a Firestore transaction to ensure atomicity
+  const addedTask = await runTransaction(db, async (transaction) => {
+    const taskDoc = await addDoc(tasksCollection, {
+      ...newTask,
+      created_at: serverTimestamp(),
+      updated_at: serverTimestamp(),
+    });
+
+    const docSnap = await transaction.get(taskDoc);
+
+    if (!docSnap.exists()) {
+      throw new Error('Failed to get the document after adding it.');
+    }
+
+    const docData = docSnap.data() as Task;
+
+    return {
+      id: taskDoc.id,
+      ...docData,
+      created_at: docData.created_at,
+      updated_at: docData.updated_at,
+    };
   });
-  return taskDoc.id;
+
+  console.warn('addedtask', addedTask)
+  return addedTask;
 };
 
 // Update an existing task

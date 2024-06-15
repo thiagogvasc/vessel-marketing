@@ -39,6 +39,42 @@ export interface RequestUpdate {
   update_description: string;
 }
 
+export interface ViewFilter {
+  property_id: string;
+  condition: string; // e.g., 'equals', 'contains'
+  value: any;
+}
+
+export interface ViewSort {
+  property_id: string;
+  order: 'Asc' | 'Desc';
+}
+
+export interface ManualSortGroup {
+  group_by_value: string;
+  task_order: string[];
+}
+
+export interface ManualSortConfig {
+  group_by_id: string;
+  sort_groups: ManualSortGroup[];
+}
+
+export interface ViewConfig {
+  group_by: string; // property ID for grouping
+  manual_sort?: ManualSortConfig; // optional manual sorting configuration
+  filters?: ViewFilter[];
+  sorts?: ViewSort[];
+}
+
+export interface DatabaseView {
+  id?: string;
+  database_id: string;
+  name: string;
+  type: string;
+  config?: ViewConfig;
+}
+
 export enum PropertyType {
   Text = 'Text',
   Number = 'Number',
@@ -79,6 +115,7 @@ export interface Database {
   id?: string;
   name: string;
   // workspaceId: string;
+  views: DatabaseView[];
   propertyDefinitions: DatabasePropertyDefinition[];
 }
 

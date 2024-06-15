@@ -20,8 +20,7 @@ const DatabaseView: React.FC<DatabaseViewProps> = ({ tasks }) => {
     setSelectedTab(newValue);
   };
 
-  // const { data: database } = useGetDatabaseById('tC55EemN4FV8zJhgVMs0');
-  // const { data: t } = useGetDatabaseTasks(database?.id);
+  const { data } = useGetDatabaseTasks('tC55EemN4FV8zJhgVMs0');
   // useEffect(() => {
 
   // }, [database, t])
@@ -34,18 +33,13 @@ const DatabaseView: React.FC<DatabaseViewProps> = ({ tasks }) => {
         variant="scrollable"
         scrollButtons="auto"
       >
-        <Tab label="Kanban" />
-        <Tab label="Table" />
-        <Tab label="List"/>
-        <Tab label="Gantt" disabled/>
-        <Tab label="Calendar" disabled/>
+        {data?.views.map(databaseView => <Tab key={databaseView.name} label={databaseView.name} /> )}
       </Tabs>
       <Box sx={{ p: 3 }}>
-        {selectedTab === 0 && <KanbanView databaseId='tC55EemN4FV8zJhgVMs0' />}
-        {selectedTab === 1 && <TableView tasks={tasks} />}
-        {selectedTab === 2 && <ListView tasks={tasks} />}
-        {/* {selectedTab === 3 && <GanttView tasks={tasks} />} */}
-        {/* {selectedTab === 4 && <CalendarView tasks={tasks} />} */}
+        {data?.views.map(databaseView => {
+          if (databaseView.type === 'kanban') return <KanbanView key={databaseView.name} databaseId={data?.id} databaseView={databaseView} />
+          return <>View type not supported</>
+        })}
       </Box>
     </Box>
   );

@@ -1,20 +1,21 @@
 import { useQuery, useMutation, useQueryClient } from 'react-query';
 import { fetchTasks, addTask, updateTask, fetchBoard, updateTaskOrder, fetchAggregateBoard, getDatabaseTasks, getDatabaseById } from '../utils/firestoreUtils';
-import { Task, Column, AggregateColumn, AggregateBoard } from '../types';
+import { Task, Column, AggregateColumn, AggregateBoard, Database } from '../types';
+import { Updater } from 'react-query/types/core/utils';
 
 // Fetch all tasks for a board
 export const useGetDatabaseTasks = (databaseId: string | null | undefined) => {
   const queryClient = useQueryClient();
 
-  return useQuery([databaseId, 'tasks'], () => {
+  return useQuery(['database-tasks', databaseId], () => {
     console.warn('start fetching database', databaseId)
     return databaseId ? getDatabaseTasks(databaseId) : Promise.resolve(null);;
-  }, { enabled: !!databaseId });
+  }, { enabled: !!databaseId, refetchOnMount: false });
 };
 
 
 export const useGetDatabaseById = (databaseId: string) => {
-  return useQuery(["database", databaseId], () => getDatabaseById(databaseId), {
+  return useQuery(["databases", databaseId], () => getDatabaseById(databaseId), {
     enabled: !!databaseId, // only run the query if id is truthy
   });
 };
@@ -22,28 +23,35 @@ export const useGetDatabaseById = (databaseId: string) => {
 
 // Add a new task
 // Add a new task
-export const useAddTask = (boardId: string) => {
+export const useAddTask = (databaseId: string) => {
   const queryClient = useQueryClient();
 
   return useMutation(
-    async (task: Omit<Task, 'id' | 'created_at' | 'updated_at'> & { columnTitle: string }) => {
-      const taskId = await addTask(task);
-      const board = await fetchBoard(boardId);
-
-      const column = board.columns.find((col: Column) => col.title === task.columnTitle);
-      if (column) {
-        column.taskIds.push(taskId);
-      }
-
-      await updateTaskOrder(boardId, board.columns);
-      return { taskId, boardId, columnTitle: task.columnTitle };
+    async (task: Omit<Task, 'id' | 'created_at' | 'updated_at'>) => {
+      const addedTask = await addTask(task);
+      return addedTask;
     },
     {
-      onSuccess: () => {
-        queryClient.invalidateQueries(['board', boardId]);
-      },
+      onSuccess: (task) => {
+        const previousDatabaseTasks = queryClient.getQueryData(['database-tasks', databaseId]) as Database & { tasks: Task[]};
+        queryClient.setQueryData<Database & { tasks: Task[]}>(['database-tasks', databaseId], (old) => ({
+          ...previousDatabaseTasks,
+          tasks: [...old?.tasks ?? [], task]
+        }))
+      }
     }
   );
+};
+
+export const useReorderTask = () => {
+
+};
+
+export const useAddColumn = () => {
+};
+
+export const useReorderColumn = () => {
+
 };
 
 // Update an existing task
@@ -55,20 +63,6 @@ export const useUpdateTask = () => {
     {
       onSuccess: (_, variables) => {
         queryClient.invalidateQueries(['board', variables.updatedTask.database_id]);
-      },
-    }
-  );
-};
-
-// Update the task order
-export const useUpdateTaskOrder = (boardId: string) => {
-  const queryClient = useQueryClient();
-
-  return useMutation(
-    (columns: Column[]) => updateTaskOrder(boardId, columns),
-    {
-      onSuccess: () => {
-        queryClient.invalidateQueries(['board', boardId]);
       },
     }
   );

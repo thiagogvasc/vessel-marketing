@@ -1,18 +1,19 @@
 'use client'
 
 import React, { useEffect, useState } from 'react';
-import { DragDropContext } from 'react-beautiful-dnd';
+import { DragDropContext } from '@hello-pangea/dnd';
 import { useGetDatabaseById, useGetDatabaseTasks, useUpdateTaskOrder } from '../hooks/useTasks';
 import Column from './Column';
-import { AggregateColumn, Column as ColumnType, Task } from '../types';
+import { AggregateColumn, Column as ColumnType, DatabaseView, Task } from '../types';
 import { Box, Grid, IconButton, TextField } from '@mui/material';
 import AddIcon from '@mui/icons-material/Add';
 
 interface KanbanViewProps {
   databaseId: string;
+  databaseView: DatabaseView;
 }
 
-const KanbanView: React.FC<KanbanViewProps> = ({ databaseId }) => {
+const KanbanView: React.FC<KanbanViewProps> = ({ databaseId, databaseView }) => {
   const [columns, setColumns] = useState<AggregateColumn[]>([]);
   const [newColumnTitle, setNewColumnTitle] = useState('');
   const [isAddingColumn, setIsAddingColumn] = useState(false);
@@ -24,7 +25,6 @@ console.warn(columns)
     if (databaseWithTasks) {
       const initialColumns = databaseWithTasks.tasks.reduce((acc: AggregateColumn[], task) => {
         const statusProperty = databaseWithTasks.propertyDefinitions.find(prop => prop.name.toLowerCase() === 'status');
-        console.warn(statusProperty)
         if (statusProperty) {
           const columnTitle = task.properties[statusProperty.name];
           const column = acc.find(col => col.title === columnTitle);
@@ -103,7 +103,7 @@ console.warn(columns)
             {columns.map(column => (
               <React.Fragment key={column.title}>
                 <Grid item xs={12} md={4}>
-                  <Column column={column} />
+                  <Column column={column} databaseView={databaseView} databaseId={databaseId} />
                 </Grid>
               </React.Fragment>
             ))}

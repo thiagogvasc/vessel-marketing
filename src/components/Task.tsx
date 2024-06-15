@@ -1,5 +1,5 @@
 import React from 'react';
-import { Draggable } from 'react-beautiful-dnd';
+import { Draggable } from '@hello-pangea/dnd';
 import { Card, CardContent, Typography } from '@mui/material';
 import { Task as TaskType } from '../types';
 

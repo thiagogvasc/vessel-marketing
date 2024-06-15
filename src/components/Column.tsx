@@ -1,43 +1,52 @@
 'use client'
 
 import React, { useState } from 'react';
-import { Droppable } from 'react-beautiful-dnd';
+import { Droppable } from '@hello-pangea/dnd';
 import Task, { TaskWithId } from './Task';
-import { AggregateColumn } from '../types';
-import { Box, Paper, Typography, IconButton, TextField, Button } from '@mui/material';
+import { AggregateColumn, DatabaseView } from '../types';
+import { Box, Paper, Typography, IconButton, TextField, Button, CircularProgress } from '@mui/material';
 import AddIcon from '@mui/icons-material/Add';
 import TaskModal from './TaskModal'; // import the TaskModal component
-import { useAddTask } from '../hooks/useTasks';
+import { useAddTask, useGetDatabaseById, useGetDatabaseTasks } from '../hooks/useTasks';
 
 interface ColumnProps {
   column: AggregateColumn;
-  // boardId: string;
+  databaseId: string;
+  databaseView: DatabaseView;
 }
 
-const Column: React.FC<ColumnProps> = ({ column }) => {
-  // const addTaskMutation = useAddTask(boardId);
+const Column: React.FC<ColumnProps> = ({ column, databaseId }) => {
+  const addTaskMutation = useAddTask(databaseId);
+  const { data: database } = useGetDatabaseTasks(databaseId);
   const [newTaskTitle, setNewTaskTitle] = useState('');
   const [isAddingTask, setIsAddingTask] = useState(false);
   const [selectedTask, setSelectedTask] = useState<TaskWithId | null>(null);
   const [isModalOpen, setIsModalOpen] = useState(false);
+
+  console.warn('Column tasks', column)
 
   const handleAddTask = () => {
     if (newTaskTitle.trim() === '') {
       setIsAddingTask(false);
       return;
     }
-    // addTaskMutation.mutateAsync({
-    //   board_id: boardId,
-    //   title: newTaskTitle,
-    //   description: '',
-    //   priority: 'medium',
-    //   status: column.title as 'To Do' | 'In Progress' | 'Done',
-    //   columnTitle: column.title,
-    //   assigned_to: '', // Add assigned_to if necessary
-    // }).then(() => {
-    //   setNewTaskTitle('');
-    //   setIsAddingTask(false);
-    // });
+
+    const defaultPropMap = new Map();
+    database?.propertyDefinitions.forEach(propDefinition => {
+      if (propDefinition.name === 'status') {
+        defaultPropMap.set('status', column.title);
+      }
+    })
+    
+    addTaskMutation.mutateAsync({
+      database_id: databaseId,
+      title: newTaskTitle,
+      description: '',
+      properties: Object.fromEntries(defaultPropMap)
+    }).then(() => {
+      setNewTaskTitle('');
+      setIsAddingTask(false);
+    });
   };
 
   const handleTaskTitleBlur = () => {
@@ -84,25 +93,33 @@ const Column: React.FC<ColumnProps> = ({ column }) => {
             ))}
             {isAddingTask && (
               <Box sx={{ p: 2, mb: 2, background: '#fff', borderRadius: '8px', boxShadow: '0 1px 3px rgba(0, 0, 0, 0.2)' }}>
-                <TextField
-                  placeholder="Task title"
-                  value={newTaskTitle}
-                  onChange={(e) => setNewTaskTitle(e.target.value)}
-                  onBlur={handleTaskTitleBlur}
-                  onKeyDown={handleTaskTitleKeyDown}
-                  variant="outlined"
-                  size="small"
-                  fullWidth
-                  autoFocus
-                />
-                <Box sx={{ display: 'flex', justifyContent: 'space-between', mt: 1 }}>
-                  <Button variant="contained" color="primary" onClick={handleAddTask}>
-                    Add
-                  </Button>
-                  <Button variant="outlined" color="secondary" onClick={() => setIsAddingTask(false)}>
-                    Cancel
-                  </Button>
-                </Box>
+                {addTaskMutation.isLoading ? 
+                  <>
+                    <CircularProgress />
+                  </>
+                : 
+                  <>
+                    <TextField
+                      placeholder="Task title"
+                      value={newTaskTitle}
+                      onChange={(e) => setNewTaskTitle(e.target.value)}
+                      onBlur={handleTaskTitleBlur}
+                      onKeyDown={handleTaskTitleKeyDown}
+                      variant="outlined"
+                      size="small"
+                      fullWidth
+                      autoFocus
+                    />
+                    <Box sx={{ display: 'flex', justifyContent: 'space-between', mt: 1 }}>
+                      <Button variant="contained" color="primary" onClick={handleAddTask}>
+                        Add
+                      </Button>
+                      <Button variant="outlined" color="secondary" onClick={() => setIsAddingTask(false)}>
+                        Cancel
+                      </Button>
+                    </Box>
+                  </>
+                }
               </Box>
             )}
             {provided.placeholder}
