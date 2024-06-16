@@ -175,3 +175,42 @@ export const updateTaskOrder = async (boardId: string, columns: Column[]): Promi
     updated_at: serverTimestamp(),
   });
 };
+
+export const addKanbanColumn = async (databaseId: string, viewId: string, newOption: string) => {
+  const databaseDoc = doc(db, 'databases', databaseId);
+  
+  try {
+    // Fetch the current document data
+    const docSnap = await getDoc(databaseDoc);
+    
+    if (docSnap.exists()) {
+      const data = docSnap.data();
+      
+      // Find the status property within propertyDefinitions
+      const propertyDefinitions = data.propertyDefinitions || [];
+      const statusProperty = propertyDefinitions.find((prop: any) => prop.name === 'status');
+
+      if (statusProperty && statusProperty.data && statusProperty.data.options) {
+        // Add the new option to the options array if it doesn't already exist
+        if (!statusProperty.data.options.includes(newOption)) {
+          statusProperty.data.options.push(newOption);
+          
+          // Update the document with the modified propertyDefinitions array
+          await updateDoc(databaseDoc, {
+            propertyDefinitions: propertyDefinitions
+          });
+          
+          console.log('New option added successfully!');
+        } else {
+          console.log('Option already exists.');
+        }
+      } else {
+        console.error('Status property or options array does not exist in the document.');
+      }
+    } else {
+      console.error('No such document!');
+    }
+  } catch (error) {
+    console.error('Error adding new option: ', error);
+  }
+};

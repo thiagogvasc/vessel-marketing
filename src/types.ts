@@ -61,7 +61,7 @@ export interface ManualSortConfig {
 }
 
 export interface ViewConfig {
-  group_by: string; // property ID for grouping
+  group_by?: string; // property ID for grouping
   manual_sort?: ManualSortConfig; // optional manual sorting configuration
   filters?: ViewFilter[];
   sorts?: ViewSort[];
@@ -108,7 +108,7 @@ export interface PropertyMetadata {
 export interface DatabasePropertyDefinition {
   name: string;
   type: PropertyType;
-  metadata: PropertyMetadata;
+  data?: PropertyMetadata;
 }
 
 export interface Database {

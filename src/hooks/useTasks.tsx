@@ -1,5 +1,5 @@
 import { useQuery, useMutation, useQueryClient } from 'react-query';
-import { fetchTasks, addTask, updateTask, fetchBoard, updateTaskOrder, fetchAggregateBoard, getDatabaseTasks, getDatabaseById } from '../utils/firestoreUtils';
+import { fetchTasks, addTask, updateTask, fetchBoard, updateTaskOrder, fetchAggregateBoard, getDatabaseTasks, getDatabaseById, addKanbanColumn } from '../utils/firestoreUtils';
 import { Task, Column, AggregateColumn, AggregateBoard, Database } from '../types';
 import { Updater } from 'react-query/types/core/utils';
 
@@ -47,7 +47,12 @@ export const useReorderTask = () => {
 
 };
 
-export const useAddColumn = () => {
+export const useAddKanbanColumn = () => {
+  return useMutation(
+    async ({ databaseId, viewId, newOption }: { databaseId: string; viewId: string, newOption: string }) => {
+      await addKanbanColumn(databaseId, viewId, newOption);
+    }
+  );
 };
 
 export const useReorderColumn = () => {

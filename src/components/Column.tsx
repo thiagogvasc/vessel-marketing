@@ -23,8 +23,6 @@ const Column: React.FC<ColumnProps> = ({ column, databaseId }) => {
   const [selectedTask, setSelectedTask] = useState<TaskWithId | null>(null);
   const [isModalOpen, setIsModalOpen] = useState(false);
 
-  console.warn('Column tasks', column)
-
   const handleAddTask = () => {
     if (newTaskTitle.trim() === '') {
       setIsAddingTask(false);

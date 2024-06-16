@@ -2,7 +2,7 @@
 
 import React, { useEffect, useState } from 'react';
 import { DragDropContext } from '@hello-pangea/dnd';
-import { useGetDatabaseById, useGetDatabaseTasks, useUpdateTaskOrder } from '../hooks/useTasks';
+import { useAddKanbanColumn, useGetDatabaseById, useGetDatabaseTasks } from '../hooks/useTasks';
 import Column from './Column';
 import { AggregateColumn, Column as ColumnType, DatabaseView, Task } from '../types';
 import { Box, Grid, IconButton, TextField } from '@mui/material';
@@ -18,24 +18,28 @@ const KanbanView: React.FC<KanbanViewProps> = ({ databaseId, databaseView }) => 
   const [newColumnTitle, setNewColumnTitle] = useState('');
   const [isAddingColumn, setIsAddingColumn] = useState(false);
   const { data: databaseWithTasks, isLoading: isTasksLoading } = useGetDatabaseTasks(databaseId);
-  // const updateTaskOrderMutation = useUpdateTaskOrder();
+  const addKanbanColumnMutation = useAddKanbanColumn(); 
 console.warn(columns)
 
   useEffect(() => {
     if (databaseWithTasks) {
-      const initialColumns = databaseWithTasks.tasks.reduce((acc: AggregateColumn[], task) => {
-        const statusProperty = databaseWithTasks.propertyDefinitions.find(prop => prop.name.toLowerCase() === 'status');
-        if (statusProperty) {
-          const columnTitle = task.properties[statusProperty.name];
-          const column = acc.find(col => col.title === columnTitle);
-          if (column) {
-            column.tasks.push(task);
-          } else {
-            acc.push({ title: columnTitle, tasks: [task] });
-          }
+      const initialColumns: AggregateColumn[] = [];
+      databaseWithTasks.propertyDefinitions.forEach(propertyDef => {
+        if (propertyDef.name === 'status') {
+          propertyDef.data?.options?.forEach(statusOption => {
+            const tasks: Task[] = [];
+            databaseWithTasks.tasks.forEach(task => {
+              if (task.properties['status'] === statusOption) {
+                tasks.push(task);
+              }
+            })
+            initialColumns.push({
+              title: statusOption,
+              tasks
+            })
+          })
         }
-        return acc;
-      }, []);
+      })
       setColumns(initialColumns);
     }
   }, [databaseWithTasks]);
@@ -72,9 +76,15 @@ console.warn(columns)
 
   const handleAddColumn = () => {
     if (newColumnTitle.trim() === '') return;
-    setColumns([...columns, { title: newColumnTitle, tasks: [] }]);
-    setNewColumnTitle('');
-    setIsAddingColumn(false);
+    // setColumns([...columns, { title: newColumnTitle, tasks: [] }]);
+    addKanbanColumnMutation.mutateAsync({
+      databaseId, 
+      viewId: databaseView.id ?? '',
+      newOption: newColumnTitle
+    }).then(() => {
+      setNewColumnTitle('');
+      setIsAddingColumn(false);
+    })
   };
 
   const handleColumnTitleBlur = () => {
