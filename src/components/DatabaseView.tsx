@@ -9,11 +9,8 @@ import ListView from './ListView';
 import { useGetDatabaseById, useGetDatabaseTasks } from '../hooks/useTasks';
 
 
-interface DatabaseViewProps {
-  tasks: Task[];
-}
 
-const DatabaseView: React.FC<DatabaseViewProps> = ({ tasks }) => {
+const DatabaseView: React.FC = () => {
   const [selectedTab, setSelectedTab] = useState(0);
 
   const handleTabChange = (event: React.ChangeEvent<{}>, newValue: number) => {

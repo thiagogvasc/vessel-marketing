@@ -50,19 +50,14 @@ export interface ViewSort {
   order: 'Asc' | 'Desc';
 }
 
-export interface ManualSortGroup {
+export interface GroupByGroup {
   group_by_value: string;
   task_order: string[];
 }
 
-export interface ManualSortConfig {
-  group_by_id: string;
-  sort_groups: ManualSortGroup[];
-}
-
 export interface ViewConfig {
   group_by?: string; // property ID for grouping
-  manual_sort?: ManualSortConfig; // optional manual sorting configuration
+  groups?: GroupByGroup[]; // optional manual sorting configuration
   filters?: ViewFilter[];
   sorts?: ViewSort[];
 }

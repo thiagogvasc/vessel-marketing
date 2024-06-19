@@ -23,6 +23,7 @@ const Task: React.FC<TaskProps> = ({ task, index, onClick }) => {
           {...provided.dragHandleProps}
           sx={{ mb: 2, cursor: 'pointer' }}
           onClick={() => onClick(task)}
+          elevation={0}
         >
           <CardContent>
             <Typography variant="body1">{task.title}</Typography>

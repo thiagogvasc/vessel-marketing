@@ -15,9 +15,10 @@ interface ColumnProps {
   databaseView: DatabaseView;
 }
 
-const Column: React.FC<ColumnProps> = ({ column, databaseId }) => {
-  const addTaskMutation = useAddTask(databaseId);
+const Column: React.FC<ColumnProps> = ({ column, databaseId, databaseView }) => {
+  const addTaskMutation = useAddTask(databaseId, databaseView.name);
   const { data: database } = useGetDatabaseTasks(databaseId);
+  console.warn('after setig query daa', database)
   const [newTaskTitle, setNewTaskTitle] = useState('');
   const [isAddingTask, setIsAddingTask] = useState(false);
   const [selectedTask, setSelectedTask] = useState<TaskWithId | null>(null);
@@ -75,7 +76,7 @@ const Column: React.FC<ColumnProps> = ({ column, databaseId }) => {
   };
 
   return (
-    <Paper elevation={2} sx={{ p: 2, background: '#f0f0f0', borderRadius: '8px', position: 'relative' }}>
+    <Paper elevation={0} sx={{ p: 2, background: 'rgb(237 237 237)', borderRadius: '8px', position: 'relative', boxShadow: '0px 1px 2px 0px rgba(84,87,118,.12)' }}>
       <Typography variant="h6" gutterBottom>
         {column.title}
       </Typography>
@@ -84,7 +85,7 @@ const Column: React.FC<ColumnProps> = ({ column, databaseId }) => {
           <Box
             ref={provided.innerRef}
             {...provided.droppableProps}
-            sx={{ minHeight: '100px', background: snapshot.isDraggingOver ? 'lightblue' : '#f0f0f0', p: 1, borderRadius: '8px' }}
+            sx={{ minHeight: '100px', background: snapshot.isDraggingOver ? 'lightblue' : 'rgb(237 237 237)', p: 1, borderRadius: '8px' }}
           >
             {column.tasks.map((task, index) => (
               task?.id && <Task key={task.id} task={task as TaskWithId} index={index} onClick={handleTaskClick} />
@@ -129,12 +130,14 @@ const Column: React.FC<ColumnProps> = ({ column, databaseId }) => {
           <AddIcon />
         </IconButton>
       )}
-      <TaskModal
-        task={selectedTask}
-        open={isModalOpen}
-        onClose={handleModalClose}
-        onSave={handleTaskSave}
-      />
+      {selectedTask && (
+        <TaskModal
+          task={selectedTask}
+          open={isModalOpen}
+          onClose={handleModalClose}
+          onSave={handleTaskSave}
+        />
+      )}
     </Paper>
   );
 };

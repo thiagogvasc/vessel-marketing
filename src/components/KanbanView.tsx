@@ -2,9 +2,9 @@
 
 import React, { useEffect, useState } from 'react';
 import { DragDropContext } from '@hello-pangea/dnd';
-import { useAddKanbanColumn, useGetDatabaseById, useGetDatabaseTasks } from '../hooks/useTasks';
+import { useAddKanbanColumn, useGetDatabaseTasks, useUpdateKanbanViewManualSort } from '../hooks/useTasks';
 import Column from './Column';
-import { AggregateColumn, Column as ColumnType, DatabaseView, Task } from '../types';
+import { AggregateColumn, DatabaseView, Task } from '../types';
 import { Box, Grid, IconButton, TextField } from '@mui/material';
 import AddIcon from '@mui/icons-material/Add';
 
@@ -18,31 +18,24 @@ const KanbanView: React.FC<KanbanViewProps> = ({ databaseId, databaseView }) => 
   const [newColumnTitle, setNewColumnTitle] = useState('');
   const [isAddingColumn, setIsAddingColumn] = useState(false);
   const { data: databaseWithTasks, isLoading: isTasksLoading } = useGetDatabaseTasks(databaseId);
-  const addKanbanColumnMutation = useAddKanbanColumn(); 
-console.warn(columns)
+  const updateKanbanViewManualSort = useUpdateKanbanViewManualSort();
+  const addKanbanColumnMutation = useAddKanbanColumn(databaseId, databaseView.name);
 
   useEffect(() => {
     if (databaseWithTasks) {
       const initialColumns: AggregateColumn[] = [];
-      databaseWithTasks.propertyDefinitions.forEach(propertyDef => {
-        if (propertyDef.name === 'status') {
-          propertyDef.data?.options?.forEach(statusOption => {
-            const tasks: Task[] = [];
-            databaseWithTasks.tasks.forEach(task => {
-              if (task.properties['status'] === statusOption) {
-                tasks.push(task);
-              }
-            })
-            initialColumns.push({
-              title: statusOption,
-              tasks
-            })
-          })
-        }
-      })
+      databaseView.config?.groups?.forEach(sortGroup => {
+        const taskIds = sortGroup.task_order;
+        const columnTitle = sortGroup.group_by_value;
+        const tasks = taskIds.map(taskId => databaseWithTasks.tasks.find(t => t.id === taskId) as Task);
+        initialColumns.push({
+          title: columnTitle,
+          tasks
+        });
+      });
       setColumns(initialColumns);
     }
-  }, [databaseWithTasks]);
+  }, [databaseWithTasks, databaseView]);
 
   const handleDragEnd = (result: any) => {
     if (!result.destination) return;
@@ -65,26 +58,24 @@ console.warn(columns)
         return col;
       }));
 
-      // updateTaskOrderMutation.mutate(
-      //   columns.map(column => ({
-      //     title: column.title,
-      //     taskIds: column.tasks.map(task => task.id),
-      //   } as ColumnType))
-      // );
+      updateKanbanViewManualSort.mutateAsync({
+        databaseId, viewId: databaseView.name, columns
+      }).then(() => {
+        console.warn('updated order');
+      });
     }
   };
 
   const handleAddColumn = () => {
     if (newColumnTitle.trim() === '') return;
-    // setColumns([...columns, { title: newColumnTitle, tasks: [] }]);
     addKanbanColumnMutation.mutateAsync({
       databaseId, 
-      viewId: databaseView.id ?? '',
+      viewName: databaseView.name,
       newOption: newColumnTitle
     }).then(() => {
       setNewColumnTitle('');
       setIsAddingColumn(false);
-    })
+    });
   };
 
   const handleColumnTitleBlur = () => {
@@ -106,45 +97,41 @@ console.warn(columns)
   if (isTasksLoading) return <div>Loading...</div>;
 
   return (
-    <div>
-      <Box>
-        <DragDropContext onDragEnd={handleDragEnd}>
-          <Grid container spacing={2} sx={{ mt: 2 }}>
-            {columns.map(column => (
-              <React.Fragment key={column.title}>
-                <Grid item xs={12} md={4}>
-                  <Column column={column} databaseView={databaseView} databaseId={databaseId} />
-                </Grid>
-              </React.Fragment>
-            ))}
-            <Grid item xs={12} md={4}>
-              {isAddingColumn ? (
-                <Box sx={{ display: 'flex', alignItems: 'center' }}>
-                  <TextField
-                    placeholder="Column title"
-                    value={newColumnTitle}
-                    onChange={(e) => setNewColumnTitle(e.target.value)}
-                    onBlur={handleColumnTitleBlur}
-                    onKeyDown={handleColumnTitleKeyDown}
-                    variant="outlined"
-                    size="small"
-                    sx={{ flex: 1 }}
-                    autoFocus
-                  />
-                  <IconButton color="primary" onClick={handleAddColumn}>
-                    <AddIcon />
-                  </IconButton>
-                </Box>
-              ) : (
-                <IconButton color="primary" onClick={() => setIsAddingColumn(true)}>
+    <Box sx={{ overflow: 'auto', display: 'flex', flexDirection: 'column', width: '80vw', height: '60vh'}}>
+      <DragDropContext onDragEnd={handleDragEnd}>
+        <Box sx={{ display: 'flex', flexDirection: 'row', gap: 2 }}>
+          {columns.map(column => (
+            <Box key={column.title} sx={{ minWidth: 300 }}>
+              <Column column={column} databaseView={databaseView} databaseId={databaseId} />
+            </Box>
+          ))}
+          <Box sx={{ minWidth: 300 }}>
+            {isAddingColumn ? (
+              <Box sx={{ display: 'flex', alignItems: 'center' }}>
+                <TextField
+                  placeholder="Column title"
+                  value={newColumnTitle}
+                  onChange={(e) => setNewColumnTitle(e.target.value)}
+                  onBlur={handleColumnTitleBlur}
+                  onKeyDown={handleColumnTitleKeyDown}
+                  variant="outlined"
+                  size="small"
+                  sx={{ flex: 1 }}
+                  autoFocus
+                />
+                <IconButton color="primary" onClick={handleAddColumn}>
                   <AddIcon />
                 </IconButton>
-              )}
-            </Grid>
-          </Grid>
-        </DragDropContext>
-      </Box>
-    </div>
+              </Box>
+            ) : (
+              <IconButton color="primary" onClick={() => setIsAddingColumn(true)}>
+                <AddIcon />
+              </IconButton>
+            )}
+          </Box>
+        </Box>
+      </DragDropContext>
+    </Box>
   );
 };
 

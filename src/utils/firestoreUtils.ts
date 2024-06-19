@@ -1,5 +1,5 @@
 // src/utils/firestoreUtils.ts
-import { collection, addDoc, getDocs, updateDoc, doc, DocumentData, QuerySnapshot, getDoc, where, query, Timestamp, writeBatch, serverTimestamp, documentId, runTransaction } from "firebase/firestore";
+import { collection, addDoc, getDocs, updateDoc, doc, DocumentData, QuerySnapshot, getDoc, where, query, Timestamp, writeBatch, serverTimestamp, documentId, runTransaction, setDoc } from "firebase/firestore";
 import { db } from "../../firebaseConfig";
 import { User, Request, Task, Column, AggregateBoard, AggregateColumn, Database } from "../types";
 
@@ -127,16 +127,47 @@ export const fetchAggregateBoard = async (boardId: string): Promise<any> => {
 
 interface NewTask extends Omit<Task, 'id' | 'created_at' | 'updated_at'> {}
 
-export const addTask = async (newTask: NewTask): Promise<Task> => {
+export const addTask = async (newTask: NewTask, databaseId: string, viewName: string): Promise<Task> => {
   const tasksCollection = collection(db, 'tasks');
+  const taskDoc = doc(tasksCollection)
 
   // Use a Firestore transaction to ensure atomicity
   const addedTask = await runTransaction(db, async (transaction) => {
-    const taskDoc = await addDoc(tasksCollection, {
+    await setDoc(taskDoc, {
       ...newTask,
       created_at: serverTimestamp(),
       updated_at: serverTimestamp(),
     });
+
+    const databaseDoc = doc(db, 'databases', databaseId);
+    const database = (await getDoc(databaseDoc)).data() as Database;
+    const newviews = database.views.map(view => {
+      if (view.name === viewName) {
+        return {
+          ...view,
+          config: {
+            ...view.config,
+            groups: view.config?.groups?.map(group => {
+              if (group.group_by_value === newTask.properties['status']) {
+                return {
+                  ...group,
+                  task_order: [...group.task_order, taskDoc.id]
+                }
+              } else {
+                return group;
+              }
+            })
+          }
+        }
+      } else {
+        return view;
+      }
+    })
+
+    await updateDoc(databaseDoc, {
+      views: newviews
+    })
+
 
     const docSnap = await transaction.get(taskDoc);
 
@@ -176,7 +207,21 @@ export const updateTaskOrder = async (boardId: string, columns: Column[]): Promi
   });
 };
 
-export const addKanbanColumn = async (databaseId: string, viewId: string, newOption: string) => {
+export const updateKanbanViewManualSort = async (databaseId: string, viewName: string, columns: AggregateColumn[]) => {
+  const databaseDoc = doc(db, 'databases', databaseId);
+  const databaseSnapShot = await getDoc(databaseDoc);
+  const database = databaseSnapShot.data() as Database;
+  const view = database.views.find(view => view.name === viewName);
+
+  if (!view?.config?.groups) return;
+  view.config.groups = columns.map(column => ({ group_by_value: column.title, task_order: column.tasks.map(task => task.id as string)}));
+  const updatedViews = database.views.map(v => (v.name === viewName ? view : v));
+  await updateDoc(databaseDoc, {
+    views: updatedViews,
+  });
+}
+
+export const addKanbanColumn = async (databaseId: string, viewName: string, newOption: string) => {
   const databaseDoc = doc(db, 'databases', databaseId);
   
   try {
@@ -184,11 +229,24 @@ export const addKanbanColumn = async (databaseId: string, viewId: string, newOpt
     const docSnap = await getDoc(databaseDoc);
     
     if (docSnap.exists()) {
-      const data = docSnap.data();
+      const data = docSnap.data() as Database;
       
       // Find the status property within propertyDefinitions
       const propertyDefinitions = data.propertyDefinitions || [];
       const statusProperty = propertyDefinitions.find((prop: any) => prop.name === 'status');
+
+      const newViews = data.views.map(view => {
+        if (view.name === viewName) {
+          const newView = {...view};
+          newView.config?.groups?.push({
+            group_by_value: newOption,
+            task_order: []
+          })
+          return newView;
+        } else {
+          return view;
+        }
+      });
 
       if (statusProperty && statusProperty.data && statusProperty.data.options) {
         // Add the new option to the options array if it doesn't already exist
@@ -197,20 +255,16 @@ export const addKanbanColumn = async (databaseId: string, viewId: string, newOpt
           
           // Update the document with the modified propertyDefinitions array
           await updateDoc(databaseDoc, {
-            propertyDefinitions: propertyDefinitions
+            propertyDefinitions: propertyDefinitions,
+            views: newViews
           });
-          
-          console.log('New option added successfully!');
-        } else {
-          console.log('Option already exists.');
+
+          return newOption;
         }
-      } else {
-        console.error('Status property or options array does not exist in the document.');
       }
-    } else {
-      console.error('No such document!');
     }
   } catch (error) {
     console.error('Error adding new option: ', error);
+    throw error;
   }
 };
