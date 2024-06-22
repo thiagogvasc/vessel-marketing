@@ -7,7 +7,7 @@ import { AggregateColumn, DatabaseView } from '../types';
 import { Box, Paper, Typography, IconButton, TextField, Button, CircularProgress } from '@mui/material';
 import AddIcon from '@mui/icons-material/Add';
 import TaskModal from './TaskModal'; // import the TaskModal component
-import { useAddTask, useGetDatabaseById, useGetDatabaseTasks } from '../hooks/useTasks';
+import { useAddTask, useGetDatabaseById, useGetDatabaseTasks, useUpdateTask } from '../hooks/useTasks';
 
 interface ColumnProps {
   column: AggregateColumn;
@@ -17,6 +17,7 @@ interface ColumnProps {
 
 const Column: React.FC<ColumnProps> = ({ column, databaseId, databaseView }) => {
   const addTaskMutation = useAddTask(databaseId, databaseView.name);
+  const updateTaskMutation = useUpdateTask();
   const { data: database } = useGetDatabaseTasks(databaseId);
   console.warn('after setig query daa', database)
   const [newTaskTitle, setNewTaskTitle] = useState('');
@@ -70,9 +71,8 @@ const Column: React.FC<ColumnProps> = ({ column, databaseId, databaseView }) => 
     setSelectedTask(null);
   };
 
-  const handleTaskSave = (updatedTask: TaskWithId) => {
-    // Update the task in your state or make an API call to save the changes
-    console.log('Updated task:', updatedTask);
+  const handleTaskSave = async (updatedTask: TaskWithId) => {
+    await updateTaskMutation.mutateAsync({ id: updatedTask.id, updatedTask, databaseId, viewName: databaseView.name})
   };
 
   return (

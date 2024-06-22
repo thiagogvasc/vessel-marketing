@@ -1,7 +1,7 @@
 // src/utils/firestoreUtils.ts
 import { collection, addDoc, getDocs, updateDoc, doc, DocumentData, QuerySnapshot, getDoc, where, query, Timestamp, writeBatch, serverTimestamp, documentId, runTransaction, setDoc } from "firebase/firestore";
 import { db } from "../../firebaseConfig";
-import { User, Request, Task, Column, AggregateBoard, AggregateColumn, Database } from "../types";
+import { User, Request, Task, Column, AggregateBoard, AggregateColumn, Database, GroupByGroup } from "../types";
 
 export const convertDocs = <T>(querySnapshot: QuerySnapshot<DocumentData>): T[] => {
   return querySnapshot.docs.map((doc) => ({
@@ -189,12 +189,72 @@ export const addTask = async (newTask: NewTask, databaseId: string, viewName: st
   return addedTask;
 };
 
-// Update an existing task
-export const updateTask = async (id: string, updatedTask: Partial<Omit<Task, 'id' | 'created_at'>>): Promise<void> => {
-  const taskDoc = doc(db, 'tasks', id);
+export const updateTask = async (
+  id: string,
+  updatedTask: Partial<Omit<Task, "id" | "created_at">>,
+  databaseId: string,
+  viewName: string
+): Promise<void> => {
+  const taskDoc = doc(db, "tasks", id);
   await updateDoc(taskDoc, {
     ...updatedTask,
     updated_at: serverTimestamp(),
+  });
+
+  const database = await getDatabaseById(databaseId);
+  if (!database) {
+    throw new Error(`Database with id ${databaseId} not found`);
+  }
+
+  const newViews = database.views.map((view) => {
+    const changedProperties = updatedTask.properties;
+    if (!changedProperties) return view;
+
+    Object.keys(changedProperties).forEach((propertyName) => {
+      if (view.config?.group_by === propertyName) {
+        // Remove task from the old group
+        let indexToRemove = -1;
+        let groupToRemoveTaskFrom: GroupByGroup | null = null;
+        view.config.groups?.forEach((group) => {
+          const taskIndex = group.task_order.indexOf(id);
+          if (taskIndex !== -1) {
+            indexToRemove = taskIndex;
+            groupToRemoveTaskFrom = group;
+          }
+        });
+
+        if (indexToRemove !== -1 && groupToRemoveTaskFrom) {
+          groupToRemoveTaskFrom.task_order.splice(indexToRemove, 1);
+        }
+
+        // Add task to the new group
+        const newGroupByValue = changedProperties[view.config.group_by];
+        const newGroup = view.config.groups?.find(
+          (group) => group.group_by_value === newGroupByValue
+        );
+
+        if (newGroup) {
+          newGroup.task_order.push(id);
+        } else {
+          // If the group does not exist, create it
+          view.config.groups = [
+            ...(view.config.groups || []),
+            {
+              group_by_value: newGroupByValue,
+              task_order: [id],
+            },
+          ];
+        }
+      }
+    });
+
+    return view;
+  });
+
+  // Save the updated views back to the database
+  const databaseDoc = doc(db, "databases", databaseId);
+  await updateDoc(databaseDoc, {
+    views: newViews,
   });
 };
 

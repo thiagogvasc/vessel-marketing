@@ -130,7 +130,7 @@ export const useUpdateTask = () => {
   const queryClient = useQueryClient();
 
   return useMutation(
-    ({ id, updatedTask }: { id: string; updatedTask: Partial<Omit<Task, 'id' | 'created_at'>> }) => updateTask(id, updatedTask),
+    ({ id, updatedTask, databaseId, viewName }: { id: string; updatedTask: Partial<Omit<Task, 'id' | 'created_at'>>, databaseId: string, viewName: string }) => updateTask(id, updatedTask, databaseId, viewName),
     {
       onSuccess: (_, variables) => {
         queryClient.invalidateQueries(['board', variables.updatedTask.database_id]);

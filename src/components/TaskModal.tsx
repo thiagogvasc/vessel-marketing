@@ -24,7 +24,6 @@ const TaskModal: React.FC<TaskModalProps> = ({ task, open, onClose, onSave }) =>
   const [showNewPropertyForm, setShowNewPropertyForm] = useState(false);
 
   const { data: databaseWithTasks } = useGetDatabaseTasks(task?.database_id);
-  console.warn(properties);
 
   useEffect(() => {
     const propDefinitions = databaseWithTasks?.propertyDefinitions;
@@ -61,8 +60,10 @@ const TaskModal: React.FC<TaskModalProps> = ({ task, open, onClose, onSave }) =>
     onClose();
   };
 
-  const handlePropertyChange = (index: number, newValue: any) => {
-    setProperties(properties.map((prop, i) => i === index ? { ...prop, propertyValue: newValue } : prop));
+  const handlePropertyChange = (propertyName: string, newValue: any) => {
+    setProperties(properties.map(prop =>
+      prop.propertyDefinition.name === propertyName ? { ...prop, propertyValue: newValue } : prop
+    ));
   };
 
   const handleAddProperty = () => {
@@ -86,7 +87,6 @@ const TaskModal: React.FC<TaskModalProps> = ({ task, open, onClose, onSave }) =>
             onChange={(e) => setTitle(e.target.value)}
             fullWidth
             variant="outlined"
-            inputProps={{ style: { fontSize: '2rem', fontWeight: 'bold' } }}
           />
           <Box sx={{ display: 'flex', gap: 4 }}>
             <TextField
@@ -105,7 +105,7 @@ const TaskModal: React.FC<TaskModalProps> = ({ task, open, onClose, onSave }) =>
                     <TextField
                       label={prop.propertyDefinition.name}
                       value={prop.propertyValue}
-                      onChange={(e) => handlePropertyChange(index, e.target.value)}
+                      onChange={(e) => handlePropertyChange(prop.propertyDefinition.name, e.target.value)}
                       fullWidth
                     />
                   )}
@@ -115,7 +115,7 @@ const TaskModal: React.FC<TaskModalProps> = ({ task, open, onClose, onSave }) =>
                       <Select
                         labelId={`${prop.propertyDefinition.name}-label`}
                         value={prop.propertyValue}
-                        onChange={(e) => handlePropertyChange(index, e.target.value)}
+                        onChange={(e) => handlePropertyChange(prop.propertyDefinition.name, e.target.value)}
                         fullWidth
                       >
                         {prop.propertyDefinition.data?.options?.map(option => (
