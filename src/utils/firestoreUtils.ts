@@ -191,10 +191,10 @@ export const addTask = async (newTask: NewTask, databaseId: string, viewName: st
 
 export const updateTask = async (
   id: string,
-  updatedTask: Partial<Omit<Task, "id" | "created_at">>,
+  updatedTask: Partial<Omit<Task, "id">>,
   databaseId: string,
   viewName: string
-): Promise<void> => {
+): Promise<{id: string, updatedTask: Partial<Omit<Task, "id">>}> => {
   const taskDoc = doc(db, "tasks", id);
   await updateDoc(taskDoc, {
     ...updatedTask,
@@ -256,6 +256,8 @@ export const updateTask = async (
   await updateDoc(databaseDoc, {
     views: newViews,
   });
+
+  return { id, updatedTask }
 };
 
 // Update the task order in a board
@@ -267,18 +269,25 @@ export const updateTaskOrder = async (boardId: string, columns: Column[]): Promi
   });
 };
 
-export const updateKanbanViewManualSort = async (databaseId: string, viewName: string, columns: AggregateColumn[]) => {
+export const updateKanbanViewManualSort = async (databaseId: string, viewName: string, columns: AggregateColumn[], taskId: string, updatedTask: Partial<Task>): Promise<{id: string, updatedTask: Partial<Task>, columns: AggregateColumn[]}> => {
   const databaseDoc = doc(db, 'databases', databaseId);
   const databaseSnapShot = await getDoc(databaseDoc);
   const database = databaseSnapShot.data() as Database;
   const view = database.views.find(view => view.name === viewName);
 
-  if (!view?.config?.groups) return;
-  view.config.groups = columns.map(column => ({ group_by_value: column.title, task_order: column.tasks.map(task => task.id as string)}));
+  view?.config?.groups && (view.config.groups = columns.map(column => ({ group_by_value: column.title, task_order: column.tasks.map(task => task.id as string)})));
   const updatedViews = database.views.map(v => (v.name === viewName ? view : v));
   await updateDoc(databaseDoc, {
     views: updatedViews,
   });
+
+  await updateTask(taskId, updatedTask, databaseId, viewName);
+
+  return {
+    id: taskId,
+    updatedTask,
+    columns
+  }
 }
 
 export const addKanbanColumn = async (databaseId: string, viewName: string, newOption: string) => {

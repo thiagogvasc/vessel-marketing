@@ -18,10 +18,12 @@ const KanbanView: React.FC<KanbanViewProps> = ({ databaseId, databaseView }) => 
   const [newColumnTitle, setNewColumnTitle] = useState('');
   const [isAddingColumn, setIsAddingColumn] = useState(false);
   const { data: databaseWithTasks, isLoading: isTasksLoading } = useGetDatabaseTasks(databaseId);
-  const updateKanbanViewManualSort = useUpdateKanbanViewManualSort();
+  console.warn('databasewithtaskss rerender', databaseWithTasks)
+  const updateKanbanViewManualSort = useUpdateKanbanViewManualSort(databaseId, databaseView.id as string);
   const addKanbanColumnMutation = useAddKanbanColumn(databaseId, databaseView.name);
 
   useEffect(() => {
+    console.warn('useeffect databasewithtasks')
     if (databaseWithTasks) {
       const initialColumns: AggregateColumn[] = [];
       databaseView.config?.groups?.forEach(sortGroup => {
@@ -34,6 +36,7 @@ const KanbanView: React.FC<KanbanViewProps> = ({ databaseId, databaseView }) => 
         });
       });
       setColumns(initialColumns);
+      console.warn('initial columnsss',initialColumns)
     }
   }, [databaseWithTasks, databaseView]);
 
@@ -58,11 +61,19 @@ const KanbanView: React.FC<KanbanViewProps> = ({ databaseId, databaseView }) => 
         return col;
       }));
 
-      updateKanbanViewManualSort.mutateAsync({
-        databaseId, viewId: databaseView.name, columns
-      }).then(() => {
-        console.warn('updated order');
-      });
+      const groupByField = databaseView.config?.group_by;
+      if (groupByField) {
+        updateKanbanViewManualSort.mutateAsync({
+          columns, taskId: movedTask.id!, updatedTask: {
+            ...movedTask,
+            properties: {
+              [groupByField]: destinationColumn.title
+            }
+          }
+        }).then(() => {
+          console.warn('updated order');
+        });
+      }
     }
   };
 

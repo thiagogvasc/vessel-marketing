@@ -18,6 +18,7 @@ const TaskModal: React.FC<TaskModalProps> = ({ task, open, onClose, onSave }) =>
   const [title, setTitle] = useState(task?.title || '');
   const [description, setDescription] = useState(task?.description || '');
   const [properties, setProperties] = useState<{ propertyDefinition: DatabasePropertyDefinition, propertyValue: any }[]>([]);
+  console.warn(properties,"propertieess")
   const [newPropertyType, setNewPropertyType] = useState('');
   const [newPropertyName, setNewPropertyName] = useState('');
   const [newPropertyValue, setNewPropertyValue] = useState('');
@@ -37,7 +38,7 @@ const TaskModal: React.FC<TaskModalProps> = ({ task, open, onClose, onSave }) =>
       const propertyDefinition = propDefinitions?.find(propDef => propDef.name === propertyName);
       propertyDefinition && properties.push({ propertyDefinition, propertyValue });
     });
-
+    console.warn('task changed')
     setProperties(properties);
   }, [databaseWithTasks, task]);
 

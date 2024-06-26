@@ -1,6 +1,6 @@
 'use client'
 
-import React, { useState } from 'react';
+import React, { useEffect, useState } from 'react';
 import { Droppable } from '@hello-pangea/dnd';
 import Task, { TaskWithId } from './Task';
 import { AggregateColumn, DatabaseView } from '../types';
@@ -17,13 +17,19 @@ interface ColumnProps {
 
 const Column: React.FC<ColumnProps> = ({ column, databaseId, databaseView }) => {
   const addTaskMutation = useAddTask(databaseId, databaseView.name);
-  const updateTaskMutation = useUpdateTask();
+  const updateTaskMutation = useUpdateTask(databaseId, databaseView.name);
   const { data: database } = useGetDatabaseTasks(databaseId);
-  console.warn('after setig query daa', database)
   const [newTaskTitle, setNewTaskTitle] = useState('');
   const [isAddingTask, setIsAddingTask] = useState(false);
   const [selectedTask, setSelectedTask] = useState<TaskWithId | null>(null);
   const [isModalOpen, setIsModalOpen] = useState(false);
+
+  useEffect(() => {
+    if (selectedTask) {
+      const prevTask = column.tasks.find(task => task.id === selectedTask.id) as TaskWithId ?? null
+      setSelectedTask(prevTask)
+    }
+  }, [column])
 
   const handleAddTask = () => {
     if (newTaskTitle.trim() === '') {
@@ -72,7 +78,7 @@ const Column: React.FC<ColumnProps> = ({ column, databaseId, databaseView }) => 
   };
 
   const handleTaskSave = async (updatedTask: TaskWithId) => {
-    await updateTaskMutation.mutateAsync({ id: updatedTask.id, updatedTask, databaseId, viewName: databaseView.name})
+    await updateTaskMutation.mutateAsync({ id: updatedTask.id, updatedTask })
   };
 
   return (
