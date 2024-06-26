@@ -4,9 +4,10 @@ import React, { useEffect, useState } from 'react';
 import { Droppable } from '@hello-pangea/dnd';
 import Task, { TaskWithId } from './Task';
 import { AggregateColumn, DatabaseView } from '../types';
-import { Box, Paper, Typography, IconButton, TextField, Button, CircularProgress } from '@mui/material';
+import { Box, Paper, Typography, IconButton, TextField, Button, CircularProgress, Menu, MenuItem } from '@mui/material';
 import AddIcon from '@mui/icons-material/Add';
-import TaskModal from './TaskModal'; // import the TaskModal component
+import MoreVertIcon from '@mui/icons-material/MoreVert'; // Import the MoreVertIcon
+import TaskModal from './TaskModal';
 import { useAddTask, useGetDatabaseById, useGetDatabaseTasks, useUpdateTask } from '../hooks/useTasks';
 
 interface ColumnProps {
@@ -23,6 +24,10 @@ const Column: React.FC<ColumnProps> = ({ column, databaseId, databaseView }) => 
   const [isAddingTask, setIsAddingTask] = useState(false);
   const [selectedTask, setSelectedTask] = useState<TaskWithId | null>(null);
   const [isModalOpen, setIsModalOpen] = useState(false);
+
+  // State for context menu
+  const [anchorEl, setAnchorEl] = useState<null | HTMLElement>(null);
+  const isMenuOpen = Boolean(anchorEl);
 
   useEffect(() => {
     if (selectedTask) {
@@ -81,11 +86,37 @@ const Column: React.FC<ColumnProps> = ({ column, databaseId, databaseView }) => 
     await updateTaskMutation.mutateAsync({ id: updatedTask.id, updatedTask })
   };
 
+  const handleMenuOpen = (event: React.MouseEvent<HTMLElement>) => {
+    setAnchorEl(event.currentTarget);
+  };
+
+  const handleMenuClose = () => {
+    setAnchorEl(null);
+  };
+
+  const handleDeleteColumn = () => {
+    // Add your delete logic here
+    console.log('Delete column', column.title);
+    handleMenuClose();
+  };
+
   return (
     <Paper elevation={0} sx={{ p: 2, background: 'rgb(237 237 237)', borderRadius: '8px', position: 'relative', boxShadow: '0px 1px 2px 0px rgba(84,87,118,.12)' }}>
-      <Typography variant="h6" gutterBottom>
-        {column.title}
-      </Typography>
+      <Box display="flex" justifyContent="space-between" alignItems="center">
+        <Typography variant="h6" gutterBottom>
+          {column.title}
+        </Typography>
+        <IconButton onClick={handleMenuOpen}>
+          <MoreVertIcon />
+        </IconButton>
+      </Box>
+      <Menu
+        anchorEl={anchorEl}
+        open={isMenuOpen}
+        onClose={handleMenuClose}
+      >
+        <MenuItem onClick={handleDeleteColumn}>Delete</MenuItem>
+      </Menu>
       <Droppable droppableId={column.title}>
         {(provided, snapshot) => (
           <Box
