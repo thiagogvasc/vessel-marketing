@@ -3,12 +3,12 @@
 import React, { useEffect, useState } from 'react';
 import { Droppable } from '@hello-pangea/dnd';
 import Task, { TaskWithId } from './Task';
-import { AggregateColumn, DatabaseView } from '../types';
+import { AggregateColumn, DatabaseView, Task as TaskType } from '../types';
 import { Box, Paper, Typography, IconButton, TextField, Button, CircularProgress, Menu, MenuItem } from '@mui/material';
 import AddIcon from '@mui/icons-material/Add';
 import MoreVertIcon from '@mui/icons-material/MoreVert'; // Import the MoreVertIcon
 import TaskModal from './TaskModal';
-import { useAddTask, useGetDatabaseById, useGetDatabaseTasks, useUpdateTask } from '../hooks/useTasks';
+import { useAddTask, useDeleteKanbanColumn, useDeleteTask, useGetDatabaseById, useGetDatabaseTasks, useUpdateTask } from '../hooks/useTasks';
 
 interface ColumnProps {
   column: AggregateColumn;
@@ -18,6 +18,8 @@ interface ColumnProps {
 
 const Column: React.FC<ColumnProps> = ({ column, databaseId, databaseView }) => {
   const addTaskMutation = useAddTask(databaseId, databaseView.name);
+  const deleteTaskMutation = useDeleteTask(databaseId, databaseView.name);
+  const deleteColumnMutation = useDeleteKanbanColumn(databaseId, databaseView.name);
   const updateTaskMutation = useUpdateTask(databaseId, databaseView.name);
   const { data: database } = useGetDatabaseTasks(databaseId);
   const [newTaskTitle, setNewTaskTitle] = useState('');
@@ -86,6 +88,10 @@ const Column: React.FC<ColumnProps> = ({ column, databaseId, databaseView }) => 
     await updateTaskMutation.mutateAsync({ id: updatedTask.id, updatedTask })
   };
 
+  const handleTaskDelete = async (taskToDelete: TaskType) => {
+    await deleteTaskMutation.mutateAsync(taskToDelete)
+  }
+
   const handleMenuOpen = (event: React.MouseEvent<HTMLElement>) => {
     setAnchorEl(event.currentTarget);
   };
@@ -97,6 +103,7 @@ const Column: React.FC<ColumnProps> = ({ column, databaseId, databaseView }) => 
   const handleDeleteColumn = () => {
     // Add your delete logic here
     console.log('Delete column', column.title);
+    deleteColumnMutation.mutateAsync({databaseId, viewName: databaseView.name, optionToDelete: column.title})
     handleMenuClose();
   };
 
@@ -173,6 +180,7 @@ const Column: React.FC<ColumnProps> = ({ column, databaseId, databaseView }) => 
           open={isModalOpen}
           onClose={handleModalClose}
           onSave={handleTaskSave}
+          onDelete={handleTaskDelete}
         />
       )}
     </Paper>

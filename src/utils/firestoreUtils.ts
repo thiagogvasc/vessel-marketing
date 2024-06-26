@@ -189,6 +189,69 @@ export const addTask = async (newTask: NewTask, databaseId: string, viewName: st
   return addedTask;
 };
 
+export const deleteTask = async (taskToDelete: Task, databaseId: string, viewName: string): Promise<Task> => {
+  const tasksCollection = collection(db, 'tasks');
+  const taskDoc = doc(tasksCollection, taskToDelete.id);
+
+  // Use a Firestore transaction to ensure atomicity
+  const deletedTask = await runTransaction(db, async (transaction) => {
+    const databaseDoc = doc(db, 'databases', databaseId);
+    
+    // Read the database document first
+    const databaseSnap = await transaction.get(databaseDoc);
+    if (!databaseSnap.exists()) {
+      throw new Error('Database not found.');
+    }
+
+    const taskSnap = await transaction.get(taskDoc);
+    if (!taskSnap.exists()) {
+      throw new Error('Task not found.');
+    }
+
+    const database = databaseSnap.data() as Database;
+    const newViews = database.views.map(view => {
+      if (view.name === viewName) {
+        return {
+          ...view,
+          config: {
+            ...view.config,
+            groups: view.config?.groups?.map(group => {
+              if (group.group_by_value === taskToDelete.properties['status']) {
+                return {
+                  ...group,
+                  task_order: group.task_order.filter(taskId => taskId !== taskToDelete.id)
+                };
+              } else {
+                return group;
+              }
+            })
+          }
+        };
+      } else {
+        return view;
+      }
+    });
+
+    // Update the database document within the transaction
+    transaction.update(databaseDoc, { views: newViews });
+
+    const taskData = taskSnap.data() as Task;
+
+    // Delete the task document within the transaction
+    transaction.delete(taskDoc);
+
+    return {
+      id: taskDoc.id,
+      ...taskData,
+      created_at: taskData.created_at,
+      updated_at: taskData.updated_at,
+    };
+  });
+
+  console.warn('deletedTask', deletedTask);
+  return deletedTask;
+};
+
 export const updateTask = async (
   id: string,
   updatedTask: Partial<Omit<Task, "id">>,
@@ -337,3 +400,55 @@ export const addKanbanColumn = async (databaseId: string, viewName: string, newO
     throw error;
   }
 };
+
+export const deleteKanbanColumn = async (databaseId: string, viewName: string, optionToDelete: string) => {
+  const databaseDoc = doc(db, 'databases', databaseId);
+  
+  try {
+    // Fetch the current document data
+    const docSnap = await getDoc(databaseDoc);
+    
+    if (docSnap.exists()) {
+      const data = docSnap.data() as Database;
+      
+      // Find the status property within propertyDefinitions
+      const propertyDefinitions = data.propertyDefinitions || [];
+      const statusProperty = propertyDefinitions.find((prop: any) => prop.name === 'status');
+
+      const newViews = data.views.map(view => {
+        if (view.name === viewName) {
+          const newView = {...view};
+          newView.config?.groups
+          return {
+            ...view,
+            config: {
+              ...view.config,
+              groups: view.config?.groups?.filter(group => group.group_by_value !== optionToDelete)
+            }
+          };
+        } else {
+          return view;
+        }
+      });
+
+      if (statusProperty && statusProperty.data && statusProperty.data.options) {
+        // Add the new option to the options array if it doesn't already exist
+        if (statusProperty.data.options.includes(optionToDelete)) {
+          statusProperty.data.options = statusProperty.data.options.filter(prop => prop !== optionToDelete)
+          
+          // Update the document with the modified propertyDefinitions array
+          await updateDoc(databaseDoc, {
+            propertyDefinitions: propertyDefinitions,
+            views: newViews
+          });
+
+          console.warn(newViews, propertyDefinitions)
+          return optionToDelete;
+        }
+      }
+    }
+  } catch (error) {
+    console.error('Error adding new option: ', error);
+    throw error;
+  }
+}

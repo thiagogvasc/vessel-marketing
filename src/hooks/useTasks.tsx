@@ -1,5 +1,5 @@
 import { useQuery, useMutation, useQueryClient } from 'react-query';
-import { fetchTasks, addTask, updateTask, fetchBoard, updateTaskOrder, fetchAggregateBoard, getDatabaseTasks, getDatabaseById, addKanbanColumn, updateKanbanViewManualSort } from '../utils/firestoreUtils';
+import { fetchTasks, addTask, updateTask, fetchBoard, updateTaskOrder, fetchAggregateBoard, getDatabaseTasks, getDatabaseById, addKanbanColumn, updateKanbanViewManualSort, deleteTask, deleteKanbanColumn } from '../utils/firestoreUtils';
 import { Task, Column, AggregateColumn, AggregateBoard, Database, PropertyType, GroupByGroup } from '../types';
 import { Updater } from 'react-query/types/core/utils';
 
@@ -21,8 +21,57 @@ export const useGetDatabaseById = (databaseId: string | undefined | null) => {
   });
 };
 
-
 // Add a new task
+export const useDeleteTask = (databaseId: string, viewName: string) => {
+  const queryClient = useQueryClient();
+
+  return useMutation(
+    async (taskToDelete: Task) => {
+      try {
+        console.warn('calling delete task')
+        const deletedTask = await deleteTask(taskToDelete, databaseId, viewName);
+        return deletedTask;
+      } catch (err) {
+        console.warn(err)
+        throw err
+      }
+    },
+
+    {
+      onSuccess: (task) => {
+        const previousDatabaseTasks = queryClient.getQueryData(['database-tasks', databaseId]) as Database & { tasks: Task[]};
+        queryClient.setQueryData<Database & { tasks: Task[]}>(['database-tasks', databaseId], (old) => ({
+          ...previousDatabaseTasks,
+          views: previousDatabaseTasks.views.map((view) => {
+            if (view.name === viewName) {
+              return {
+                ...view,
+                config: {
+                  ...view.config,
+                  groups: view.config?.groups?.map(group => {
+                    if (group.group_by_value === task.properties[view.config?.group_by as string]) {
+                      return {
+                        ...group,
+                        task_order: group.task_order.filter(taskId => taskId !== task.id)
+                      }
+                    } else {
+                      return group;
+                    }
+                  })
+                }
+              }
+            } else {
+              return view;
+            }
+          }),
+          tasks: previousDatabaseTasks.tasks.filter(t => t.id !== task.id)
+        }))
+      }
+    }
+  );
+};
+
+
 // Add a new task
 export const useAddTask = (databaseId: string, viewName: string) => {
   const queryClient = useQueryClient();
@@ -137,6 +186,37 @@ export const useAddKanbanColumn = (databaseId: string, viewName: string) => {
                 config: {
                   ...view.config,
                   groups: [...view.config?.groups ?? [], { group_by_value: task, task_order: []}]
+                }
+              }
+            } else {
+              return view;
+            }
+          })
+        }))
+      }
+    }
+  );
+};
+
+export const useDeleteKanbanColumn = (databaseId: string, viewName: string) => {
+  const queryClient = useQueryClient();
+  return useMutation(
+    async ({ optionToDelete }: { databaseId: string; viewName: string, optionToDelete: string }) => {
+      const deletedOption = await deleteKanbanColumn(databaseId, viewName, optionToDelete);
+      return deletedOption as string;
+    },
+    {
+      onSuccess: (optionToDelete) => {
+        const previousDatabaseTasks = queryClient.getQueryData(['database-tasks', databaseId]) as Database & { tasks: Task[]};
+        queryClient.setQueryData<Database & { tasks: Task[]}>(['database-tasks', databaseId], (old) => ({
+          ...previousDatabaseTasks,
+          views: previousDatabaseTasks.views.map((view) => {
+            if (view.name === viewName) {
+              return {
+                ...view,
+                config: {
+                  ...view.config,
+                  groups: view.config?.groups?.filter(group => group.group_by_value !== optionToDelete)
                 }
               }
             } else {

@@ -1,5 +1,6 @@
 import React, { useState, useEffect } from 'react';
-import { Dialog, DialogContent, DialogActions, Button, TextField, Box, MenuItem, Select, InputLabel, FormControl } from '@mui/material';
+import { Dialog, DialogContent, DialogActions, Button, TextField, Box, MenuItem, Select, InputLabel, FormControl, IconButton, Menu, MenuItem as MenuOption } from '@mui/material';
+import MoreVertIcon from '@mui/icons-material/MoreVert';
 import { DatabasePropertyDefinition, PropertyType, Task as TaskType } from '../types';
 import { useGetDatabaseTasks } from '../hooks/useTasks';
 
@@ -12,18 +13,19 @@ interface TaskModalProps {
   open: boolean;
   onClose: () => void;
   onSave: (updatedTask: TaskWithId) => void;
+  onDelete: (task: Task) => void;
 }
 
-const TaskModal: React.FC<TaskModalProps> = ({ task, open, onClose, onSave }) => {
+const TaskModal: React.FC<TaskModalProps> = ({ task, open, onClose, onSave, onDelete }) => {
   const [title, setTitle] = useState(task?.title || '');
   const [description, setDescription] = useState(task?.description || '');
   const [properties, setProperties] = useState<{ propertyDefinition: DatabasePropertyDefinition, propertyValue: any }[]>([]);
-  console.warn(properties,"propertieess")
   const [newPropertyType, setNewPropertyType] = useState('');
   const [newPropertyName, setNewPropertyName] = useState('');
   const [newPropertyValue, setNewPropertyValue] = useState('');
   const [showNewPropertyForm, setShowNewPropertyForm] = useState(false);
-
+  const [anchorEl, setAnchorEl] = useState<null | HTMLElement>(null);
+  
   const { data: databaseWithTasks } = useGetDatabaseTasks(task?.database_id);
 
   useEffect(() => {
@@ -38,7 +40,6 @@ const TaskModal: React.FC<TaskModalProps> = ({ task, open, onClose, onSave }) =>
       const propertyDefinition = propDefinitions?.find(propDef => propDef.name === propertyName);
       propertyDefinition && properties.push({ propertyDefinition, propertyValue });
     });
-    console.warn('task changed')
     setProperties(properties);
   }, [databaseWithTasks, task]);
 
@@ -78,101 +79,128 @@ const TaskModal: React.FC<TaskModalProps> = ({ task, open, onClose, onSave }) =>
     setShowNewPropertyForm(false);
   };
 
+  const handleMenuOpen = (event: React.MouseEvent<HTMLElement>) => {
+    setAnchorEl(event.currentTarget);
+  };
+
+  const handleMenuClose = () => {
+    setAnchorEl(null);
+  };
+
+  const handleDelete = () => {
+    if (task) {
+      onDelete(task);
+    }
+    onClose();
+  };
+
   return (
     <Dialog open={open} onClose={onClose} fullWidth maxWidth="lg">
       <DialogContent>
-        <Box sx={{ display: 'flex', flexDirection: 'column', gap: 2 }}>
-          <TextField
-            label="Title"
-            value={title}
-            onChange={(e) => setTitle(e.target.value)}
-            fullWidth
-            variant="outlined"
-          />
-          <Box sx={{ display: 'flex', gap: 4 }}>
+        <Box sx={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
+          <Box sx={{ display: 'flex', flexDirection: 'column', gap: 2, flex: 1 }}>
             <TextField
-              label="Description"
-              value={description}
-              onChange={(e) => setDescription(e.target.value)}
-              multiline
-              rows={10}
+              label="Title"
+              value={title}
+              onChange={(e) => setTitle(e.target.value)}
               fullWidth
-              sx={{ flex: 7 }}
+              variant="outlined"
             />
-            <Box sx={{ flex: 3, display: 'flex', flexDirection: 'column', gap: 2 }}>
-              {properties.map((prop, index) => (
-                <Box key={index} sx={{ display: 'flex', flexDirection: 'column', gap: 2 }}>
-                  {prop.propertyDefinition.type === 'Text' && (
-                    <TextField
-                      label={prop.propertyDefinition.name}
-                      value={prop.propertyValue}
-                      onChange={(e) => handlePropertyChange(prop.propertyDefinition.name, e.target.value)}
-                      fullWidth
-                    />
-                  )}
-                  {prop.propertyDefinition.type === 'Select' && (
-                    <FormControl fullWidth>
-                      <InputLabel id={`${prop.propertyDefinition.name}-label`}>{prop.propertyDefinition.name}</InputLabel>
-                      <Select
-                        labelId={`${prop.propertyDefinition.name}-label`}
+            <Box sx={{ display: 'flex', gap: 4 }}>
+              <TextField
+                label="Description"
+                value={description}
+                onChange={(e) => setDescription(e.target.value)}
+                multiline
+                rows={10}
+                fullWidth
+                sx={{ flex: 7 }}
+              />
+              <Box sx={{ flex: 3, display: 'flex', flexDirection: 'column', gap: 2 }}>
+                {properties.map((prop, index) => (
+                  <Box key={index} sx={{ display: 'flex', flexDirection: 'column', gap: 2 }}>
+                    {prop.propertyDefinition.type === 'Text' && (
+                      <TextField
+                        label={prop.propertyDefinition.name}
                         value={prop.propertyValue}
                         onChange={(e) => handlePropertyChange(prop.propertyDefinition.name, e.target.value)}
                         fullWidth
+                      />
+                    )}
+                    {prop.propertyDefinition.type === 'Select' && (
+                      <FormControl fullWidth>
+                        <InputLabel id={`${prop.propertyDefinition.name}-label`}>{prop.propertyDefinition.name}</InputLabel>
+                        <Select
+                          labelId={`${prop.propertyDefinition.name}-label`}
+                          value={prop.propertyValue}
+                          onChange={(e) => handlePropertyChange(prop.propertyDefinition.name, e.target.value)}
+                          fullWidth
+                        >
+                          {prop.propertyDefinition.data?.options?.map(option => (
+                            <MenuItem key={option} value={option}>
+                              {option}
+                            </MenuItem>
+                          ))}
+                        </Select>
+                      </FormControl>
+                    )}
+                  </Box>
+                ))}
+                <Button
+                  variant="outlined"
+                  onClick={() => setShowNewPropertyForm(!showNewPropertyForm)}
+                  sx={{ alignSelf: 'flex-start' }}
+                >
+                  Add Property
+                </Button>
+                {showNewPropertyForm && (
+                  <Box sx={{ display: 'flex', flexDirection: 'column', gap: 2, mt: 2 }}>
+                    <TextField
+                      label="Property Name"
+                      value={newPropertyName}
+                      onChange={(e) => setNewPropertyName(e.target.value)}
+                      fullWidth
+                    />
+                    <FormControl fullWidth>
+                      <InputLabel id="new-property-type-label">Property Type</InputLabel>
+                      <Select
+                        labelId="new-property-type-label"
+                        value={newPropertyType}
+                        onChange={(e) => setNewPropertyType(e.target.value)}
+                        fullWidth
                       >
-                        {prop.propertyDefinition.data?.options?.map(option => (
-                          <MenuItem key={option} value={option}>
-                            {option}
-                          </MenuItem>
-                        ))}
+                        <MenuItem value="Text">Text</MenuItem>
+                        <MenuItem value="Select">Select</MenuItem>
                       </Select>
                     </FormControl>
-                  )}
-                </Box>
-              ))}
-              <Button
-                variant="outlined"
-                onClick={() => setShowNewPropertyForm(!showNewPropertyForm)}
-                sx={{ alignSelf: 'flex-start' }}
-              >
-                Add Property
-              </Button>
-              {showNewPropertyForm && (
-                <Box sx={{ display: 'flex', flexDirection: 'column', gap: 2, mt: 2 }}>
-                  <TextField
-                    label="Property Name"
-                    value={newPropertyName}
-                    onChange={(e) => setNewPropertyName(e.target.value)}
-                    fullWidth
-                  />
-                  <FormControl fullWidth>
-                    <InputLabel id="new-property-type-label">Property Type</InputLabel>
-                    <Select
-                      labelId="new-property-type-label"
-                      value={newPropertyType}
-                      onChange={(e) => setNewPropertyType(e.target.value)}
+                    <TextField
+                      label="Property Value"
+                      value={newPropertyValue}
+                      onChange={(e) => setNewPropertyValue(e.target.value)}
                       fullWidth
+                    />
+                    <Button
+                      variant="contained"
+                      onClick={handleAddProperty}
+                      sx={{ alignSelf: 'flex-start' }}
                     >
-                      <MenuItem value="Text">Text</MenuItem>
-                      <MenuItem value="Select">Select</MenuItem>
-                    </Select>
-                  </FormControl>
-                  <TextField
-                    label="Property Value"
-                    value={newPropertyValue}
-                    onChange={(e) => setNewPropertyValue(e.target.value)}
-                    fullWidth
-                  />
-                  <Button
-                    variant="contained"
-                    onClick={handleAddProperty}
-                    sx={{ alignSelf: 'flex-start' }}
-                  >
-                    Add
-                  </Button>
-                </Box>
-              )}
+                      Add
+                    </Button>
+                  </Box>
+                )}
+              </Box>
             </Box>
           </Box>
+          <IconButton onClick={handleMenuOpen}>
+            <MoreVertIcon />
+          </IconButton>
+          <Menu
+            anchorEl={anchorEl}
+            open={Boolean(anchorEl)}
+            onClose={handleMenuClose}
+          >
+            <MenuOption onClick={handleDelete}>Delete</MenuOption>
+          </Menu>
         </Box>
       </DialogContent>
       <DialogActions>
