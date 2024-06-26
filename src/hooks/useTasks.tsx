@@ -174,18 +174,31 @@ export const useAddKanbanColumn = (databaseId: string, viewName: string) => {
       return newColumn as string;
     },
     {
-      onSuccess: (task) => {
+      onSuccess: (newOption) => {
         const previousDatabaseTasks = queryClient.getQueryData(['database-tasks', databaseId]) as Database & { tasks: Task[]};
         console.warn('setting query data')
+        const view = previousDatabaseTasks.views.find(view => view.name === viewName);
         queryClient.setQueryData<Database & { tasks: Task[]}>(['database-tasks', databaseId], (old) => ({
           ...previousDatabaseTasks,
+          propertyDefinitions: previousDatabaseTasks.propertyDefinitions.map(propDef => {
+            if (propDef.name === view?.config?.group_by) {
+              return {
+                ...propDef,
+                data: {
+                  ...propDef.data,
+                  options: [...(propDef.data?.options ?? []), newOption]
+                }
+              }
+            }
+            return propDef
+          }),
           views: previousDatabaseTasks.views.map((view) => {
             if (view.name === viewName) {
               return {
                 ...view,
                 config: {
                   ...view.config,
-                  groups: [...view.config?.groups ?? [], { group_by_value: task, task_order: []}]
+                  groups: [...view.config?.groups ?? [], { group_by_value: newOption, task_order: []}]
                 }
               }
             } else {
