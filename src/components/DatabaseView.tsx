@@ -8,16 +8,18 @@ import KanbanView from './KanbanView';
 import ListView from './ListView';
 import { useGetDatabaseById, useGetDatabaseTasks } from '../hooks/useTasks';
 
+interface DatabaseViewProps {
+  databaseId: string;
+}
 
-
-const DatabaseView: React.FC = () => {
+const DatabaseView: React.FC<DatabaseViewProps> = ({ databaseId }) => {
   const [selectedTab, setSelectedTab] = useState(0);
 
   const handleTabChange = (event: React.ChangeEvent<{}>, newValue: number) => {
     setSelectedTab(newValue);
   };
 
-  const { data } = useGetDatabaseTasks('tC55EemN4FV8zJhgVMs0');
+  const { data } = useGetDatabaseTasks(databaseId);
   // useEffect(() => {
 
   // }, [database, t])

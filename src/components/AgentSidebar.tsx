@@ -40,7 +40,7 @@ const AgentSidebar = () => {
     { text: 'Dashboard', iconComponent: Dashboard, disabled: false, href: '/agent/dashboard'},
     { text: 'Users', iconComponent: Group, disabled: false, href: '/agent/users'},
     { text: 'Requests', iconComponent: ListAltIcon, disabled: false, href: '/agent/requests'},
-    { text: 'Test Board (test)', iconComponent: ViewKanban, disabled: false, href: '/agent/board'},
+    { text: 'Databases', iconComponent: ViewKanban, disabled: false, href: '/agent/databases'},
   ]
 
   const handleLogout = async () => {

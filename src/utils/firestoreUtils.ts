@@ -49,6 +49,14 @@ export const getDatabaseById = async (id: string): Promise<Database | null> => {
   return { id: docSnap.id, ...docSnap.data() } as Database;
 };
 
+export const getDatabases = async (): Promise<Database[]> => {
+  const databasesSnapShot = await getDocs(collection(db, "databases"));
+  return databasesSnapShot.docs.map((database) => ({
+    id: database.id,
+    ...database.data(),
+  } as Database));
+}
+
 export async function getDatabaseTasks(databaseId: string) {
   try {
     // Fetch the database document
