@@ -176,7 +176,6 @@ export const useAddKanbanColumn = (databaseId: string, viewName: string) => {
     {
       onSuccess: (newOption) => {
         const previousDatabaseTasks = queryClient.getQueryData(['database-tasks', databaseId]) as Database & { tasks: Task[]};
-        console.warn('setting query data')
         const view = previousDatabaseTasks.views.find(view => view.name === viewName);
         queryClient.setQueryData<Database & { tasks: Task[]}>(['database-tasks', databaseId], (old) => ({
           ...previousDatabaseTasks,
@@ -221,8 +220,21 @@ export const useDeleteKanbanColumn = (databaseId: string, viewName: string) => {
     {
       onSuccess: (optionToDelete) => {
         const previousDatabaseTasks = queryClient.getQueryData(['database-tasks', databaseId]) as Database & { tasks: Task[]};
+        const view = previousDatabaseTasks.views.find(view => view.name === viewName);
         queryClient.setQueryData<Database & { tasks: Task[]}>(['database-tasks', databaseId], (old) => ({
           ...previousDatabaseTasks,
+          propertyDefinitions: previousDatabaseTasks.propertyDefinitions.map(propDef => {
+            if (propDef.name === view?.config?.group_by) {
+              return {
+                ...propDef,
+                data: {
+                  ...propDef.data,
+                  options: propDef.data?.options?.filter(option => option !== optionToDelete) ?? []
+                }
+              }
+            }
+            return propDef
+          }),
           views: previousDatabaseTasks.views.map((view) => {
             if (view.name === viewName) {
               return {
