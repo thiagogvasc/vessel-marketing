@@ -14,11 +14,14 @@ import {
   styled,
   Toolbar,
   Typography,
+  IconButton,
 } from '@mui/material';
 import { Logout } from '@mui/icons-material'
 import Link from 'next/link';
 import { User } from '../types';
 import { usePathname } from 'next/navigation';
+import ChevronLeftIcon from '@mui/icons-material/ChevronLeft';
+import theme from '../theme';
 
 const StyledListItemButton = styled(ListItemButton, {
   shouldForwardProp: (prop) => prop !== 'active',
@@ -45,39 +48,54 @@ const StyledListItemButton = styled(ListItemButton, {
   },
 }));
 
-
-const MyDrawer = ({ drawerWidth, links, user, handleLogout }: { drawerWidth: number, links: {text: string, href: string, iconComponent: any, disabled: boolean}[], user: User, handleLogout: any}) => {
+const MyDrawer = ({ drawerWidth, open, toggleDrawer, links, user, handleLogout }: { drawerWidth: number, open: boolean, toggleDrawer: () => void, links: {text: string, href: string, iconComponent: any, disabled: boolean}[], user: User, handleLogout: any}) => {
   const pathname = usePathname();
   const isLinkActive = (href: string) => pathname === href ? 1 : 0;
+
   return (
     <Drawer
       variant="permanent"
       sx={{
-        width: drawerWidth,
+        width: open ? drawerWidth : `calc(${theme.spacing(8)} + 1px)`,
         flexShrink: 0,
-        [`& .MuiDrawer-paper`]: { width: drawerWidth, boxSizing: 'border-box', bgcolor: 'white' },
+        [`& .MuiDrawer-paper`]: {
+          width: open ? drawerWidth : `calc(${theme.spacing(8)} + 1px)`,
+          transition: theme.transitions.create('width', {
+            easing: theme.transitions.easing.sharp,
+            duration: theme.transitions.duration.enteringScreen,
+          }),
+          overflowX: 'hidden',
+        },
       }}
+      open={open}
     >
       <Toolbar>
-        <Typography variant="h6" noWrap component="div">
-          Vessel Marketing
-        </Typography>
+        {open && (
+          <Typography variant="h6" noWrap component="div">
+            Vessel Marketing
+          </Typography>
+        )}
+        { open && 
+          <IconButton onClick={toggleDrawer}>
+            <ChevronLeftIcon />
+          </IconButton>
+        }
       </Toolbar>
       <Box sx={{ overflow: 'auto' }}>
-        <List sx={{px: 2, gap: 2}}>
+        <List sx={{ p: 2 }}>
           {links.map((link) => (
             <StyledListItemButton
-            sx={{py: 0.5, my:1, borderRadius: 2}}
+              sx={{borderRadius: 2, display: 'flex', alignItems: 'center', justifyContent: 'center'}}
               key={link.text}
               LinkComponent={Link}
               active={isLinkActive(link.href)}
               href={link.href}
               disabled={link.disabled}
             >
-              <ListItemIcon>
+              <ListItemIcon sx={{ display: 'flex', alignItems: 'center', justifyContent: 'center' }}>
                 {React.createElement(link.iconComponent)}
               </ListItemIcon>
-              <ListItemText primary={link.text} />
+              {open && <ListItemText primary={link.text} />}
             </StyledListItemButton>
           ))}
         </List>
@@ -99,6 +117,8 @@ const MyDrawer = ({ drawerWidth, links, user, handleLogout }: { drawerWidth: num
 
 MyDrawer.propTypes = {
   drawerWidth: PropTypes.number.isRequired,
+  open: PropTypes.bool.isRequired,
+  toggleDrawer: PropTypes.func.isRequired,
   links: PropTypes.arrayOf(
     PropTypes.shape({
       text: PropTypes.string.isRequired,
