@@ -3,16 +3,48 @@
 import { useState } from 'react';
 import { useRouter } from 'next/navigation';
 import { Box, Button, Container, Grid, TextField, Typography, FormControl, InputLabel, Select, MenuItem } from '@mui/material';
+import { addDatabase } from '@/src/utils/firestoreUtils';
+import { Database, PropertyType } from '@/src/types';
 
 const NewDatabase = () => {
   const router = useRouter();
   const [name, setName] = useState('');
+  const [description, setDescription] = useState(''); // Added state for description
   const [viewType, setViewType] = useState('Kanban View');
   const [clientId, setClientId] = useState('');
 
   const handleAddDatabase = async () => {
     try {
-      //await addDatabase({ name, initialViewType: viewType, clientId });
+      const newDatabase: Omit<Database, 'id'> = {
+        name: name,
+        description: description, // Use description state here
+        propertyDefinitions: [
+          {
+            name: "status",
+            type: PropertyType.Select,
+            data: {
+              options: ["To Do", "In Progress", "Done"],
+            },
+          },
+        ],
+        views: [
+          {
+            name: "My Kanban View",
+            type: "kanban",
+            config: {
+              filters: [],
+              sorts: [],
+              group_by: "status",
+              groups: [
+                { group_by_value: "To Do", task_order: [] },
+                { group_by_value: "In Progress", task_order: [] },
+                { group_by_value: "Done", task_order: [] },
+              ],
+            },
+          },
+        ],
+      };
+      await addDatabase(newDatabase);
       router.push('/agent/databases');
     } catch (error) {
       console.error('Failed to add database:', error);
@@ -32,6 +64,15 @@ const NewDatabase = () => {
             label="Database Name"
             value={name}
             onChange={(e) => setName(e.target.value)}
+            fullWidth
+            variant="outlined"
+          />
+        </Grid>
+        <Grid item xs={12}>
+          <TextField
+            label="Description" // Added description field
+            value={description}
+            onChange={(e) => setDescription(e.target.value)}
             fullWidth
             variant="outlined"
           />
@@ -57,6 +98,7 @@ const NewDatabase = () => {
             value={clientId}
             onChange={(e) => setClientId(e.target.value)}
             fullWidth
+            disabled
             variant="outlined"
           />
         </Grid>

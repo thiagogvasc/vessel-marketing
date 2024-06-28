@@ -312,7 +312,6 @@ export const useUpdateTask = (databaseId: string, viewName: string) => {
           return view;
         });
 
-        console.warn({newViews})
         queryClient.setQueryData<Database & { tasks: Task[]}>(['database-tasks', databaseId], (old) => ({
           ...previousDatabaseTasks,
           views: newViews,

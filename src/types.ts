@@ -64,7 +64,6 @@ export interface ViewConfig {
 
 export interface DatabaseView {
   id?: string;
-  database_id: string;
   name: string;
   type: string;
   config?: ViewConfig;
@@ -109,6 +108,7 @@ export interface DatabasePropertyDefinition {
 export interface Database {
   id?: string;
   name: string;
+  description: string;
   // workspaceId: string;
   views: DatabaseView[];
   propertyDefinitions: DatabasePropertyDefinition[];
