@@ -99,7 +99,7 @@ const Requests = () => {
   );
 
   return (
-    <Container component="main" maxWidth="xl" sx={{ mt: 4 }}>
+    <Container component="main" maxWidth="xl">
       <Grid container spacing={2} mb={2} justifyContent="space-between" alignItems="center">
         <Grid item>
           <Typography component="h1" variant="h5" >

@@ -52,7 +52,7 @@ const NewDatabase = () => {
   };
 
   return (
-    <Container component="main" maxWidth="sm" sx={{ mt: 4 }}>
+    <Container component="main" maxWidth="sm" sx={{ pt: 12 }}>
       <Grid container spacing={2} justifyContent="center">
         <Grid item xs={12}>
           <Typography component="h1" variant="h5" textAlign="center">

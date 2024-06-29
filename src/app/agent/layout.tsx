@@ -10,18 +10,18 @@ const AgentLayout = ({
   children: React.ReactNode;
 }>) => {
   return (
-    <Box sx={{ display: 'flex' }}>
+    <Box sx={{ display: 'flex', height: '100%' }}>
       <AgentSidebar />
       <Box
         component="main"
         sx={{
           flexGrow: 1,
           p: 3,
+          pt: 12,
           background: 'rgb(243 244 246)',
-          height: '100vh'
+          height: '100%'
         }}
       >
-        <Toolbar />
         {children}
       </Box>
     </Box>

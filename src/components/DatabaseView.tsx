@@ -25,7 +25,7 @@ const DatabaseView: React.FC<DatabaseViewProps> = ({ databaseId }) => {
   // }, [database, t])
 
   return (
-    <Box sx={{ width: '100%' }}>
+    <Box sx={{  }}>
       <Tabs
         value={selectedTab}
         onChange={handleTabChange}

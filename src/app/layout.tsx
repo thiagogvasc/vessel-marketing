@@ -14,12 +14,11 @@ export default function RootLayout({
   return (
     <html lang="en">
       <body>
-        {/* Layout UI */}
-        <main>
+       
           <ContextProviders>
             {children}
           </ContextProviders>
-        </main>
+      
       </body>
     </html>
   )

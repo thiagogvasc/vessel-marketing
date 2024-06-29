@@ -108,7 +108,7 @@ const KanbanView: React.FC<KanbanViewProps> = ({ databaseId, databaseView }) => 
   if (isTasksLoading) return <div>Loading...</div>;
 
   return (
-    <Box sx={{ overflow: 'auto', display: 'flex', flexDirection: 'column', width: '80vw', height: '60vh'}}>
+    <Box sx={{ display: 'flex', flexDirection: 'column'}}>
       <DragDropContext onDragEnd={handleDragEnd}>
         <Box sx={{ display: 'flex', flexDirection: 'row', gap: 2 }}>
           {columns.map(column => (
