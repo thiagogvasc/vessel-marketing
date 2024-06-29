@@ -56,16 +56,21 @@ const MyDrawer = ({ drawerWidth, open, toggleDrawer, links, user, handleLogout }
     <Drawer
       variant="permanent"
       sx={{
-        width: open ? drawerWidth : `calc(${theme.spacing(8)} + 1px)`,
+        width: open ? drawerWidth + 'px' : `calc(${theme.spacing(9)})`,
+        transition: theme.transitions.create('width', {
+          easing: theme.transitions.easing.sharp,
+          duration: theme.transitions.duration.enteringScreen,
+        }),
         flexShrink: 0,
         [`& .MuiDrawer-paper`]: {
-          width: open ? drawerWidth : `calc(${theme.spacing(8)} + 1px)`,
+          width: open ? drawerWidth + 'px' : `calc(${theme.spacing(9)})`,
           transition: theme.transitions.create('width', {
             easing: theme.transitions.easing.sharp,
             duration: theme.transitions.duration.enteringScreen,
           }),
           overflowX: 'hidden',
         },
+        zIndex: 100,
       }}
       open={open}
     >
@@ -74,12 +79,7 @@ const MyDrawer = ({ drawerWidth, open, toggleDrawer, links, user, handleLogout }
           <Typography variant="h6" noWrap component="div">
             Vessel Marketing
           </Typography>
-        )}
-        { open && 
-          <IconButton onClick={toggleDrawer}>
-            <ChevronLeftIcon />
-          </IconButton>
-        }
+        )}  
       </Toolbar>
       <Box sx={{ overflow: 'auto' }}>
         <List sx={{ p: 2 }}>

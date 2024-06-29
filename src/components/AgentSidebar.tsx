@@ -25,6 +25,7 @@ import NotificationsIcon from '@mui/icons-material/Notifications';
 import SettingsIcon from '@mui/icons-material/Settings';
 import MenuIcon from '@mui/icons-material/Menu';
 import ChevronLeftIcon from '@mui/icons-material/ChevronLeft';
+import ChevronRightIcon from '@mui/icons-material/ChevronRight';
 import { Assignment, Dashboard, Group, ViewKanban } from '@mui/icons-material';
 import MyDrawer from './MyDrawer';
 import { useGetCurrentUser } from '../hooks/useUsers';
@@ -104,27 +105,34 @@ const AgentSidebar = () => {
       </MenuItem>
     </Menu>
   );
-console.warn(theme.spacing(8))
+
   return (
     <>
       <CssBaseline />
       <AppBar
         position="fixed"
         sx={{
-          width: `calc(100% - ${open ? drawerWidth : theme.spacing(8)})`,
-          ml: `${open ? drawerWidth : theme.spacing(8)} + 1px`,
+          width: `calc(100% - ${open ? drawerWidth + 'px' : theme.spacing(9)})`,
+          ml: `${open ? drawerWidth + 'px' : theme.spacing(9)}`,
           bgcolor: 'white',
           color: 'black',
-          boxShadow: 'rgba(0, 0, 0, 0) 0px 0px 0px 0px, rgba(0, 0, 0, 0) 0px 0px 0px 0px, rgba(84, 87, 118, 0.15) 0px 2px 3px 0px'
+          boxShadow: 'rgba(0, 0, 0, 0) 0px 0px 0px 0px, rgba(0, 0, 0, 0) 0px 0px 0px 0px, rgba(84, 87, 118, 0.15) 0px 2px 3px 0px',
+          transition: theme.transitions.create('width', {
+            easing: theme.transitions.easing.sharp,
+            duration: theme.transitions.duration.enteringScreen,
+          }),
         }}
         elevation={0}
       >
-        <Toolbar>
+        <Toolbar sx={{ position: 'relative'}}>
+          <Box sx={{ backgroundColor: 'white', position: 'absolute', top: '50%', left: -19, zIndex: 1000, transform: 'translate(0, -50%)'}}>
+            <IconButton size='small' onClick={toggleDrawer} sx={{  ":hover": {backgroundColor: 'rgba(0, 0, 0, 0.04)'}, backgroundColor: 'white', border: '1px solid rgba(0, 0, 0, 0.12)'}}>
+              {open ? <ChevronLeftIcon /> : <ChevronRightIcon />}
+            </IconButton>
+          </Box>
+
           {!open && (
             <>
-              <IconButton onClick={toggleDrawer}>
-                <MenuIcon />
-              </IconButton>
               <Typography variant="h6" noWrap component="div" sx={{ flexGrow: 1 }}>
                 Vessel Marketing
               </Typography>
