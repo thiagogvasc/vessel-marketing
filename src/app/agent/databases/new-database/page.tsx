@@ -5,6 +5,7 @@ import { useRouter } from 'next/navigation';
 import { Box, Button, Container, Grid, TextField, Typography, FormControl, InputLabel, Select, MenuItem } from '@mui/material';
 import { addDatabase } from '@/src/utils/firestoreUtils';
 import { Database, PropertyType } from '@/src/types';
+import { useAddDatabase } from '@/src/hooks/useDatabases';
 
 const NewDatabase = () => {
   const router = useRouter();
@@ -12,6 +13,7 @@ const NewDatabase = () => {
   const [description, setDescription] = useState(''); // Added state for description
   const [viewType, setViewType] = useState('Kanban View');
   const [clientId, setClientId] = useState('');
+  const addDatabaseMutation = useAddDatabase();
 
   const handleAddDatabase = async () => {
     try {
@@ -44,8 +46,9 @@ const NewDatabase = () => {
           },
         ],
       };
-      await addDatabase(newDatabase);
-      router.push('/agent/databases');
+      addDatabaseMutation.mutateAsync(newDatabase).then(() => {
+        router.push('/agent/databases');
+      })
     } catch (error) {
       console.error('Failed to add database:', error);
     }
