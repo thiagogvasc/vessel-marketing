@@ -31,6 +31,7 @@ import HomeIcon from '@mui/icons-material/Home';
 import NavigateNextIcon from '@mui/icons-material/NavigateNext';
 import { useRouter } from "next/navigation";
 import { User } from "@/src/types";
+import theme from "@/src/theme";
 
 
 const Users = () => {
@@ -184,9 +185,9 @@ const Users = () => {
                     >
                       <TableRow>
                         <TableCell>{user.fullname}</TableCell>
-                        <TableCell>{user.email}</TableCell>
-                        <TableCell>{user.phone_number}</TableCell>
-                        <TableCell>{user.created_at?.toDate().toLocaleString()}</TableCell>
+                        <TableCell sx={{ color: theme.palette.text.secondary }}>{user.email}</TableCell>
+                        <TableCell sx={{ color: theme.palette.text.secondary }}>{user.phone_number}</TableCell>
+                        <TableCell sx={{ color: theme.palette.text.secondary }}>{user.created_at?.toDate().toLocaleString()}</TableCell>
                         <TableCell>
                           <Button variant="outlined" component={Link} href={`/agent/users/${user.id}`}>
                             View

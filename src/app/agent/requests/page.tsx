@@ -151,11 +151,11 @@ const Requests = () => {
         </Box>
       ) : (
         <>
-          <TableContainer sx={{ mt: 3 , border:'none'}}>
-            <Table sx={{border:'none'}}>
-              <TableHead sx={{ backgroundColor:'rgb(243, 244, 246)'}}>
+          <TableContainer sx={{ mt: 3 }}>
+            <Table>
+              <TableHead>
                 <TableRow sx={{border:'none'}}>
-                  <TableCell sx={{ border: 'none'}} sortDirection={orderBy === "title" ? order : false}>
+                  <TableCell sortDirection={orderBy === "title" ? order : false}>
                     <TableSortLabel
                       active={orderBy === "title"}
                       direction={orderBy === "title" ? order : "asc"}
@@ -164,7 +164,7 @@ const Requests = () => {
                       Title
                     </TableSortLabel>
                   </TableCell>
-                  <TableCell sx={{ border: 'none'}} sortDirection={orderBy === "description" ? order : false}>
+                  <TableCell sortDirection={orderBy === "description" ? order : false}>
                     <TableSortLabel
                       active={orderBy === "description"}
                       direction={orderBy === "description" ? order : "asc"}
@@ -173,7 +173,7 @@ const Requests = () => {
                       Description
                     </TableSortLabel>
                   </TableCell>
-                  <TableCell sx={{ border: 'none'}} sortDirection={orderBy === "status" ? order : false}>
+                  <TableCell sortDirection={orderBy === "status" ? order : false}>
                     <TableSortLabel
                       active={orderBy === "status"}
                       direction={orderBy === "status" ? order : "asc"}
@@ -182,7 +182,7 @@ const Requests = () => {
                       Status
                     </TableSortLabel>
                   </TableCell>
-                  <TableCell sx={{ border: 'none'}} sortDirection={orderBy === "priority" ? order : false}>
+                  <TableCell sortDirection={orderBy === "priority" ? order : false}>
                     <TableSortLabel
                       active={orderBy === "priority"}
                       direction={orderBy === "priority" ? order : "asc"}
@@ -191,7 +191,7 @@ const Requests = () => {
                       Priority
                     </TableSortLabel>
                   </TableCell>
-                  <TableCell sx={{ border: 'none'}} sortDirection={orderBy === "created_at" ? order : false}>
+                  <TableCell sortDirection={orderBy === "created_at" ? order : false}>
                     <TableSortLabel
                       active={orderBy === "created_at"}
                       direction={orderBy === "created_at" ? order : "asc"}
@@ -200,7 +200,7 @@ const Requests = () => {
                       Created At
                     </TableSortLabel>
                   </TableCell>
-                  <TableCell sx={{ border: 'none'}} sortDirection={orderBy === "updated_at" ? order : false}>
+                  <TableCell sortDirection={orderBy === "updated_at" ? order : false}>
                     <TableSortLabel
                       active={orderBy === "updated_at"}
                       direction={orderBy === "updated_at" ? order : "asc"}
@@ -209,7 +209,7 @@ const Requests = () => {
                       Updated At
                     </TableSortLabel>
                   </TableCell>
-                  <TableCell sx={{ border: 'none'}}>Actions</TableCell>
+                  <TableCell>Actions</TableCell>
                 </TableRow>
               </TableHead>
               <TableBody>
@@ -221,13 +221,13 @@ const Requests = () => {
                     key={request.id}
                   >
                     <TableRow>
-                      <TableCell sx={{ border: 'none' }}>{request.title}</TableCell>
-                      <TableCell sx={{ border: 'none', color: theme.palette.text.secondary }}>{request.description.substring(0, 50)}...</TableCell>
-                      <TableCell sx={{ border: 'none', color: theme.palette.text.secondary }}>{request.status}</TableCell>
-                      <TableCell sx={{ border: 'none', color: theme.palette.text.secondary }}>{request.priority}</TableCell>
-                      <TableCell sx={{ border: 'none', color: theme.palette.text.secondary }}>{request.created_at?.toDate().toLocaleString()}</TableCell>
-                      <TableCell sx={{ border: 'none', color: theme.palette.text.secondary }}>{request.updated_at?.toDate().toLocaleString()}</TableCell>
-                      <TableCell sx={{ border: 'none', color: theme.palette.text.secondary }}>
+                      <TableCell>{request.title}</TableCell>
+                      <TableCell sx={{ color: theme.palette.text.secondary }}>{request.description.substring(0, 50)}...</TableCell>
+                      <TableCell sx={{ color: theme.palette.text.secondary }}>{request.status}</TableCell>
+                      <TableCell sx={{ color: theme.palette.text.secondary }}>{request.priority}</TableCell>
+                      <TableCell sx={{ color: theme.palette.text.secondary }}>{request.created_at?.toDate().toLocaleString()}</TableCell>
+                      <TableCell sx={{ color: theme.palette.text.secondary }}>{request.updated_at?.toDate().toLocaleString()}</TableCell>
+                      <TableCell sx={{ color: theme.palette.text.secondary }}>
                         <IconButton onClick={(e) => handleMenuOpen(request.id as string, e)}>
                           <MoreVert />
                         </IconButton>

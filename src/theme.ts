@@ -42,6 +42,22 @@ const theme = createTheme({
       50: deepPurple[50],
       100: deepPurple[100]
     }
+  },
+  components: {
+    MuiTableHead: {
+      styleOverrides: {
+        root: {
+          backgroundColor: 'rgb(243, 244, 246)'
+        }
+      }
+    },
+    MuiTableCell: {
+      styleOverrides: {
+        root: {
+          border: 'none',
+        },
+      },
+    },
   }
 });
 
