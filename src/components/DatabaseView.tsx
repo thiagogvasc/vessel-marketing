@@ -1,12 +1,9 @@
 'use client'
 
-import React, { useEffect, useState } from 'react';
+import React, { useState } from 'react';
 import { Box, Tabs, Tab } from '@mui/material';
-import TableView from './TableView';
-import { Task } from '../types';
 import KanbanView from './KanbanView';
-import ListView from './ListView';
-import { useGetDatabaseById, useGetDatabaseTasks } from '../hooks/useTasks';
+import { useGetDatabaseTasks } from '../hooks/useTasks';
 
 interface DatabaseViewProps {
   databaseId: string;
@@ -20,9 +17,6 @@ const DatabaseView: React.FC<DatabaseViewProps> = ({ databaseId }) => {
   };
 
   const { data } = useGetDatabaseTasks(databaseId);
-  // useEffect(() => {
-
-  // }, [database, t])
 
   return (
     <Box sx={{  }}>

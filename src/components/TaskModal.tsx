@@ -13,7 +13,7 @@ interface TaskModalProps {
   open: boolean;
   onClose: () => void;
   onSave: (updatedTask: TaskWithId) => void;
-  onDelete: (task: Task) => void;
+  onDelete: (task: TaskType) => void;
 }
 
 const TaskModal: React.FC<TaskModalProps> = ({ task, open, onClose, onSave, onDelete }) => {

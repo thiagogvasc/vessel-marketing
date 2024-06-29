@@ -24,6 +24,9 @@ import {
   Paper,
   Breadcrumbs,
   Link as MuiLink,
+  IconButton,
+  Menu,
+  MenuItem,
 } from "@mui/material";
 import AddCircleOutlineIcon from "@mui/icons-material/AddCircleOutline";
 import SearchIcon from "@mui/icons-material/Search";
@@ -31,6 +34,8 @@ import HomeIcon from '@mui/icons-material/Home';
 import NavigateNextIcon from '@mui/icons-material/NavigateNext';
 import { useRouter } from "next/navigation";
 import { Request } from "@/src/types";
+import { BorderColor, MoreVert } from "@mui/icons-material";
+import theme from "@/src/theme";
 
  
 const Requests = () => {
@@ -98,6 +103,19 @@ const Requests = () => {
     page * rowsPerPage + rowsPerPage
   );
 
+  const [anchorEl, setAnchorEl] = useState<null | HTMLElement>(null);
+  const [menuRequestId, setMenuRequestId] = useState<null | string>(null);
+  const isMenuOpen = Boolean(anchorEl);
+
+  const handleMenuClose = () => {
+    setAnchorEl(null);
+  }
+
+  const handleMenuOpen = (requestId: string, event: React.MouseEvent<HTMLElement>) => {
+    setMenuRequestId(requestId);
+    setAnchorEl(event.currentTarget);
+  };
+
   return (
     <Container component="main" maxWidth="xl">
       <Paper elevation={0} sx={{ borderRadius: 2, p:4 , boxShadow: 'rgba(0, 0, 0, 0.04) 0px 5px 22px, rgba(0, 0, 0, 0.03) 0px 0px 0px 0.5px'}}>
@@ -111,10 +129,18 @@ const Requests = () => {
         placeholder="Search requests"
         value={searchTerm}
         onChange={handleSearchChange}
+        sx={ {
+          '& .MuiOutlinedInput-root': {
+            '& fieldset': {
+              border: '1px solid rgb(239, 241, 245)', // Default border color
+            },
+            borderRadius: '10px',
+          },
+        }}
         InputProps={{
           startAdornment: (
             <InputAdornment position="start">
-              <SearchIcon />
+              <SearchIcon sx={{ color: theme.palette.grey[500]}} />
             </InputAdornment>
           ),
         }}
@@ -125,11 +151,11 @@ const Requests = () => {
         </Box>
       ) : (
         <>
-          <TableContainer sx={{ mt: 3 }}>
-            <Table>
-              <TableHead>
-                <TableRow>
-                  <TableCell sortDirection={orderBy === "title" ? order : false}>
+          <TableContainer sx={{ mt: 3 , border:'none'}}>
+            <Table sx={{border:'none'}}>
+              <TableHead sx={{ backgroundColor:'rgb(243, 244, 246)'}}>
+                <TableRow sx={{border:'none'}}>
+                  <TableCell sx={{ border: 'none'}} sortDirection={orderBy === "title" ? order : false}>
                     <TableSortLabel
                       active={orderBy === "title"}
                       direction={orderBy === "title" ? order : "asc"}
@@ -138,7 +164,7 @@ const Requests = () => {
                       Title
                     </TableSortLabel>
                   </TableCell>
-                  <TableCell sortDirection={orderBy === "description" ? order : false}>
+                  <TableCell sx={{ border: 'none'}} sortDirection={orderBy === "description" ? order : false}>
                     <TableSortLabel
                       active={orderBy === "description"}
                       direction={orderBy === "description" ? order : "asc"}
@@ -147,7 +173,7 @@ const Requests = () => {
                       Description
                     </TableSortLabel>
                   </TableCell>
-                  <TableCell sortDirection={orderBy === "status" ? order : false}>
+                  <TableCell sx={{ border: 'none'}} sortDirection={orderBy === "status" ? order : false}>
                     <TableSortLabel
                       active={orderBy === "status"}
                       direction={orderBy === "status" ? order : "asc"}
@@ -156,7 +182,7 @@ const Requests = () => {
                       Status
                     </TableSortLabel>
                   </TableCell>
-                  <TableCell sortDirection={orderBy === "priority" ? order : false}>
+                  <TableCell sx={{ border: 'none'}} sortDirection={orderBy === "priority" ? order : false}>
                     <TableSortLabel
                       active={orderBy === "priority"}
                       direction={orderBy === "priority" ? order : "asc"}
@@ -165,7 +191,7 @@ const Requests = () => {
                       Priority
                     </TableSortLabel>
                   </TableCell>
-                  <TableCell sortDirection={orderBy === "created_at" ? order : false}>
+                  <TableCell sx={{ border: 'none'}} sortDirection={orderBy === "created_at" ? order : false}>
                     <TableSortLabel
                       active={orderBy === "created_at"}
                       direction={orderBy === "created_at" ? order : "asc"}
@@ -174,7 +200,7 @@ const Requests = () => {
                       Created At
                     </TableSortLabel>
                   </TableCell>
-                  <TableCell sortDirection={orderBy === "updated_at" ? order : false}>
+                  <TableCell sx={{ border: 'none'}} sortDirection={orderBy === "updated_at" ? order : false}>
                     <TableSortLabel
                       active={orderBy === "updated_at"}
                       direction={orderBy === "updated_at" ? order : "asc"}
@@ -183,7 +209,7 @@ const Requests = () => {
                       Updated At
                     </TableSortLabel>
                   </TableCell>
-                  <TableCell>Actions</TableCell>
+                  <TableCell sx={{ border: 'none'}}>Actions</TableCell>
                 </TableRow>
               </TableHead>
               <TableBody>
@@ -195,19 +221,27 @@ const Requests = () => {
                     key={request.id}
                   >
                     <TableRow>
-                      <TableCell>{request.title}</TableCell>
-                      <TableCell>{request.description.substring(0, 50)}...</TableCell>
-                      <TableCell>{request.status}</TableCell>
-                      <TableCell>{request.priority}</TableCell>
-                      <TableCell>{request.created_at?.toDate().toLocaleString()}</TableCell>
-                      <TableCell>{request.updated_at?.toDate().toLocaleString()}</TableCell>
-                      <TableCell>
-                        <Button variant="outlined" component={Link} href={`/agent/requests/${request.id}`}>
-                          View
-                        </Button>
+                      <TableCell sx={{ border: 'none' }}>{request.title}</TableCell>
+                      <TableCell sx={{ border: 'none', color: theme.palette.text.secondary }}>{request.description.substring(0, 50)}...</TableCell>
+                      <TableCell sx={{ border: 'none', color: theme.palette.text.secondary }}>{request.status}</TableCell>
+                      <TableCell sx={{ border: 'none', color: theme.palette.text.secondary }}>{request.priority}</TableCell>
+                      <TableCell sx={{ border: 'none', color: theme.palette.text.secondary }}>{request.created_at?.toDate().toLocaleString()}</TableCell>
+                      <TableCell sx={{ border: 'none', color: theme.palette.text.secondary }}>{request.updated_at?.toDate().toLocaleString()}</TableCell>
+                      <TableCell sx={{ border: 'none', color: theme.palette.text.secondary }}>
+                        <IconButton onClick={(e) => handleMenuOpen(request.id as string, e)}>
+                          <MoreVert />
+                        </IconButton>
+                        <Menu
+                          anchorEl={anchorEl}
+                          open={isMenuOpen && menuRequestId === request.id}
+                          onClose={handleMenuClose}
+                        >
+                          <MenuItem onClick={() => { handleMenuClose(); router.push(`/agent/requests/${request.id}`); }}>View</MenuItem>
+                        </Menu>
                       </TableCell>
                     </TableRow>
                   </Grow>
+                  
                 ))}
               </TableBody>
             </Table>

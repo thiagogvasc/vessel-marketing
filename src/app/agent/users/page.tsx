@@ -109,6 +109,14 @@ const Users = () => {
           placeholder="Search users"
           value={searchTerm}
           onChange={handleSearchChange}
+          sx={ {
+            '& .MuiOutlinedInput-root': {
+              '& fieldset': {
+                border: '1px solid rgb(239, 241, 245)', // Default border color
+              },
+              borderRadius: '10px',
+            },
+          }}
           InputProps={{
             startAdornment: (
               <InputAdornment position="start">
