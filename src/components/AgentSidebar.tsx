@@ -114,9 +114,11 @@ const AgentSidebar = () => {
         sx={{
           width: `calc(100% - ${open ? drawerWidth + 'px' : theme.spacing(9)})`,
           ml: `${open ? drawerWidth + 'px' : theme.spacing(9)}`,
-          bgcolor: 'white',
+          // background: 'rgb(253 254 255)',
+          backgroundColor:'white',
           color: 'black',
-          boxShadow: 'rgba(0, 0, 0, 0) 0px 0px 0px 0px, rgba(0, 0, 0, 0) 0px 0px 0px 0px, rgba(84, 87, 118, 0.15) 0px 2px 3px 0px',
+          borderBottom: '1px solid rgb(239, 241, 245)',
+          // boxShadow: 'rgba(0, 0, 0, 0) 0px 0px 0px 0px, rgba(0, 0, 0, 0) 0px 0px 0px 0px, rgba(84, 87, 118, 0.15) 0px 2px 3px 0px',
           transition: theme.transitions.create('width', {
             easing: theme.transitions.easing.sharp,
             duration: theme.transitions.duration.enteringScreen,
@@ -126,7 +128,7 @@ const AgentSidebar = () => {
       >
         <Toolbar sx={{ position: 'relative'}}>
           <Box sx={{ backgroundColor: 'white', position: 'absolute', top: '50%', left: -19, zIndex: 1000, transform: 'translate(0, -50%)'}}>
-            <IconButton size='small' onClick={toggleDrawer} sx={{  ":hover": {backgroundColor: 'rgba(0, 0, 0, 0.04)'}, backgroundColor: 'white', border: '1px solid rgba(0, 0, 0, 0.12)'}}>
+            <IconButton size='small' onClick={toggleDrawer} sx={{  ":hover": {backgroundColor: 'rgba(0, 0, 0, 0.04)'}, backgroundColor: 'white', border: '1px solid rgb(239, 241, 245)'}}>
               {open ? <ChevronLeftIcon /> : <ChevronRightIcon />}
             </IconButton>
           </Box>

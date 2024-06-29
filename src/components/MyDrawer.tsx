@@ -63,6 +63,7 @@ const MyDrawer = ({ drawerWidth, open, toggleDrawer, links, user, handleLogout }
         }),
         flexShrink: 0,
         [`& .MuiDrawer-paper`]: {
+          borderRight: '1px solid rgb(239, 241, 245)',
           width: open ? drawerWidth + 'px' : `calc(${theme.spacing(9)})`,
           transition: theme.transitions.create('width', {
             easing: theme.transitions.easing.sharp,
@@ -99,7 +100,7 @@ const MyDrawer = ({ drawerWidth, open, toggleDrawer, links, user, handleLogout }
             </StyledListItemButton>
           ))}
         </List>
-        <Divider />
+        <Divider sx={{borderColor: 'rgb(239, 241, 245)'}} />
         {user && (
           <List>
             <ListItemButton onClick={handleLogout}>
