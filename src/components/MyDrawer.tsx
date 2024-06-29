@@ -22,6 +22,7 @@ import { User } from '../types';
 import { usePathname } from 'next/navigation';
 import ChevronLeftIcon from '@mui/icons-material/ChevronLeft';
 import theme from '../theme';
+import Image from 'next/image';
 
 const StyledListItemButton = styled(ListItemButton, {
   shouldForwardProp: (prop) => prop !== 'active',
@@ -76,10 +77,12 @@ const MyDrawer = ({ drawerWidth, open, toggleDrawer, links, user, handleLogout }
       open={open}
     >
       <Toolbar>
-        {open && (
+        {open && (<>
+          <Image alt="vessel marketing" src='/logovessel.png' width={50} height={50} />
           <Typography variant="h6" noWrap component="div">
             Vessel Marketing
           </Typography>
+        </>
         )}  
       </Toolbar>
       <Box sx={{ overflow: 'auto' }}>
@@ -100,17 +103,6 @@ const MyDrawer = ({ drawerWidth, open, toggleDrawer, links, user, handleLogout }
             </StyledListItemButton>
           ))}
         </List>
-        <Divider sx={{borderColor: 'rgb(239, 241, 245)'}} />
-        {user && (
-          <List>
-            <ListItemButton onClick={handleLogout}>
-              <ListItemIcon>
-                <Logout />
-              </ListItemIcon>
-              <ListItemText primary="Logout" />
-            </ListItemButton>
-          </List>
-        )}
       </Box>
     </Drawer>
   );

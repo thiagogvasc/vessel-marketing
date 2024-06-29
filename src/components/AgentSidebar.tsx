@@ -31,6 +31,7 @@ import MyDrawer from './MyDrawer';
 import { useGetCurrentUser } from '../hooks/useUsers';
 import { User } from '../types';
 import theme from '../theme';
+import Image from 'next/image';
 
 const drawerWidth = 240;
 
@@ -46,7 +47,7 @@ const AgentSidebar = () => {
     { text: 'Dashboard', iconComponent: Dashboard, disabled: false, href: '/agent/dashboard'},
     { text: 'Users', iconComponent: Group, disabled: false, href: '/agent/users'},
     { text: 'Requests', iconComponent: ListAltIcon, disabled: false, href: '/agent/requests'},
-    { text: 'Databases', iconComponent: ViewKanban, disabled: false, href: '/agent/databases'},
+    { text: 'Projects', iconComponent: ViewKanban, disabled: false, href: '/agent/databases'},
   ]
 
   const handleLogout = async () => {
@@ -114,11 +115,8 @@ const AgentSidebar = () => {
         sx={{
           width: `calc(100% - ${open ? drawerWidth + 'px' : theme.spacing(9)})`,
           ml: `${open ? drawerWidth + 'px' : theme.spacing(9)}`,
-          // background: 'rgb(253 254 255)',
-          backgroundColor:'white',
+          background: 'rgb(253 254 255)',
           color: 'black',
-          borderBottom: '1px solid rgb(239, 241, 245)',
-          // boxShadow: 'rgba(0, 0, 0, 0) 0px 0px 0px 0px, rgba(0, 0, 0, 0) 0px 0px 0px 0px, rgba(84, 87, 118, 0.15) 0px 2px 3px 0px',
           transition: theme.transitions.create('width', {
             easing: theme.transitions.easing.sharp,
             duration: theme.transitions.duration.enteringScreen,
@@ -132,9 +130,10 @@ const AgentSidebar = () => {
               {open ? <ChevronLeftIcon /> : <ChevronRightIcon />}
             </IconButton>
           </Box>
-
+          
           {!open && (
             <>
+              <Image alt="vessel marketing" src='/logovessel.png' width={50} height={50} />
               <Typography variant="h6" noWrap component="div" sx={{ flexGrow: 1 }}>
                 Vessel Marketing
               </Typography>

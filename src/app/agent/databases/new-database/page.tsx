@@ -59,12 +59,12 @@ const NewDatabase = () => {
       <Grid container spacing={2} justifyContent="center">
         <Grid item xs={12}>
           <Typography component="h1" variant="h5" textAlign="center">
-            Add Database
+            Add Project
           </Typography>
         </Grid>
         <Grid item xs={12}>
           <TextField
-            label="Database Name"
+            label="Project Name"
             value={name}
             onChange={(e) => setName(e.target.value)}
             fullWidth
@@ -111,7 +111,7 @@ const NewDatabase = () => {
             color="primary"
             onClick={handleAddDatabase}
           >
-            Add Database
+            Add Project
           </Button>
         </Grid>
       </Grid>

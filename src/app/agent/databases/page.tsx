@@ -31,6 +31,7 @@ import HomeIcon from '@mui/icons-material/Home';
 import NavigateNextIcon from '@mui/icons-material/NavigateNext';
 import { useRouter } from "next/navigation";
 import { Database } from "@/src/types"; // Assuming there's a Database type in your types file
+import { Add } from "@mui/icons-material";
 
 const Databases = () => {
   const router = useRouter();
@@ -85,40 +86,24 @@ const Databases = () => {
 
   return (
     <Container component="main" maxWidth="xl">
+      <Paper elevation={0} sx={{ borderRadius: 2, p:4 , boxShadow: 'rgba(0, 0, 0, 0.04) 0px 5px 22px, rgba(0, 0, 0, 0.03) 0px 0px 0px 0.5px'}}>
       <Grid container spacing={2} mb={2} justifyContent="space-between" alignItems="center">
         <Grid item>
           <Typography component="h1" variant="h5">
-            Databases
+            Projects
           </Typography>
-        </Grid>
-        <Grid item>
-          <Breadcrumbs aria-label="breadcrumb" separator={<NavigateNextIcon fontSize="small" />}>
-            <MuiLink
-              color="inherit"
-              href="/"
-              onClick={(e) => {
-                e.preventDefault();
-                router.push('/agent/dashboard');
-              }}
-              noWrap
-            >
-              <HomeIcon sx={{ mr: 0.5 }} fontSize="inherit" />
-              Dashboard
-            </MuiLink>
-            <Typography color="textPrimary" noWrap>Databases</Typography>
-          </Breadcrumbs>
         </Grid>
         <Grid item>
           <Button
             variant="contained"
-            startIcon={<AddCircleOutlineIcon />}
+            startIcon={<Add />}
             onClick={() => router.push('/agent/databases/new-database')} // Route to add new database
           >
-            Add Database
+            Add Project
           </Button>
         </Grid>
       </Grid>
-      <Paper elevation={0} sx={{ borderRadius: 2, px: 2, py: 1 }}>
+      {/* <Paper elevation={0} sx={{ borderRadius: 2, px: 2, py: 1 }}> */}
         <TextField
           variant="outlined"
           margin="normal"

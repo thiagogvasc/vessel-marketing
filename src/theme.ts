@@ -37,7 +37,7 @@ const theme = createTheme({
   },
   palette: {
     primary: {
-      main: deepPurple[700],
+      main: deepPurple[500],
       
       50: deepPurple[50],
       100: deepPurple[100]
