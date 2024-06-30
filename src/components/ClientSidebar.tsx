@@ -19,17 +19,14 @@ import {
   Avatar,
   Tooltip,
 } from '@mui/material';
-import ListAltIcon from '@mui/icons-material/ListAlt';
 import LogoutIcon from '@mui/icons-material/Logout';
 import NotificationsIcon from '@mui/icons-material/Notifications';
 import SettingsIcon from '@mui/icons-material/Settings';
-import MenuIcon from '@mui/icons-material/Menu';
 import ChevronLeftIcon from '@mui/icons-material/ChevronLeft';
 import ChevronRightIcon from '@mui/icons-material/ChevronRight';
-import { Assignment, Dashboard, EventNote, Group, MeetingRoom, ViewKanban } from '@mui/icons-material';
+import { DashboardOutlined, EventNoteOutlined, ListAltOutlined, MeetingRoomOutlined } from '@mui/icons-material';
 import MyDrawer from './MyDrawer';
 import { useGetCurrentUser } from '../hooks/useUsers';
-import { User } from '../types';
 import theme from '../theme';
 import Image from 'next/image';
 
@@ -44,10 +41,10 @@ const AgentSidebar = () => {
   const { data: userData } = useGetCurrentUser();
 
   const links = [
-    { text: 'Dashboard', iconComponent: Dashboard, disabled: false, href: '/client/dashboard'},
-    { text: 'Requests', iconComponent: ListAltIcon, disabled: false, href: '/client/requests'},
-    { text: 'Meetings', iconComponent: MeetingRoom, disabled: true, href: '/client/meetings'},
-    { text: 'Planning', iconComponent: EventNote, disabled: true, href: '/client/planning'},
+    { text: 'Dashboard', iconComponent: DashboardOutlined, disabled: false, href: '/client/dashboard'},
+    { text: 'Requests', iconComponent: ListAltOutlined, disabled: false, href: '/client/requests'},
+    { text: 'Meetings', iconComponent: MeetingRoomOutlined, disabled: true, href: '/client/meetings'},
+    { text: 'Planning', iconComponent: EventNoteOutlined, disabled: true, href: '/client/planning'},
   ]
 
   const handleLogout = async () => {
