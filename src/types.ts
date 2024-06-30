@@ -109,6 +109,7 @@ export interface Database {
   id?: string;
   name: string;
   description: string;
+  client_id?: string;
   // workspaceId: string;
   views: DatabaseView[];
   propertyDefinitions: DatabasePropertyDefinition[];

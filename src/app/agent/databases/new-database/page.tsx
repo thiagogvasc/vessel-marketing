@@ -2,8 +2,7 @@
 
 import { useState } from 'react';
 import { useRouter } from 'next/navigation';
-import { Box, Button, Container, Grid, TextField, Typography, FormControl, InputLabel, Select, MenuItem } from '@mui/material';
-import { addDatabase } from '@/src/utils/firestoreUtils';
+import { Button, Container, Grid, TextField, Typography, FormControl, InputLabel, Select, MenuItem } from '@mui/material';
 import { Database, PropertyType } from '@/src/types';
 import { useAddDatabase } from '@/src/hooks/useDatabases';
 
@@ -19,6 +18,7 @@ const NewDatabase = () => {
     try {
       const newDatabase: Omit<Database, 'id'> = {
         name: name,
+        client_id: clientId.length > 0 ? clientId : undefined,
         description: description, // Use description state here
         propertyDefinitions: [
           {
@@ -101,7 +101,6 @@ const NewDatabase = () => {
             value={clientId}
             onChange={(e) => setClientId(e.target.value)}
             fullWidth
-            disabled
             variant="outlined"
           />
         </Grid>
