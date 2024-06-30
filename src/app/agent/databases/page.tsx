@@ -103,7 +103,6 @@ const Databases = () => {
           </Button>
         </Grid>
       </Grid>
-      {/* <Paper elevation={0} sx={{ borderRadius: 2, px: 2, py: 1 }}> */}
         <TextField
           variant="outlined"
           margin="normal"

@@ -1,6 +1,6 @@
 'use client'
 import { withAuth } from '@/src/components/withAuth';
-import Sidebar from '../../components/ClientSidebar';
+import ClientSidebar from '../../components/ClientSidebar';
 import { Box, Toolbar } from '@mui/material';
 
 
@@ -10,18 +10,18 @@ const ClientLayout = ({
   children: React.ReactNode;
 }>) => {
   return (
-    <Box sx={{ display: 'flex' }}>
-      <Sidebar />
+    <Box sx={{ display: 'flex', height: '100%' }}>
+      <ClientSidebar />
       <Box
         component="main"
         sx={{
           flexGrow: 1,
           p: 3,
-          background: 'rgb(243 244 246)',
-          height: '100vh'
+          pt: 12,
+          background: '#fcfbfe',
+          height: '100%'
         }}
       >
-        <Toolbar />
         {children}
       </Box>
     </Box>

@@ -24,23 +24,20 @@ import {
   Paper,
   Breadcrumbs,
   Link as MuiLink,
+  IconButton,
+  Menu,
+  MenuItem,
 } from "@mui/material";
 import AddCircleOutlineIcon from "@mui/icons-material/AddCircleOutline";
 import SearchIcon from "@mui/icons-material/Search";
 import HomeIcon from '@mui/icons-material/Home';
 import NavigateNextIcon from '@mui/icons-material/NavigateNext';
 import { useRouter } from "next/navigation";
+import { Request } from "@/src/types";
+import { Add, BorderColor, MoreVert } from "@mui/icons-material";
+import theme from "@/src/theme";
 
-interface Request {
-  id: string;
-  title: string;
-  description: string;
-  status: string;
-  priority: string;
-  created_at: string;
-  updated_at: string;
-}
-
+ 
 const Requests = () => {
   const router = useRouter();
   const { data: requests, isLoading } = useGetRequests();
@@ -50,6 +47,7 @@ const Requests = () => {
   const [rowsPerPage, setRowsPerPage] = useState(5);
   const [order, setOrder] = useState<"asc" | "desc">("asc");
   const [orderBy, setOrderBy] = useState<keyof Request>("title");
+  console.warn(requests)
 
   useEffect(() => {
     if (!isLoading && requests) {
@@ -105,8 +103,22 @@ const Requests = () => {
     page * rowsPerPage + rowsPerPage
   );
 
+  const [anchorEl, setAnchorEl] = useState<null | HTMLElement>(null);
+  const [menuRequestId, setMenuRequestId] = useState<null | string>(null);
+  const isMenuOpen = Boolean(anchorEl);
+
+  const handleMenuClose = () => {
+    setAnchorEl(null);
+  }
+
+  const handleMenuOpen = (requestId: string, event: React.MouseEvent<HTMLElement>) => {
+    setMenuRequestId(requestId);
+    setAnchorEl(event.currentTarget);
+  };
+
   return (
-    <Container component="main" maxWidth="xl" sx={{ mt: 4 }}>
+    <Container component="main" maxWidth="xl">
+      <Paper elevation={0} sx={{ borderRadius: 2, p:4 , boxShadow: 'rgba(0, 0, 0, 0.04) 0px 5px 22px, rgba(0, 0, 0, 0.03) 0px 0px 0px 0.5px'}}>
       <Grid container spacing={2} mb={2} justifyContent="space-between" alignItems="center">
         <Grid item>
           <Typography component="h1" variant="h5">
@@ -114,24 +126,16 @@ const Requests = () => {
           </Typography>
         </Grid>
         <Grid item>
-          <Breadcrumbs aria-label="breadcrumb" separator={<NavigateNextIcon fontSize="small" />}>
-            <MuiLink
-              color="inherit"
-              href="/"
-              onClick={(e) => {
-                e.preventDefault();
-                router.push('/client/dashboard');
-              }}
-              noWrap
-            >
-              <HomeIcon sx={{ mr: 0.5 }} fontSize="inherit" />
-              Dashboard
-            </MuiLink>
-            <Typography color="textPrimary" noWrap>Requests</Typography>
-          </Breadcrumbs>
+          <Button
+            variant="contained"
+            startIcon={<Add />}
+            component={Link}
+            href="/client/requests/new-request"
+          >
+            New Request
+          </Button>
         </Grid>
       </Grid>
-      <Paper elevation={0} sx={{ borderRadius: 2, px: 2, py: 1}}>
       <TextField
         variant="outlined"
         margin="normal"
@@ -139,10 +143,18 @@ const Requests = () => {
         placeholder="Search requests"
         value={searchTerm}
         onChange={handleSearchChange}
+        sx={ {
+          '& .MuiOutlinedInput-root': {
+            '& fieldset': {
+              border: '1px solid rgb(239, 241, 245)', // Default border color
+            },
+            borderRadius: '10px',
+          },
+        }}
         InputProps={{
           startAdornment: (
             <InputAdornment position="start">
-              <SearchIcon />
+              <SearchIcon sx={{ color: theme.palette.grey[500]}} />
             </InputAdornment>
           ),
         }}
@@ -156,7 +168,7 @@ const Requests = () => {
           <TableContainer sx={{ mt: 3 }}>
             <Table>
               <TableHead>
-                <TableRow>
+                <TableRow sx={{border:'none'}}>
                   <TableCell sortDirection={orderBy === "title" ? order : false}>
                     <TableSortLabel
                       active={orderBy === "title"}
@@ -182,6 +194,15 @@ const Requests = () => {
                       onClick={() => handleRequestSort("status")}
                     >
                       Status
+                    </TableSortLabel>
+                  </TableCell>
+                  <TableCell sortDirection={orderBy === "priority" ? order : false}>
+                    <TableSortLabel
+                      active={orderBy === "priority"}
+                      direction={orderBy === "priority" ? order : "asc"}
+                      onClick={() => handleRequestSort("priority")}
+                    >
+                      Priority
                     </TableSortLabel>
                   </TableCell>
                   <TableCell sortDirection={orderBy === "created_at" ? order : false}>
@@ -215,17 +236,26 @@ const Requests = () => {
                   >
                     <TableRow>
                       <TableCell>{request.title}</TableCell>
-                      <TableCell>{request.description.substring(0, 50)}...</TableCell>
-                      <TableCell>{request.status}</TableCell>
-                      <TableCell>{request.created_at?.toDate().toLocaleString()}</TableCell>
-                      <TableCell>{request.updated_at?.toDate().toLocaleString()}</TableCell>
-                      <TableCell>
-                        <Button variant="outlined" component={Link} href={`/client/requests/${request.id}`}>
-                          View
-                        </Button>
+                      <TableCell sx={{ color: theme.palette.text.secondary }}>{request.description.substring(0, 50)}...</TableCell>
+                      <TableCell sx={{ color: theme.palette.text.secondary }}>{request.status}</TableCell>
+                      <TableCell sx={{ color: theme.palette.text.secondary }}>{request.priority}</TableCell>
+                      <TableCell sx={{ color: theme.palette.text.secondary }}>{request.created_at?.toDate().toLocaleString()}</TableCell>
+                      <TableCell sx={{ color: theme.palette.text.secondary }}>{request.updated_at?.toDate().toLocaleString()}</TableCell>
+                      <TableCell sx={{ color: theme.palette.text.secondary }}>
+                        <IconButton onClick={(e) => handleMenuOpen(request.id as string, e)}>
+                          <MoreVert />
+                        </IconButton>
+                        <Menu
+                          anchorEl={anchorEl}
+                          open={isMenuOpen && menuRequestId === request.id}
+                          onClose={handleMenuClose}
+                        >
+                          <MenuItem onClick={() => { handleMenuClose(); router.push(`/client/requests/${request.id}`); }}>View</MenuItem>
+                        </Menu>
                       </TableCell>
                     </TableRow>
                   </Grow>
+                  
                 ))}
               </TableBody>
             </Table>
@@ -242,16 +272,6 @@ const Requests = () => {
         </>
       )}
     </Paper>
-    <Box sx={{ display: 'flex', justifyContent: 'flex-end', mt: 2 }}>
-      <Button
-        variant="contained"
-        startIcon={<AddCircleOutlineIcon />}
-        component={Link}
-        href="/client/requests/new-request"
-      >
-        New Request
-      </Button>
-    </Box>
     </Container>
   );
 }
