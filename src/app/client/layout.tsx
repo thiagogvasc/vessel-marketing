@@ -1,6 +1,6 @@
 'use client'
 import { withAuth } from '@/src/components/withAuth';
-import Sidebar from '../../components/Sidebar';
+import Sidebar from '../../components/ClientSidebar';
 import { Box, Toolbar } from '@mui/material';
 
 

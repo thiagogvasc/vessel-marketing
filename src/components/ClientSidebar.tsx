@@ -11,6 +11,7 @@ import {
   Box,
   Divider,
   AppBar,
+  CssBaseline,
   IconButton,
   Menu,
   MenuItem,
@@ -19,29 +20,34 @@ import {
   Tooltip,
 } from '@mui/material';
 import ListAltIcon from '@mui/icons-material/ListAlt';
-import MeetingRoomIcon from '@mui/icons-material/MeetingRoom';
-import EventNoteIcon from '@mui/icons-material/EventNote';
 import LogoutIcon from '@mui/icons-material/Logout';
 import NotificationsIcon from '@mui/icons-material/Notifications';
 import SettingsIcon from '@mui/icons-material/Settings';
-import { Dashboard } from '@mui/icons-material';
-import { useGetCurrentUser } from '../hooks/useUsers';
+import MenuIcon from '@mui/icons-material/Menu';
+import ChevronLeftIcon from '@mui/icons-material/ChevronLeft';
+import ChevronRightIcon from '@mui/icons-material/ChevronRight';
+import { Assignment, Dashboard, EventNote, Group, MeetingRoom, ViewKanban } from '@mui/icons-material';
 import MyDrawer from './MyDrawer';
+import { useGetCurrentUser } from '../hooks/useUsers';
+import { User } from '../types';
+import theme from '../theme';
+import Image from 'next/image';
 
-const drawerWidth = 280;
+const drawerWidth = 240;
 
-const Sidebar = () => {
+const AgentSidebar = () => {
   const { user, logout } = useAuth();
   const router = useRouter();
   const [anchorEl, setAnchorEl] = useState<null | HTMLElement>(null);
+  const [open, setOpen] = useState(true); // State to control drawer open/close
 
   const { data: userData } = useGetCurrentUser();
 
   const links = [
     { text: 'Dashboard', iconComponent: Dashboard, disabled: false, href: '/client/dashboard'},
     { text: 'Requests', iconComponent: ListAltIcon, disabled: false, href: '/client/requests'},
-    { text: 'Meetings', iconComponent: MeetingRoomIcon, disabled: true, href: '/client/meetings'},
-    { text: 'Planning', iconComponent: EventNoteIcon, disabled: true, href: '/client/planning'},
+    { text: 'Meetings', iconComponent: MeetingRoom, disabled: true, href: '/client/meetings'},
+    { text: 'Planning', iconComponent: EventNote, disabled: true, href: '/client/planning'},
   ]
 
   const handleLogout = async () => {
@@ -55,6 +61,10 @@ const Sidebar = () => {
 
   const handleMenuClose = () => {
     setAnchorEl(null);
+  };
+
+  const toggleDrawer = () => {
+    setOpen(!open);
   };
 
   const isMenuOpen = Boolean(anchorEl);
@@ -99,17 +109,37 @@ const Sidebar = () => {
 
   return (
     <>
+      <CssBaseline />
       <AppBar
         position="fixed"
         sx={{
-          width: `calc(100% - ${drawerWidth}px)`,
-          ml: `${drawerWidth}px`,
-          bgcolor: 'white',
+          width: `calc(100% - ${open ? drawerWidth + 'px' : theme.spacing(9)})`,
+          ml: `${open ? drawerWidth + 'px' : theme.spacing(9)}`,
+          background: '#fcfbfe',
           color: 'black',
+          transition: theme.transitions.create('width', {
+            easing: theme.transitions.easing.sharp,
+            duration: theme.transitions.duration.enteringScreen,
+          }),
         }}
         elevation={0}
       >
-        <Toolbar>
+        <Toolbar sx={{ position: 'relative'}}>
+          <Box sx={{ backgroundColor: 'white', position: 'absolute', top: '50%', left: -19, zIndex: 1000, transform: 'translate(0, -50%)'}}>
+            <IconButton size='small' onClick={toggleDrawer} sx={{  ":hover": {backgroundColor: 'rgba(0, 0, 0, 0.04)'}, backgroundColor: 'white', border: '1px solid rgb(239, 241, 245)'}}>
+              {open ? <ChevronLeftIcon /> : <ChevronRightIcon />}
+            </IconButton>
+          </Box>
+
+          {!open && (
+            <>
+              <Image alt="vessel marketing" src='/logovessel.png' width={50} height={50} />
+              <Typography variant="h6" noWrap component="div" sx={{ flexGrow: 1 }}>
+                Vessel Marketing
+              </Typography>
+            </>
+          )}
+          
           <Box sx={{ flexGrow: 1 }} />
           <IconButton size="large" aria-label="show new notifications" color="inherit">
             <Badge badgeContent={4} color="error">
@@ -131,10 +161,21 @@ const Sidebar = () => {
           </Tooltip>
         </Toolbar>
       </AppBar>
+      
+      {userData && 
+        <MyDrawer
+          drawerWidth={drawerWidth}
+          open={open}
+          toggleDrawer={toggleDrawer}
+          links={links}
+          handleLogout={handleLogout}
+          user={userData}
+        />
+      }
+
       {renderMenu}
-      {userData && <MyDrawer drawerWidth={drawerWidth} links={links} handleLogout={handleLogout} user={userData} />}
     </>
   );
 };
 
-export default Sidebar;
+export default AgentSidebar;
