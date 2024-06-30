@@ -5,7 +5,6 @@ import { getAllUsers, getUserById } from '../utils/users/userUtils';
 import { useAuth } from '../contexts/AuthContext';
 
 
-// Hook to get all requests
 export const useGetAllUsers = () => {
   return useQuery("users", getAllUsers);
 };
@@ -23,21 +22,6 @@ export const useGetUserById = (userId: string | undefined) => {
       return res
     }).catch(err => Promise.reject(err))
   }, { enabled: !!userId, refetchOnMount: false });
-};
-
-
-// Update an existing task
-export const useUpdateUserById = () => {
-  const queryClient = useQueryClient();
-
-  return useMutation(
-    ({ id, updatedUser }: { id: string; updatedUser: Partial<Omit<User, 'id' | 'created_at'>> }) => updateTask(id, updatedUser),
-    {
-      onSuccess: (_, variables) => {
-        queryClient.invalidateQueries(['user', variables.id]);
-      },
-    }
-  );
 };
 
 // Update the task order

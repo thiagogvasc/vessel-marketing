@@ -301,7 +301,7 @@ export const updateTask = async (
         });
 
         if (indexToRemove !== -1 && groupToRemoveTaskFrom) {
-          groupToRemoveTaskFrom.task_order.splice(indexToRemove, 1);
+          (groupToRemoveTaskFrom as GroupByGroup).task_order.splice(indexToRemove, 1);
         }
 
         // Add task to the new group
