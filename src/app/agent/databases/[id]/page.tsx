@@ -36,7 +36,7 @@ export default function Database() {
       
         <Box sx={{ p: 3 }}>
           {data?.views.map(databaseView => {
-            if (databaseView.type === 'kanban') return <KanbanView key={databaseView.name} databaseId={data?.id} databaseView={databaseView} />
+            if (databaseView.type === 'kanban') return <KanbanView readOnly={false} key={databaseView.name} databaseId={data?.id} databaseView={databaseView} />
             return <>View type not supported</>
           })}
         </Box>
