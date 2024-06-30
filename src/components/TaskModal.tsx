@@ -14,9 +14,10 @@ interface TaskModalProps {
   onClose: () => void;
   onSave: (updatedTask: TaskWithId) => void;
   onDelete: (task: TaskType) => void;
+  readOnly: boolean;
 }
 
-const TaskModal: React.FC<TaskModalProps> = ({ task, open, onClose, onSave, onDelete }) => {
+const TaskModal: React.FC<TaskModalProps> = ({ task, open, onClose, onSave, onDelete, readOnly }) => {
   const [title, setTitle] = useState(task?.title || '');
   const [description, setDescription] = useState(task?.description || '');
   const [properties, setProperties] = useState<{ propertyDefinition: DatabasePropertyDefinition, propertyValue: any }[]>([]);
@@ -105,6 +106,7 @@ const TaskModal: React.FC<TaskModalProps> = ({ task, open, onClose, onSave, onDe
               onChange={(e) => setTitle(e.target.value)}
               fullWidth
               variant="outlined"
+              disabled={readOnly}
             />
             <Box sx={{ display: 'flex', gap: 4 }}>
               <TextField
@@ -114,6 +116,7 @@ const TaskModal: React.FC<TaskModalProps> = ({ task, open, onClose, onSave, onDe
                 multiline
                 rows={10}
                 fullWidth
+                disabled={readOnly}
                 sx={{ flex: 7 }}
               />
               <Box sx={{ flex: 3, display: 'flex', flexDirection: 'column', gap: 2 }}>
@@ -125,6 +128,7 @@ const TaskModal: React.FC<TaskModalProps> = ({ task, open, onClose, onSave, onDe
                         value={prop.propertyValue}
                         onChange={(e) => handlePropertyChange(prop.propertyDefinition.name, e.target.value)}
                         fullWidth
+                        disabled={readOnly}
                       />
                     )}
                     {prop.propertyDefinition.type === 'Select' && (
@@ -135,6 +139,7 @@ const TaskModal: React.FC<TaskModalProps> = ({ task, open, onClose, onSave, onDe
                           value={prop.propertyValue}
                           onChange={(e) => handlePropertyChange(prop.propertyDefinition.name, e.target.value)}
                           fullWidth
+                          disabled={readOnly}
                         >
                           {prop.propertyDefinition.data?.options?.map(option => (
                             <MenuItem key={option} value={option}>
@@ -150,6 +155,7 @@ const TaskModal: React.FC<TaskModalProps> = ({ task, open, onClose, onSave, onDe
                   variant="outlined"
                   onClick={() => setShowNewPropertyForm(!showNewPropertyForm)}
                   sx={{ alignSelf: 'flex-start' }}
+                  disabled={readOnly}
                 >
                   Add Property
                 </Button>
@@ -160,6 +166,7 @@ const TaskModal: React.FC<TaskModalProps> = ({ task, open, onClose, onSave, onDe
                       value={newPropertyName}
                       onChange={(e) => setNewPropertyName(e.target.value)}
                       fullWidth
+                      disabled={readOnly}
                     />
                     <FormControl fullWidth>
                       <InputLabel id="new-property-type-label">Property Type</InputLabel>
@@ -168,6 +175,7 @@ const TaskModal: React.FC<TaskModalProps> = ({ task, open, onClose, onSave, onDe
                         value={newPropertyType}
                         onChange={(e) => setNewPropertyType(e.target.value)}
                         fullWidth
+                        disabled={readOnly}
                       >
                         <MenuItem value="Text">Text</MenuItem>
                         <MenuItem value="Select">Select</MenuItem>
@@ -178,11 +186,13 @@ const TaskModal: React.FC<TaskModalProps> = ({ task, open, onClose, onSave, onDe
                       value={newPropertyValue}
                       onChange={(e) => setNewPropertyValue(e.target.value)}
                       fullWidth
+                      disabled={readOnly}
                     />
                     <Button
                       variant="contained"
                       onClick={handleAddProperty}
                       sx={{ alignSelf: 'flex-start' }}
+                      disabled={readOnly}
                     >
                       Add
                     </Button>
@@ -191,7 +201,7 @@ const TaskModal: React.FC<TaskModalProps> = ({ task, open, onClose, onSave, onDe
               </Box>
             </Box>
           </Box>
-          <IconButton onClick={handleMenuOpen}>
+          <IconButton onClick={handleMenuOpen} disabled={readOnly}>
             <MoreVertIcon />
           </IconButton>
           <Menu
@@ -207,7 +217,7 @@ const TaskModal: React.FC<TaskModalProps> = ({ task, open, onClose, onSave, onDe
         <Button onClick={onClose} color="secondary">
           Cancel
         </Button>
-        <Button onClick={handleSave} color="primary">
+        <Button onClick={handleSave} color="primary" disabled={readOnly}>
           Save
         </Button>
       </DialogActions>

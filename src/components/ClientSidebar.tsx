@@ -24,7 +24,7 @@ import NotificationsIcon from '@mui/icons-material/Notifications';
 import SettingsIcon from '@mui/icons-material/Settings';
 import ChevronLeftIcon from '@mui/icons-material/ChevronLeft';
 import ChevronRightIcon from '@mui/icons-material/ChevronRight';
-import { DashboardOutlined, EventNoteOutlined, ListAltOutlined, MeetingRoomOutlined } from '@mui/icons-material';
+import { DashboardOutlined, EventNoteOutlined, ListAltOutlined, MeetingRoomOutlined, ViewKanbanOutlined } from '@mui/icons-material';
 import MyDrawer from './MyDrawer';
 import { useGetCurrentUser } from '../hooks/useUsers';
 import theme from '../theme';
@@ -43,6 +43,7 @@ const AgentSidebar = () => {
   const links = [
     { text: 'Dashboard', iconComponent: DashboardOutlined, disabled: false, href: '/client/dashboard'},
     { text: 'Requests', iconComponent: ListAltOutlined, disabled: false, href: '/client/requests'},
+    { text: 'Projects', iconComponent: ViewKanbanOutlined, disabled: false, href: '/client/databases'},
     { text: 'Meetings', iconComponent: MeetingRoomOutlined, disabled: true, href: '/client/meetings'},
     { text: 'Planning', iconComponent: EventNoteOutlined, disabled: true, href: '/client/planning'},
   ]

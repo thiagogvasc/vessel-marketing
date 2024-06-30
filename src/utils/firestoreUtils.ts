@@ -57,6 +57,15 @@ export const getDatabases = async (): Promise<Database[]> => {
   } as Database));
 }
 
+export const getDatabasesByClientId = async (clientId: string): Promise<Database[]> => {
+  const q = query(collection(db, "databases"), where("client_id", "==", clientId));
+  const databasesSnapShot = await getDocs(q);
+  return databasesSnapShot.docs.map((database) => ({
+    id: database.id,
+    ...database.data(),
+  } as Database));
+}
+
 export const addDatabase = async (databaseToAdd: Omit<Database, 'id'>): Promise<Database> => {
   const docRef = await addDoc(collection(db, "databases"), databaseToAdd);
   const createdDatabase: Database = { id: docRef.id, ...databaseToAdd };

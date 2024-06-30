@@ -11,10 +11,21 @@ interface TaskProps {
   task: TaskWithId;
   index: number;
   onClick: (task: TaskWithId) => void;
+  readOnly: boolean;
 }
 
-const Task: React.FC<TaskProps> = ({ task, index, onClick }) => {
-  return (
+const Task: React.FC<TaskProps> = ({ task, index, onClick, readOnly }) => {
+  return readOnly ? (
+    <Card
+      sx={{ cursor: 'pointer', borderRadius: 2, boxShadow: 'rgba(0, 0, 0, 0.04) 0px 5px 22px, rgba(0, 0, 0, 0.03) 0px 0px 0px 0.5px' }}
+      onClick={() => onClick(task)}
+      elevation={0}
+    >
+      <CardContent>
+        <Typography variant="body1">{task.title}</Typography>
+      </CardContent>
+    </Card>
+  ) : (
     <Draggable draggableId={task.id} index={index}>
       {(provided) => (
         <Card
@@ -31,7 +42,7 @@ const Task: React.FC<TaskProps> = ({ task, index, onClick }) => {
         </Card>
       )}
     </Draggable>
-  );
+  )
 };
 
 export default Task;

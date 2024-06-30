@@ -1,5 +1,5 @@
 import { useMutation, useQuery, useQueryClient } from "react-query";
-import { addDatabase, getDatabases } from "../utils/firestoreUtils";
+import { addDatabase, getDatabases, getDatabasesByClientId } from "../utils/firestoreUtils";
 import { Database } from "../types";
 
 
@@ -11,6 +11,13 @@ export const useGetDatabases = () => {
     refetchOnMount: false
   });
 };
+
+export const useGetDatabasesByClientId = (client_id: string | null | undefined) => {
+  return useQuery(["databasesByClientId"], () => client_id ? getDatabasesByClientId(client_id) : Promise.resolve(null), {
+    refetchOnMount: false
+  });
+};
+
 
 export const useAddDatabase = () => {
   const queryClient = useQueryClient();

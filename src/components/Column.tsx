@@ -4,19 +4,20 @@ import React, { useEffect, useState } from 'react';
 import { Droppable } from '@hello-pangea/dnd';
 import Task, { TaskWithId } from './Task';
 import { AggregateColumn, DatabaseView, Task as TaskType } from '../types';
-import { Box, Paper, Typography, IconButton, TextField, Button, CircularProgress, Menu, MenuItem } from '@mui/material';
+import { Box, Typography, IconButton, TextField, Button, CircularProgress, Menu, MenuItem } from '@mui/material';
 import AddIcon from '@mui/icons-material/Add';
 import MoreVertIcon from '@mui/icons-material/MoreVert'; // Import the MoreVertIcon
 import TaskModal from './TaskModal';
-import { useAddTask, useDeleteKanbanColumn, useDeleteTask, useGetDatabaseById, useGetDatabaseTasks, useUpdateTask } from '../hooks/useTasks';
+import { useAddTask, useDeleteKanbanColumn, useDeleteTask, useGetDatabaseTasks, useUpdateTask } from '../hooks/useTasks';
 
 interface ColumnProps {
   column: AggregateColumn;
   databaseId: string;
   databaseView: DatabaseView;
+  readOnly: boolean;
 }
 
-const Column: React.FC<ColumnProps> = ({ column, databaseId, databaseView }) => {
+const Column: React.FC<ColumnProps> = ({ column, databaseId, databaseView, readOnly }) => {
   const addTaskMutation = useAddTask(databaseId, databaseView.name);
   const deleteTaskMutation = useDeleteTask(databaseId, databaseView.name);
   const deleteColumnMutation = useDeleteKanbanColumn(databaseId, databaseView.name);
@@ -101,88 +102,113 @@ const Column: React.FC<ColumnProps> = ({ column, databaseId, databaseView }) => 
   };
 
   const handleDeleteColumn = () => {
-    // Add your delete logic here
-    console.log('Delete column', column.title);
     deleteColumnMutation.mutateAsync({databaseId, viewName: databaseView.name, optionToDelete: column.title})
     handleMenuClose();
   };
 
   return (
     <Box>
-      {/* <Paper elevation={0} sx={{ borderRadius: 2, p: 4, boxShadow: 'rgba(0, 0, 0, 0.04) 0px 5px 22px, rgba(0, 0, 0, 0.03) 0px 0px 0px 0.5px'}}> */}
-      <Box display="flex" justifyContent="space-between" alignItems="center">
-        <Typography variant="h6" gutterBottom>
-          {column.title}
-        </Typography>
-        <IconButton onClick={handleMenuOpen}>
-          <MoreVertIcon />
-        </IconButton>
-      </Box>
-      <Menu
-        anchorEl={anchorEl}
-        open={isMenuOpen}
-        onClose={handleMenuClose}
-      >
-        <MenuItem onClick={handleDeleteColumn}>Delete</MenuItem>
-      </Menu>
-      <Droppable droppableId={column.title}>
-        {(provided, snapshot) => (
-          <Box
-            ref={provided.innerRef}
-            {...provided.droppableProps}
-            sx={{ display:'flex', flexDirection:'column', gap: 1, minHeight: '64px', background: snapshot.isDraggingOver ? 'lightblue' : 'inherit', p: 1, borderRadius: '8px' }}
+      {readOnly ? (
+        <>
+          <Box display="flex" justifyContent="space-between" alignItems="center">
+            <Typography variant="h6" gutterBottom>
+              {column.title}
+            </Typography>
+          </Box>
+          <Box sx={{ display:'flex', flexDirection:'column', gap: 1, minHeight: '64px', p: 1, borderRadius: '8px' }}>
+            {column.tasks.map((task, index) => { console.warn('PRINTING COLUMN', column); return (
+              task?.id && <Task readOnly={readOnly} key={task.id} task={task as TaskWithId} index={index} onClick={handleTaskClick} />
+            )})}
+          </Box>
+          {selectedTask && (
+            <TaskModal
+              readOnly={readOnly}
+              task={selectedTask}
+              open={isModalOpen}
+              onClose={handleModalClose}
+              onSave={handleTaskSave}
+              onDelete={handleTaskDelete}
+            />
+          )}
+        </>
+      ) : (
+        <>
+          <Box display="flex" justifyContent="space-between" alignItems="center">
+            <Typography variant="h6" gutterBottom>
+              {column.title}
+            </Typography>
+            <IconButton onClick={handleMenuOpen}>
+              <MoreVertIcon />
+            </IconButton>
+          </Box>
+          <Menu
+            anchorEl={anchorEl}
+            open={isMenuOpen}
+            onClose={handleMenuClose}
           >
-            {column.tasks.map((task, index) => (
-              task?.id && <Task key={task.id} task={task as TaskWithId} index={index} onClick={handleTaskClick} />
-            ))}
-            {isAddingTask && (
-              <Box sx={{ p: 2, background: '#fff', borderRadius: '8px', boxShadow: '0 1px 3px rgba(0, 0, 0, 0.2)' }}>
-                {addTaskMutation.isLoading ? 
-                  <>
-                    <CircularProgress />
-                  </>
-                : 
-                  <>
-                    <TextField
-                      placeholder="Task title"
-                      value={newTaskTitle}
-                      onChange={(e) => setNewTaskTitle(e.target.value)}
-                      onBlur={handleTaskTitleBlur}
-                      onKeyDown={handleTaskTitleKeyDown}
-                      variant="outlined"
-                      size="small"
-                      fullWidth
-                      autoFocus
-                    />
-                    <Box sx={{ display: 'flex', justifyContent: 'space-between', mt: 1 }}>
-                      <Button variant="contained" color="primary" onClick={handleAddTask}>
-                        Add
-                      </Button>
-                      <Button variant="outlined" color="secondary" onClick={() => setIsAddingTask(false)}>
-                        Cancel
-                      </Button>
-                    </Box>
-                  </>
-                }
+            <MenuItem onClick={handleDeleteColumn}>Delete</MenuItem>
+          </Menu>
+          <Droppable droppableId={column.title}>
+            {(provided, snapshot) => (
+              <Box
+                ref={provided.innerRef}
+                {...provided.droppableProps}
+                sx={{ display:'flex', flexDirection:'column', gap: 1, minHeight: '64px', background: snapshot.isDraggingOver ? 'lightblue' : 'inherit', p: 1, borderRadius: '8px' }}
+              >
+                {column.tasks.map((task, index) => (
+                  task?.id && <Task readOnly={readOnly} key={task.id} task={task as TaskWithId} index={index} onClick={handleTaskClick} />
+                ))}
+                {isAddingTask && (
+                  <Box sx={{ p: 2, background: '#fff', borderRadius: '8px', boxShadow: '0 1px 3px rgba(0, 0, 0, 0.2)' }}>
+                    {addTaskMutation.isLoading ? 
+                      <>
+                        <CircularProgress />
+                      </>
+                    : 
+                      <>
+                        <TextField
+                          placeholder="Task title"
+                          value={newTaskTitle}
+                          onChange={(e) => setNewTaskTitle(e.target.value)}
+                          onBlur={handleTaskTitleBlur}
+                          onKeyDown={handleTaskTitleKeyDown}
+                          variant="outlined"
+                          size="small"
+                          fullWidth
+                          autoFocus
+                        />
+                        <Box sx={{ display: 'flex', justifyContent: 'space-between', mt: 1 }}>
+                          <Button variant="contained" color="primary" onClick={handleAddTask}>
+                            Add
+                          </Button>
+                          <Button variant="outlined" color="secondary" onClick={() => setIsAddingTask(false)}>
+                            Cancel
+                          </Button>
+                        </Box>
+                      </>
+                    }
+                  </Box>
+                )}
+                {provided.placeholder}
               </Box>
             )}
-            {provided.placeholder}
-          </Box>
-        )}
-      </Droppable>
-      {!isAddingTask && (
-        <IconButton color="primary" onClick={() => setIsAddingTask(true)} sx={{  }}>
-          <AddIcon />
-        </IconButton>
-      )}
-      {selectedTask && (
-        <TaskModal
-          task={selectedTask}
-          open={isModalOpen}
-          onClose={handleModalClose}
-          onSave={handleTaskSave}
-          onDelete={handleTaskDelete}
-        />
+          </Droppable>
+          {!isAddingTask && (
+            <IconButton color="primary" onClick={() => setIsAddingTask(true)} sx={{  }}>
+              <AddIcon />
+            </IconButton>
+          )}
+          {selectedTask && (
+            <TaskModal
+              readOnly={readOnly}
+              task={selectedTask}
+              open={isModalOpen}
+              onClose={handleModalClose}
+              onSave={handleTaskSave}
+              onDelete={handleTaskDelete}
+            />
+          )}
+        </>
       )}
     {/* </Paper> */}
     </Box>

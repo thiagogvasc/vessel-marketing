@@ -11,19 +11,18 @@ import AddIcon from '@mui/icons-material/Add';
 interface KanbanViewProps {
   databaseId: string;
   databaseView: DatabaseView;
+  readOnly: boolean;
 }
 
-const KanbanView: React.FC<KanbanViewProps> = ({ databaseId, databaseView }) => {
+const KanbanView: React.FC<KanbanViewProps> = ({ databaseId, databaseView, readOnly }) => {
   const [columns, setColumns] = useState<AggregateColumn[]>([]);
   const [newColumnTitle, setNewColumnTitle] = useState('');
   const [isAddingColumn, setIsAddingColumn] = useState(false);
   const { data: databaseWithTasks, isLoading: isTasksLoading } = useGetDatabaseTasks(databaseId);
-  console.warn('databasewithtaskss rerender', databaseWithTasks)
   const updateKanbanViewManualSort = useUpdateKanbanViewManualSort(databaseId, databaseView.id as string);
   const addKanbanColumnMutation = useAddKanbanColumn(databaseId, databaseView.name);
 
   useEffect(() => {
-    console.warn('useeffect databasewithtasks')
     if (databaseWithTasks) {
       const initialColumns: AggregateColumn[] = [];
       databaseView.config?.groups?.forEach(sortGroup => {
@@ -36,7 +35,6 @@ const KanbanView: React.FC<KanbanViewProps> = ({ databaseId, databaseView }) => 
         });
       });
       setColumns(initialColumns);
-      console.warn('initial columnsss',initialColumns)
     }
   }, [databaseWithTasks, databaseView]);
 
@@ -109,39 +107,49 @@ const KanbanView: React.FC<KanbanViewProps> = ({ databaseId, databaseView }) => 
 
   return (
     <Box sx={{ display: 'flex', flexDirection: 'column'}}>
-      <DragDropContext onDragEnd={handleDragEnd}>
+      {readOnly ? (
         <Box sx={{ display: 'flex', flexDirection: 'row', gap: 2 }}>
           {columns.map(column => (
             <Box key={column.title} sx={{ minWidth: 300 }}>
-              <Column column={column} databaseView={databaseView} databaseId={databaseId} />
+              <Column readOnly={readOnly} column={column} databaseView={databaseView} databaseId={databaseId} />
             </Box>
           ))}
-          <Box sx={{ minWidth: 300 }}>
-            {isAddingColumn ? (
-              <Box sx={{ display: 'flex', alignItems: 'center' }}>
-                <TextField
-                  placeholder="Column title"
-                  value={newColumnTitle}
-                  onChange={(e) => setNewColumnTitle(e.target.value)}
-                  onBlur={handleColumnTitleBlur}
-                  onKeyDown={handleColumnTitleKeyDown}
-                  variant="outlined"
-                  size="small"
-                  sx={{ flex: 1 }}
-                  autoFocus
-                />
-                <IconButton color="primary" onClick={handleAddColumn}>
+        </Box>
+      ) : (
+        <DragDropContext onDragEnd={handleDragEnd}>
+          <Box sx={{ display: 'flex', flexDirection: 'row', gap: 2 }}>
+            {columns.map(column => (
+              <Box key={column.title} sx={{ minWidth: 300 }}>
+                <Column readOnly={readOnly} column={column} databaseView={databaseView} databaseId={databaseId} />
+              </Box>
+            ))}
+            <Box sx={{ minWidth: 300 }}>
+              {isAddingColumn ? (
+                <Box sx={{ display: 'flex', alignItems: 'center' }}>
+                  <TextField
+                    placeholder="Column title"
+                    value={newColumnTitle}
+                    onChange={(e) => setNewColumnTitle(e.target.value)}
+                    onBlur={handleColumnTitleBlur}
+                    onKeyDown={handleColumnTitleKeyDown}
+                    variant="outlined"
+                    size="small"
+                    sx={{ flex: 1 }}
+                    autoFocus
+                  />
+                  <IconButton color="primary" onClick={handleAddColumn}>
+                    <AddIcon />
+                  </IconButton>
+                </Box>
+              ) : (
+                <IconButton color="primary" onClick={() => setIsAddingColumn(true)}>
                   <AddIcon />
                 </IconButton>
-              </Box>
-            ) : (
-              <IconButton color="primary" onClick={() => setIsAddingColumn(true)}>
-                <AddIcon />
-              </IconButton>
-            )}
+              )}
+            </Box>
           </Box>
-        </Box>
-      </DragDropContext>
+        </DragDropContext>
+      )}
     </Box>
   );
 };

@@ -66,6 +66,9 @@ const UserDetail = () => {
       ) : (
         <Paper elevation={1} sx={{ borderRadius: 2, p: 3 }}>
           <Typography component="h2" variant="h6" gutterBottom>
+            ID: {user?.id}
+          </Typography>
+          <Typography component="h2" variant="h6" gutterBottom>
             Full Name: {user?.fullname}
           </Typography>
           <Typography component="h2" variant="h6" gutterBottom>
