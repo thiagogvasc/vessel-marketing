@@ -18,7 +18,7 @@ const NewDatabase = () => {
     try {
       const newDatabase: Omit<Database, 'id'> = {
         name: name,
-        client_id: clientId.length > 0 ? clientId : undefined,
+        client_id: clientId,
         description: description, // Use description state here
         propertyDefinitions: [
           {
