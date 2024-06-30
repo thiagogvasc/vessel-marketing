@@ -102,6 +102,7 @@ const NewDatabase = () => {
             onChange={(e) => setClientId(e.target.value)}
             fullWidth
             variant="outlined"
+            disabled
           />
         </Grid>
         <Grid item xs={12} textAlign="center">
