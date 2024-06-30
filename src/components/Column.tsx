@@ -108,7 +108,8 @@ const Column: React.FC<ColumnProps> = ({ column, databaseId, databaseView }) => 
   };
 
   return (
-    <Paper elevation={0} sx={{ borderRadius: 2, p: 4, boxShadow: 'rgba(0, 0, 0, 0.04) 0px 5px 22px, rgba(0, 0, 0, 0.03) 0px 0px 0px 0.5px'}}>
+    <Box>
+      {/* <Paper elevation={0} sx={{ borderRadius: 2, p: 4, boxShadow: 'rgba(0, 0, 0, 0.04) 0px 5px 22px, rgba(0, 0, 0, 0.03) 0px 0px 0px 0.5px'}}> */}
       <Box display="flex" justifyContent="space-between" alignItems="center">
         <Typography variant="h6" gutterBottom>
           {column.title}
@@ -129,13 +130,13 @@ const Column: React.FC<ColumnProps> = ({ column, databaseId, databaseView }) => 
           <Box
             ref={provided.innerRef}
             {...provided.droppableProps}
-            sx={{ minHeight: '100px', background: snapshot.isDraggingOver ? 'lightblue' : 'inherit', p: 1, borderRadius: '8px' }}
+            sx={{ display:'flex', flexDirection:'column', gap: 1, minHeight: '64px', background: snapshot.isDraggingOver ? 'lightblue' : 'inherit', p: 1, borderRadius: '8px' }}
           >
             {column.tasks.map((task, index) => (
               task?.id && <Task key={task.id} task={task as TaskWithId} index={index} onClick={handleTaskClick} />
             ))}
             {isAddingTask && (
-              <Box sx={{ p: 2, mb: 2, background: '#fff', borderRadius: '8px', boxShadow: '0 1px 3px rgba(0, 0, 0, 0.2)' }}>
+              <Box sx={{ p: 2, background: '#fff', borderRadius: '8px', boxShadow: '0 1px 3px rgba(0, 0, 0, 0.2)' }}>
                 {addTaskMutation.isLoading ? 
                   <>
                     <CircularProgress />
@@ -170,7 +171,7 @@ const Column: React.FC<ColumnProps> = ({ column, databaseId, databaseView }) => 
         )}
       </Droppable>
       {!isAddingTask && (
-        <IconButton color="primary" onClick={() => setIsAddingTask(true)} sx={{ mt: 2 }}>
+        <IconButton color="primary" onClick={() => setIsAddingTask(true)} sx={{  }}>
           <AddIcon />
         </IconButton>
       )}
@@ -183,7 +184,8 @@ const Column: React.FC<ColumnProps> = ({ column, databaseId, databaseView }) => 
           onDelete={handleTaskDelete}
         />
       )}
-    </Paper>
+    {/* </Paper> */}
+    </Box>
   );
 };
 

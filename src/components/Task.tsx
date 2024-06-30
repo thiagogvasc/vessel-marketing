@@ -21,7 +21,7 @@ const Task: React.FC<TaskProps> = ({ task, index, onClick }) => {
           ref={provided.innerRef}
           {...provided.draggableProps}
           {...provided.dragHandleProps}
-          sx={{ mb: 2, cursor: 'pointer', borderRadius: 2, boxShadow: 'rgba(0, 0, 0, 0.04) 0px 5px 22px, rgba(0, 0, 0, 0.03) 0px 0px 0px 0.5px' }}
+          sx={{ cursor: 'pointer', borderRadius: 2, boxShadow: 'rgba(0, 0, 0, 0.04) 0px 5px 22px, rgba(0, 0, 0, 0.03) 0px 0px 0px 0.5px' }}
           onClick={() => onClick(task)}
           elevation={0}
         >
