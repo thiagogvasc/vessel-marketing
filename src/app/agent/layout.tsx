@@ -18,7 +18,7 @@ const AgentLayout = ({
           flexGrow: 1,
           p: 3,
           pt: 12,
-          background: 'rgb(253 254 255)',
+          background: '#fcfbfe',
           height: '100%'
         }}
       >

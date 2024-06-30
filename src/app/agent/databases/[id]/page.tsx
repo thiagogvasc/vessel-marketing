@@ -1,18 +1,46 @@
 'use client'
 
-import DatabaseView from "@/src/components/DatabaseView";
+import KanbanView from "@/src/components/KanbanView";
+import { useGetDatabaseTasks } from "@/src/hooks/useTasks";
 import { Task } from "@/src/types";
-import { Box, Container, Typography } from "@mui/material";
+import { Box, Container, Paper, Tab, Tabs, Typography } from "@mui/material";
 import { Timestamp } from "firebase/firestore";
 import { useParams } from "next/navigation";
+import { useState } from "react";
 
 
 export default function Database() {
-    const { id: databaseId } = useParams();
-    return (
-      <Box component="main" sx={{ height: '100%', maxWidth: '100%', overflow: 'auto'}}>
-        <Typography component="h1" variant="h5">Kanban Board - Test</Typography>
-        <DatabaseView databaseId={databaseId as string} />
-      </Box>
-    );
+  const { id: databaseId } = useParams();
+  const [selectedTab, setSelectedTab] = useState(0);
+
+  const handleTabChange = (event: React.ChangeEvent<{}>, newValue: number) => {
+    setSelectedTab(newValue);
+  };
+
+  const { data } = useGetDatabaseTasks(databaseId as string);
+
+  return (
+    <Container component="main" maxWidth="xl">
+      <Paper elevation={0} sx={{ borderRadius: 2, p:4 , boxShadow: 'rgba(0, 0, 0, 0.04) 0px 5px 22px, rgba(0, 0, 0, 0.03) 0px 0px 0px 0.5px'}}>
+        <Typography component="h1" variant="h5">{data?.name}</Typography>
+      </Paper>
+        <Tabs
+          sx={{ pt: 2 }}
+          value={selectedTab}
+          onChange={handleTabChange}
+          variant="scrollable"
+          scrollButtons="auto"
+        >
+          {data?.views.map(databaseView => <Tab key={databaseView.name} label={databaseView.name} /> )}
+        </Tabs>
+      
+        <Box sx={{ p: 3 }}>
+          {data?.views.map(databaseView => {
+            if (databaseView.type === 'kanban') return <KanbanView key={databaseView.name} databaseId={data?.id} databaseView={databaseView} />
+            return <>View type not supported</>
+          })}
+        </Box>
+      
+    </Container>
+  );
 }

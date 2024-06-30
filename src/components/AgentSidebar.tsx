@@ -115,7 +115,7 @@ const AgentSidebar = () => {
         sx={{
           width: `calc(100% - ${open ? drawerWidth + 'px' : theme.spacing(9)})`,
           ml: `${open ? drawerWidth + 'px' : theme.spacing(9)}`,
-          background: 'rgb(253 254 255)',
+          background: '#fcfbfe',
           color: 'black',
           transition: theme.transitions.create('width', {
             easing: theme.transitions.easing.sharp,
@@ -130,7 +130,7 @@ const AgentSidebar = () => {
               {open ? <ChevronLeftIcon /> : <ChevronRightIcon />}
             </IconButton>
           </Box>
-          
+
           {!open && (
             <>
               <Image alt="vessel marketing" src='/logovessel.png' width={50} height={50} />

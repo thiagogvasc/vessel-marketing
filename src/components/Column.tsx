@@ -108,7 +108,7 @@ const Column: React.FC<ColumnProps> = ({ column, databaseId, databaseView }) => 
   };
 
   return (
-    <Paper elevation={0} sx={{ p: 2, background: 'rgb(237 237 237)', borderRadius: '8px', position: 'relative', boxShadow: '0px 1px 2px 0px rgba(84,87,118,.12)' }}>
+    <Paper elevation={0} sx={{ borderRadius: 2, p: 4, boxShadow: 'rgba(0, 0, 0, 0.04) 0px 5px 22px, rgba(0, 0, 0, 0.03) 0px 0px 0px 0.5px'}}>
       <Box display="flex" justifyContent="space-between" alignItems="center">
         <Typography variant="h6" gutterBottom>
           {column.title}
@@ -129,7 +129,7 @@ const Column: React.FC<ColumnProps> = ({ column, databaseId, databaseView }) => 
           <Box
             ref={provided.innerRef}
             {...provided.droppableProps}
-            sx={{ minHeight: '100px', background: snapshot.isDraggingOver ? 'lightblue' : 'rgb(237 237 237)', p: 1, borderRadius: '8px' }}
+            sx={{ minHeight: '100px', background: snapshot.isDraggingOver ? 'lightblue' : 'inherit', p: 1, borderRadius: '8px' }}
           >
             {column.tasks.map((task, index) => (
               task?.id && <Task key={task.id} task={task as TaskWithId} index={index} onClick={handleTaskClick} />
