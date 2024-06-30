@@ -18,7 +18,7 @@ const NewDatabase = () => {
     try {
       const newDatabase: Omit<Database, 'id'> = {
         name: name,
-        client_id: clientId,
+        ...(clientId.length > 0 && { client_id: clientId }),
         description: description, // Use description state here
         propertyDefinitions: [
           {
@@ -102,7 +102,6 @@ const NewDatabase = () => {
             onChange={(e) => setClientId(e.target.value)}
             fullWidth
             variant="outlined"
-            disabled
           />
         </Grid>
         <Grid item xs={12} textAlign="center">
