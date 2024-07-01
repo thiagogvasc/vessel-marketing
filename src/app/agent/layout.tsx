@@ -18,7 +18,8 @@ const AgentLayout = ({
           flexGrow: 1,
           p: 3,
           pt: 12,
-          height: '100%'
+          height: '100%',
+          minWidth: 0
         }}
       >
         {children}

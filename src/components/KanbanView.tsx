@@ -106,7 +106,7 @@ const KanbanView: React.FC<KanbanViewProps> = ({ databaseId, databaseView, readO
   if (isTasksLoading) return <div>Loading...</div>;
 
   return (
-    <Box sx={{ display: 'flex', flexDirection: 'column'}}>
+    <Box sx={{ width: '100%' }}>
       {readOnly ? (
         <Box sx={{ display: 'flex', flexDirection: 'row', gap: 2 }}>
           {columns.map(column => (
