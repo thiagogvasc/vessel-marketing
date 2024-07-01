@@ -18,7 +18,6 @@ const ClientLayout = ({
           flexGrow: 1,
           p: 3,
           pt: 12,
-          background: '#fcfbfe',
           height: '100%'
         }}
       >

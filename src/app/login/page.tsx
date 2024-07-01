@@ -22,17 +22,13 @@ import { Formik, Form, Field, ErrorMessage } from 'formik';
 import * as Yup from 'yup';
 
 const Login = () => {
-  const { user, login } = useAuth();
+  const { user, login, loading } = useAuth();
   const router = useRouter();
   const [loginError, setLoginError] = useState<string | null>(null);
 
-  useEffect(() => {
-    user && router.push('/');
-  }, [user, router]);
-
   const handleSubmit = async (values: { email: string, password: string }) => {
     login(values.email, values.password)
-    .then(res => { console.warn(res)})
+    .then(res => { console.warn(res); router.push('/')})
     .catch(err => {
       console.warn(err)
       setLoginError(err.message || 'Failed to login');
@@ -45,8 +41,8 @@ const Login = () => {
   });
 
   return (
-    <Container component="main" maxWidth="xs">
-      <Paper elevation={6} sx={{ p: 4, mt: 8, borderRadius: 3 }}>
+    <Container component="main" maxWidth="xs" sx={{ pt: 12 }}>
+      <Paper elevation={0} sx={{ borderRadius: 3, p: 4 , boxShadow: 'rgba(0, 0, 0, 0.04) 0px 5px 22px, rgba(0, 0, 0, 0.03) 0px 0px 0px 0.5px'}}>
         <Box
           sx={{
             display: 'flex',

@@ -26,15 +26,10 @@ const Register = () => {
   const { user, register } = useAuth();
   const router = useRouter();
 
-  useEffect(() => {
-    if (user) {
-      router.push('/login');
-    }
-  }, [user, router]);
-
   const handleRegisterSuccess = (res: any) => {
     console.warn(res);
-  };
+    router.push('/login');
+  }; 
 
   const handleRegisterFailure = (err: any) => {
     console.warn(err);
@@ -66,9 +61,8 @@ const Register = () => {
   });
 
   return (
-    <Container component="main" maxWidth="sm">
-
-      <Paper elevation={3} sx={{ p: 4, mt: 8, borderRadius: 2 }}>
+    <Container component="main" maxWidth="xs" sx={{ pt: 12 }}>
+      <Paper elevation={0} sx={{ borderRadius: 3, p: 4 , boxShadow: 'rgba(0, 0, 0, 0.04) 0px 5px 22px, rgba(0, 0, 0, 0.03) 0px 0px 0px 0.5px'}}>
         <Box sx={{ display: 'flex', flexDirection: 'column', alignItems: 'center' }}>
           <Avatar sx={{ m: 1, bgcolor: 'primary.main' }}>
             <LockOutlinedIcon />
