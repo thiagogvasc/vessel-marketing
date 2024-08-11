@@ -1,6 +1,6 @@
 'use client'
 
-import KanbanView from "@/src/components/KanbanView";
+import { KanbanView } from "@/src/components/KanbanView";
 import { useGetDatabaseWithTasks } from "@/src/hooks/useTasks";
 import { Task } from "@/src/types";
 import { Box, Container, Paper, Tab, Tabs, Typography, IconButton, TextField, Menu, MenuItem } from "@mui/material";

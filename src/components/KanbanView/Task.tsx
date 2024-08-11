@@ -1,7 +1,7 @@
 import React from 'react';
 import { Draggable } from '@hello-pangea/dnd';
 import { Card, CardContent, Paper, Typography } from '@mui/material';
-import { Task as TaskType } from '../types';
+import { Task as TaskType } from '../../types';
 
 export interface TaskWithId extends TaskType {
   id: string;
@@ -14,26 +14,15 @@ interface TaskProps {
   readOnly: boolean;
 }
 
-const Task: React.FC<TaskProps> = ({ task, index, onClick, readOnly }) => {
-  return readOnly ? (
-    <Card
-      sx={{ cursor: 'pointer', borderRadius: 2, boxShadow: 'rgba(0, 0, 0, 0.04) 0px 5px 22px, rgba(0, 0, 0, 0.03) 0px 0px 0px 0.5px' }}
-      onClick={() => onClick(task)}
-      elevation={0}
-    >
-      <CardContent>
-        <Typography variant="body1">{task.title}</Typography>
-      </CardContent>
-    </Card>
-  ) : (
-    <Draggable draggableId={task.id} index={index}>
+export const Task: React.FC<TaskProps> = ({ task, index, onClick, readOnly }) => {
+  return <Draggable draggableId={task.id} index={index} isDragDisabled={readOnly}>
       {(provided) => (
         <Card
           ref={provided.innerRef}
           {...provided.draggableProps}
           {...provided.dragHandleProps}
           sx={{ cursor: 'pointer', borderRadius: 2, boxShadow: 'rgba(0, 0, 0, 0.04) 0px 5px 22px, rgba(0, 0, 0, 0.03) 0px 0px 0px 0.5px' }}
-          onClick={() => onClick(task)}
+          onClick={() => !readOnly && onClick(task)}
           elevation={0}
         >
           <CardContent>
@@ -42,7 +31,4 @@ const Task: React.FC<TaskProps> = ({ task, index, onClick, readOnly }) => {
         </Card>
       )}
     </Draggable>
-  )
 };
-
-export default Task;

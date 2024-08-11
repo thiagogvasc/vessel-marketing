@@ -2,9 +2,9 @@
 
 import React, { useEffect, useState } from 'react';
 import { DragDropContext } from '@hello-pangea/dnd';
-import { useAddKanbanColumn, useGetDatabaseWithTasks, useUpdateKanbanViewManualSort } from '../hooks/useTasks';
-import Column from './Column';
-import { AggregateColumn, DatabaseView, Task } from '../types';
+import { useAddKanbanColumn, useGetDatabaseWithTasks, useUpdateKanbanViewManualSort } from '../../hooks/useTasks';
+import { Column } from './Column';
+import { AggregateColumn, DatabaseView, Task } from '../../types';
 import { Box, Grid, IconButton, TextField } from '@mui/material';
 import AddIcon from '@mui/icons-material/Add';
 
@@ -14,7 +14,7 @@ interface KanbanViewProps {
   readOnly: boolean;
 }
 
-const KanbanView: React.FC<KanbanViewProps> = ({ databaseId, databaseView, readOnly }) => {
+export const KanbanView: React.FC<KanbanViewProps> = ({ databaseId, databaseView, readOnly }) => {
   const [columns, setColumns] = useState<AggregateColumn[]>([]);
   const [newColumnTitle, setNewColumnTitle] = useState('');
   const [isAddingColumn, setIsAddingColumn] = useState(false);
@@ -107,51 +107,39 @@ const KanbanView: React.FC<KanbanViewProps> = ({ databaseId, databaseView, readO
 
   return (
     <Box sx={{ width: '100%' }}>
-      {readOnly ? (
+      <DragDropContext onDragEnd={handleDragEnd}>
         <Box sx={{ display: 'flex', flexDirection: 'row', gap: 2 }}>
           {columns.map(column => (
             <Box key={column.title} sx={{ minWidth: 300 }}>
               <Column readOnly={readOnly} column={column} databaseView={databaseView} databaseId={databaseId} />
             </Box>
           ))}
-        </Box>
-      ) : (
-        <DragDropContext onDragEnd={handleDragEnd}>
-          <Box sx={{ display: 'flex', flexDirection: 'row', gap: 2 }}>
-            {columns.map(column => (
-              <Box key={column.title} sx={{ minWidth: 300 }}>
-                <Column readOnly={readOnly} column={column} databaseView={databaseView} databaseId={databaseId} />
-              </Box>
-            ))}
-            <Box sx={{ minWidth: 300 }}>
-              {isAddingColumn ? (
-                <Box sx={{ display: 'flex', alignItems: 'center' }}>
-                  <TextField
-                    placeholder="Column title"
-                    value={newColumnTitle}
-                    onChange={(e) => setNewColumnTitle(e.target.value)}
-                    onBlur={handleColumnTitleBlur}
-                    onKeyDown={handleColumnTitleKeyDown}
-                    variant="outlined"
-                    size="small"
-                    sx={{ flex: 1 }}
-                    autoFocus
-                  />
-                  <IconButton color="primary" onClick={handleAddColumn}>
-                    <AddIcon />
-                  </IconButton>
-                </Box>
-              ) : (
-                <IconButton color="primary" onClick={() => setIsAddingColumn(true)}>
+          <Box sx={{ minWidth: 300 }}>
+            {isAddingColumn ? (
+              <Box sx={{ display: 'flex', alignItems: 'center' }}>
+                <TextField
+                  placeholder="Column title"
+                  value={newColumnTitle}
+                  onChange={(e) => setNewColumnTitle(e.target.value)}
+                  onBlur={handleColumnTitleBlur}
+                  onKeyDown={handleColumnTitleKeyDown}
+                  variant="outlined"
+                  size="small"
+                  sx={{ flex: 1 }}
+                  autoFocus
+                />
+                <IconButton color="primary" onClick={handleAddColumn}>
                   <AddIcon />
                 </IconButton>
-              )}
-            </Box>
+              </Box>
+            ) : (
+              <IconButton color="primary" onClick={() => setIsAddingColumn(true)}>
+                <AddIcon />
+              </IconButton>
+            )}
           </Box>
-        </DragDropContext>
-      )}
+        </Box>
+      </DragDropContext>
     </Box>
   );
 };
-
-export default KanbanView;
