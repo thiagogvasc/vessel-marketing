@@ -1,7 +1,7 @@
 'use client'
 
 import KanbanView from "@/src/components/KanbanView";
-import { useGetDatabaseTasks } from "@/src/hooks/useTasks";
+import { useGetDatabaseWithTasks } from "@/src/hooks/useTasks";
 import { Task } from "@/src/types";
 import { Box, Container, Paper, Tab, Tabs, Typography, IconButton, TextField, Menu, MenuItem } from "@mui/material";
 import { Add, Search, FilterList, Sort, SwapVert } from "@mui/icons-material";
@@ -51,7 +51,7 @@ export default function Database() {
     setFilterAnchorEl(null);
   };
 
-  const { data } = useGetDatabaseTasks(databaseId as string);
+  const { data } = useGetDatabaseWithTasks(databaseId as string);
 
   return (
     <Container component="main" maxWidth="xl">

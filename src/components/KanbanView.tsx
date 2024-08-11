@@ -2,7 +2,7 @@
 
 import React, { useEffect, useState } from 'react';
 import { DragDropContext } from '@hello-pangea/dnd';
-import { useAddKanbanColumn, useGetDatabaseTasks, useUpdateKanbanViewManualSort } from '../hooks/useTasks';
+import { useAddKanbanColumn, useGetDatabaseWithTasks, useUpdateKanbanViewManualSort } from '../hooks/useTasks';
 import Column from './Column';
 import { AggregateColumn, DatabaseView, Task } from '../types';
 import { Box, Grid, IconButton, TextField } from '@mui/material';
@@ -18,7 +18,7 @@ const KanbanView: React.FC<KanbanViewProps> = ({ databaseId, databaseView, readO
   const [columns, setColumns] = useState<AggregateColumn[]>([]);
   const [newColumnTitle, setNewColumnTitle] = useState('');
   const [isAddingColumn, setIsAddingColumn] = useState(false);
-  const { data: databaseWithTasks, isLoading: isTasksLoading } = useGetDatabaseTasks(databaseId);
+  const { data: databaseWithTasks, isLoading: isTasksLoading } = useGetDatabaseWithTasks(databaseId);
   const updateKanbanViewManualSort = useUpdateKanbanViewManualSort(databaseId, databaseView.id as string);
   const addKanbanColumnMutation = useAddKanbanColumn(databaseId, databaseView.name);
 

@@ -2,7 +2,7 @@ import React, { useState, useEffect } from 'react';
 import { Dialog, DialogContent, DialogActions, Button, TextField, Box, MenuItem, Select, InputLabel, FormControl, IconButton, Menu, MenuItem as MenuOption } from '@mui/material';
 import MoreVertIcon from '@mui/icons-material/MoreVert';
 import { DatabasePropertyDefinition, PropertyType, Task as TaskType } from '../types';
-import { useGetDatabaseTasks } from '../hooks/useTasks';
+import { useGetDatabaseWithTasks } from '../hooks/useTasks';
 
 export interface TaskWithId extends TaskType {
   id: string;
@@ -27,7 +27,7 @@ const TaskModal: React.FC<TaskModalProps> = ({ task, open, onClose, onSave, onDe
   const [showNewPropertyForm, setShowNewPropertyForm] = useState(false);
   const [anchorEl, setAnchorEl] = useState<null | HTMLElement>(null);
   
-  const { data: databaseWithTasks } = useGetDatabaseTasks(task?.database_id);
+  const { data: databaseWithTasks } = useGetDatabaseWithTasks(task?.database_id);
 
   useEffect(() => {
     const propDefinitions = databaseWithTasks?.propertyDefinitions;

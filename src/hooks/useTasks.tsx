@@ -4,7 +4,7 @@ import { Task, Column, AggregateColumn, AggregateBoard, Database, PropertyType, 
 import { Updater } from 'react-query/types/core/utils';
 
 // Fetch all tasks for a board
-export const useGetDatabaseTasks = (databaseId: string | null | undefined) => {
+export const useGetDatabaseWithTasks = (databaseId: string | null | undefined) => {
   // const queryClient = useQueryClient();
 
   return useQuery(['database-tasks', databaseId], () => {

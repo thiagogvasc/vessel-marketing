@@ -1,7 +1,7 @@
 'use client'
 
 import KanbanView from "@/src/components/KanbanView";
-import { useGetDatabaseTasks } from "@/src/hooks/useTasks";
+import { useGetDatabaseWithTasks } from "@/src/hooks/useTasks";
 import { Box, Container, Paper, Tab, Tabs, Typography } from "@mui/material";
 import { useParams } from "next/navigation";
 import { useState } from "react";
@@ -15,7 +15,7 @@ export default function Database() {
     setSelectedTab(newValue);
   };
 
-  const { data } = useGetDatabaseTasks(databaseId as string);
+  const { data } = useGetDatabaseWithTasks(databaseId as string);
 
   return (
     <Container component="main" maxWidth="xl">

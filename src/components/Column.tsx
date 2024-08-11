@@ -8,7 +8,7 @@ import { Box, Typography, IconButton, TextField, Button, CircularProgress, Menu,
 import AddIcon from '@mui/icons-material/Add';
 import MoreVertIcon from '@mui/icons-material/MoreVert'; // Import the MoreVertIcon
 import TaskModal from './TaskModal';
-import { useAddTask, useDeleteKanbanColumn, useDeleteTask, useGetDatabaseTasks, useUpdateTask } from '../hooks/useTasks';
+import { useAddTask, useDeleteKanbanColumn, useDeleteTask, useGetDatabaseWithTasks, useUpdateTask } from '../hooks/useTasks';
 
 interface ColumnProps {
   column: AggregateColumn;
@@ -22,7 +22,7 @@ const Column: React.FC<ColumnProps> = ({ column, databaseId, databaseView, readO
   const deleteTaskMutation = useDeleteTask(databaseId, databaseView.name);
   const deleteColumnMutation = useDeleteKanbanColumn(databaseId, databaseView.name);
   const updateTaskMutation = useUpdateTask(databaseId, databaseView.name);
-  const { data: database } = useGetDatabaseTasks(databaseId);
+  const { data: database } = useGetDatabaseWithTasks(databaseId);
   const [newTaskTitle, setNewTaskTitle] = useState('');
   const [isAddingTask, setIsAddingTask] = useState(false);
   const [selectedTask, setSelectedTask] = useState<TaskWithId | null>(null);
