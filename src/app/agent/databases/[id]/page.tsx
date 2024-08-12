@@ -1,13 +1,11 @@
 'use client'
 
-import { KanbanView } from "@/src/components/KanbanView";
 import { useGetDatabaseWithTasks } from "@/src/hooks/useTasks";
-import { Task } from "@/src/types";
 import { Box, Container, Paper, Tab, Tabs, Typography, IconButton, TextField, Menu, MenuItem } from "@mui/material";
 import { Add, Search, FilterList, Sort, SwapVert } from "@mui/icons-material";
-import { Timestamp } from "firebase/firestore";
 import { useParams } from "next/navigation";
 import { useState } from "react";
+import { AgentKanbanViewContainer } from "@/src/containers/AgentKanbanViewContainer";
 
 
 export default function Database() {
@@ -112,7 +110,7 @@ export default function Database() {
       </Box>
       <Box sx={{ p: 3, width: '100%', overflowX: 'scroll' }}>
         {data?.views.map(databaseView => {
-          if (databaseView.type === 'kanban') return <KanbanView readOnly={false} key={databaseView.name} databaseId={data?.id} databaseView={databaseView} />
+          if (databaseView.type === 'kanban') return <AgentKanbanViewContainer readOnly={false} key={databaseView.name} databaseId={data?.id} databaseView={databaseView} />
           return <>View type not supported</>
         })}
       </Box>

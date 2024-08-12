@@ -1,95 +1,40 @@
 'use client'
 
-import React, { useEffect, useState } from 'react';
+import React, { useState } from 'react';
 import { DragDropContext } from '@hello-pangea/dnd';
-import { useAddKanbanColumn, useGetDatabaseWithTasks, useUpdateKanbanViewManualSort } from '../../hooks/useTasks';
 import { Column } from './Column';
-import { AggregateColumn, DatabaseView, Task } from '../../types';
-import { Box, Grid, IconButton, TextField } from '@mui/material';
+import { AggregateColumn } from '../../types';
+import { Box, IconButton, TextField } from '@mui/material';
 import AddIcon from '@mui/icons-material/Add';
+import { TaskWithId } from './Task';
+
 
 interface KanbanViewProps {
-  databaseId: string;
-  databaseView: DatabaseView;
   readOnly: boolean;
+  columns: AggregateColumn[];
+  taskAdded?: (columnTitle: string, newTaskTitle: string) => void;
+  taskClicked?: (taskClicked: TaskWithId) => void;
+  taskDragged?: (result: any) => void;
+  columnDeleted?: (columnTitle: string) => void;
+  columnAdded?: (newColumnTitle: string) => void;
 }
 
-export const KanbanView: React.FC<KanbanViewProps> = ({ databaseId, databaseView, readOnly }) => {
-  const [columns, setColumns] = useState<AggregateColumn[]>([]);
+export const KanbanView: React.FC<KanbanViewProps> = ({ readOnly, columns, taskDragged, columnAdded, columnDeleted, taskAdded, taskClicked }) => {
   const [newColumnTitle, setNewColumnTitle] = useState('');
   const [isAddingColumn, setIsAddingColumn] = useState(false);
-  const { data: databaseWithTasks, isLoading: isTasksLoading } = useGetDatabaseWithTasks(databaseId);
-  const updateKanbanViewManualSort = useUpdateKanbanViewManualSort(databaseId, databaseView.id as string);
-  const addKanbanColumnMutation = useAddKanbanColumn(databaseId, databaseView.name);
 
-  useEffect(() => {
-    if (databaseWithTasks) {
-      const initialColumns: AggregateColumn[] = [];
-      databaseView.config?.groups?.forEach(sortGroup => {
-        const taskIds = sortGroup.task_order;
-        const columnTitle = sortGroup.group_by_value;
-        const tasks = taskIds.map(taskId => databaseWithTasks.tasks.find(t => t.id === taskId) as Task);
-        initialColumns.push({
-          title: columnTitle,
-          tasks
-        });
-      });
-      setColumns(initialColumns);
-    }
-  }, [databaseWithTasks, databaseView]);
-
-  const handleDragEnd = (result: any) => {
-    if (!result.destination) return;
-
-    const sourceIndex = result.source.index;
-    const destinationIndex = result.destination.index;
-    const sourceColumnTitle = result.source.droppableId;
-    const destinationColumnTitle = result.destination.droppableId;
-
-    const sourceColumn = columns.find(col => col.title === sourceColumnTitle);
-    const destinationColumn = columns.find(col => col.title === destinationColumnTitle);
-
-    if (sourceColumn && destinationColumn) {
-      const [movedTask] = sourceColumn.tasks.splice(sourceIndex, 1);
-      destinationColumn.tasks.splice(destinationIndex, 0, movedTask);
-
-      setColumns(columns.map(col => {
-        if (col.title === sourceColumnTitle) return sourceColumn;
-        if (col.title === destinationColumnTitle) return destinationColumn;
-        return col;
-      }));
-
-      const groupByField = databaseView.config?.group_by;
-      if (groupByField) {
-        updateKanbanViewManualSort.mutateAsync({
-          columns, taskId: movedTask.id!, updatedTask: {
-            ...movedTask,
-            properties: {
-              [groupByField]: destinationColumn.title
-            }
-          }
-        }).then(() => {
-          console.warn('updated order');
-        });
-      }
-    }
+  const handleTaskDragged = (result: any) => {
+    taskDragged?.(result);
   };
 
-  const handleAddColumn = () => {
+  const handleColumnAdded = () => {
     if (newColumnTitle.trim() === '') return;
-    addKanbanColumnMutation.mutateAsync({
-      databaseId, 
-      viewName: databaseView.name,
-      newOption: newColumnTitle
-    }).then(() => {
-      setNewColumnTitle('');
-      setIsAddingColumn(false);
-    });
+    columnAdded?.(newColumnTitle);
   };
 
   const handleColumnTitleBlur = () => {
     if (newColumnTitle.trim() !== '') {
-      handleAddColumn();
+      handleColumnAdded();
     } else {
       setIsAddingColumn(false);
     }
@@ -97,21 +42,37 @@ export const KanbanView: React.FC<KanbanViewProps> = ({ databaseId, databaseView
 
   const handleColumnTitleKeyDown = (e: React.KeyboardEvent) => {
     if (e.key === 'Enter') {
-      handleAddColumn();
+      handleColumnAdded();
     } else if (e.key === 'Escape') {
       setIsAddingColumn(false);
     }
   };
 
-  if (isTasksLoading) return <div>Loading...</div>;
+  const handleTaskClicked = (task: TaskWithId) => {
+    taskClicked?.(task);
+  }
+
+  const handleTaskAdded = (columnTitle: string, newTaskTitle: string) => {
+    taskAdded?.(columnTitle, newTaskTitle);
+  }
+
+  const handleColumnDeleted = (columnTitle: string) => {
+    columnDeleted?.(columnTitle);
+  }
 
   return (
     <Box sx={{ width: '100%' }}>
-      <DragDropContext onDragEnd={handleDragEnd}>
+      <DragDropContext onDragEnd={handleTaskDragged}>
         <Box sx={{ display: 'flex', flexDirection: 'row', gap: 2 }}>
           {columns.map(column => (
             <Box key={column.title} sx={{ minWidth: 300 }}>
-              <Column readOnly={readOnly} column={column} databaseView={databaseView} databaseId={databaseId} />
+              <Column 
+                readOnly={readOnly} 
+                column={column} 
+                taskAdded={handleTaskAdded} 
+                columnDeleted={handleColumnDeleted}
+                taskClicked={handleTaskClicked}
+              />
             </Box>
           ))}
           <Box sx={{ minWidth: 300 }}>
@@ -128,7 +89,7 @@ export const KanbanView: React.FC<KanbanViewProps> = ({ databaseId, databaseView
                   sx={{ flex: 1 }}
                   autoFocus
                 />
-                <IconButton color="primary" onClick={handleAddColumn}>
+                <IconButton color="primary" onClick={handleColumnAdded}>
                   <AddIcon />
                 </IconButton>
               </Box>
