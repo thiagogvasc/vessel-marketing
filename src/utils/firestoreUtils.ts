@@ -1,7 +1,7 @@
 // src/utils/firestoreUtils.ts
 import { collection, addDoc, getDocs, updateDoc, doc, DocumentData, QuerySnapshot, getDoc, where, query, Timestamp, writeBatch, serverTimestamp, documentId, runTransaction, setDoc } from "firebase/firestore";
 import { db } from "../../firebaseConfig";
-import { User, Request, Task, Column, AggregateBoard, AggregateColumn, Database, GroupByGroup, PropertyType } from "../types";
+import { User, Request, Task, Column, AggregateBoard, AggregateColumn, Database, GroupByGroup, PropertyType, TaskComment } from "../types";
 
 export const convertDocs = <T>(querySnapshot: QuerySnapshot<DocumentData>): T[] => {
   return querySnapshot.docs.map((doc) => ({

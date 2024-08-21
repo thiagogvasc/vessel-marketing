@@ -3,23 +3,25 @@ import { Dialog, DialogContent, DialogActions, Button, TextField, Box, MenuItem,
 import MoreVertIcon from '@mui/icons-material/MoreVert';
 import { DatabasePropertyDefinition, PropertyType, Task as TaskType } from '../types';
 import { useGetDatabaseWithTasks } from '../hooks/useTasks';
+import { TaskComments } from './TaskComments';
 
 export interface TaskWithId extends TaskType {
   id: string;
 }
 
-interface TaskModalProps {
-  task: TaskWithId | null;
+interface TaskDialogProps {
+  task: TaskWithId;
   open: boolean;
   onClose: () => void;
   onSave: (updatedTask: TaskWithId) => void;
   onDelete: (task: TaskType) => void;
   readOnly: boolean;
+  onCommentAdded?: (commentText: string) => void;
 }
 
-const TaskModal: React.FC<TaskModalProps> = ({ task, open, onClose, onSave, onDelete, readOnly }) => {
-  const [title, setTitle] = useState(task?.title || '');
-  const [description, setDescription] = useState(task?.description || '');
+const TaskDialog: React.FC<TaskDialogProps> = ({ task, open, onClose, onSave, onDelete, readOnly, onCommentAdded }) => {
+  const [title, setTitle] = useState(task.title);
+  const [description, setDescription] = useState(task.description);
   const [properties, setProperties] = useState<{ propertyDefinition: DatabasePropertyDefinition, propertyValue: any }[]>([]);
   const [newPropertyType, setNewPropertyType] = useState('');
   const [newPropertyName, setNewPropertyName] = useState('');
@@ -43,13 +45,6 @@ const TaskModal: React.FC<TaskModalProps> = ({ task, open, onClose, onSave, onDe
     });
     setProperties(properties);
   }, [databaseWithTasks, task]);
-
-  useEffect(() => {
-    if (task) {
-      setTitle(task.title);
-      setDescription(task.description);
-    }
-  }, [task]);
 
   const handleSave = () => {
     if (task) {
@@ -95,6 +90,8 @@ const TaskModal: React.FC<TaskModalProps> = ({ task, open, onClose, onSave, onDe
     onClose();
   };
 
+  const handleCommentAdded = (commentText: string) => onCommentAdded?.(commentText);
+
   return (
     <Dialog open={open} onClose={onClose} fullWidth maxWidth="lg">
       <DialogContent>
@@ -102,6 +99,7 @@ const TaskModal: React.FC<TaskModalProps> = ({ task, open, onClose, onSave, onDe
           <Box sx={{ display: 'flex', flexDirection: 'column', gap: 2, flex: 1 }}>
             <TextField
               label="Title"
+              size="small"
               value={title}
               onChange={(e) => setTitle(e.target.value)}
               fullWidth
@@ -200,6 +198,12 @@ const TaskModal: React.FC<TaskModalProps> = ({ task, open, onClose, onSave, onDe
                 )}
               </Box>
             </Box>
+            <Box>
+              <TaskComments
+                comments={task?.comments ?? []}
+                commentAdded={handleCommentAdded}
+              />
+            </Box>
           </Box>
           <IconButton onClick={handleMenuOpen} disabled={readOnly}>
             <MoreVertIcon />
@@ -225,4 +229,4 @@ const TaskModal: React.FC<TaskModalProps> = ({ task, open, onClose, onSave, onDe
   );
 };
 
-export default TaskModal;
+export default TaskDialog;

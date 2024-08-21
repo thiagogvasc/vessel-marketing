@@ -1,12 +1,12 @@
 'use client'
 
 import React, { useState } from 'react';
-import { useAddKanbanColumn, useAddTask, useDeleteKanbanColumn, useDeleteTask, useGetDatabaseWithTasks, useUpdateKanbanViewManualSort, useUpdateTask } from '../hooks/useTasks';
-import { DatabaseView, Task } from '../types';
+import { useAddKanbanColumn, useAddTask, useDeleteKanbanColumn, useGetDatabaseWithTasks, useUpdateKanbanViewManualSort } from '../hooks/useTasks';
+import { DatabaseView } from '../types';
 import { TaskWithId } from '../components/KanbanView/Task';
-import TaskModal from '../components/TaskModal';
 import { KanbanView } from '../components/KanbanView';
 import { useKanbanColumns } from '../hooks/useKanbanColumns';
+import { TaskDialogContainer } from './TaskDialogContainer';
 
 interface KanbanViewProps {
   databaseId: string;
@@ -19,12 +19,10 @@ export const AgentKanbanViewContainer: React.FC<KanbanViewProps> = ({ databaseId
   const updateKanbanViewManualSort = useUpdateKanbanViewManualSort(databaseId, databaseView.id as string);
   const addKanbanColumnMutation = useAddKanbanColumn(databaseId, databaseView.name);
   const addTaskMutation = useAddTask(databaseId, databaseView.name);
-  const updateTaskMutation = useUpdateTask(databaseId, databaseView.name);
-  const deleteTaskMutation = useDeleteTask(databaseId, databaseView.name);
   const deleteColumnMutation = useDeleteKanbanColumn(databaseId, databaseView.name);
 
   const { columns, setColumns } = useKanbanColumns(databaseWithTasks, databaseView);
-  const [isTaskModalOpen, setIsTaskModalOpen] = useState(false);
+  const [isTaskDialogOpen, setIsTaskDialogOpen] = useState(false);
   const [selectedTask, setSelectedTask] = useState<TaskWithId | null>(null);
 
   const handleDragEnd = (result: any) => {
@@ -73,7 +71,7 @@ export const AgentKanbanViewContainer: React.FC<KanbanViewProps> = ({ databaseId
 
   const handleTaskClicked = (taskClicked: TaskWithId) => {
     setSelectedTask(taskClicked);
-    setIsTaskModalOpen(true);
+    setIsTaskDialogOpen(true);
   }
 
   const handleTaskAdded = async (columnTitle: string, newTaskTitle: string) => {
@@ -88,24 +86,17 @@ export const AgentKanbanViewContainer: React.FC<KanbanViewProps> = ({ databaseId
       database_id: databaseId,
       title: newTaskTitle,
       description: '',
+      comments: [],
       properties: Object.fromEntries(defaultPropMap)
     })
   }
 
-  const handleTaskUpdated = async (updatedTask: TaskWithId) => {
-    await updateTaskMutation.mutateAsync({ id: updatedTask.id, updatedTask });
-  }
-
-  const handleTaskDeleted = async (taskToDelete: Task) => {
-    await deleteTaskMutation.mutateAsync(taskToDelete)
-  }
-
   const handleColumnDeleted = async (columnTitle: string) => {
-    await deleteColumnMutation.mutateAsync({databaseId, viewName: databaseView.name, optionToDelete: columnTitle})
+    await deleteColumnMutation.mutateAsync({ databaseId, viewName: databaseView.name, optionToDelete: columnTitle })
   }
 
-  const handleTaskModalClose = () => {
-    setIsTaskModalOpen(false);
+  const handleTaskDialogClose = () => {
+    setIsTaskDialogOpen(false);
     setSelectedTask(null);
   };
 
@@ -123,13 +114,12 @@ export const AgentKanbanViewContainer: React.FC<KanbanViewProps> = ({ databaseId
         taskClicked={handleTaskClicked}
       />
       {selectedTask && (
-        <TaskModal
-          readOnly={readOnly}
-          task={selectedTask}
-          open={isTaskModalOpen}
-          onClose={handleTaskModalClose}
-          onSave={handleTaskUpdated}
-          onDelete={handleTaskDeleted}
+        <TaskDialogContainer 
+          databaseId={databaseId} 
+          viewName={databaseView.name} 
+          task={selectedTask} 
+          open={isTaskDialogOpen} 
+          dialogClosed={handleTaskDialogClose}
         />
       )}
     </>

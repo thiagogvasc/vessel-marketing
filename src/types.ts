@@ -115,10 +115,18 @@ export interface Database {
   propertyDefinitions: DatabasePropertyDefinition[];
 }
 
+export interface TaskComment {
+  id?: string,
+  text: string,
+  author: string,
+  created_at?: string;
+}
+
 export interface Task {
   id?: string; // auto-generated
   database_id: string;
   title: string;
+  comments: TaskComment[];
   description: string;
   created_at?: string; // ISO string format for timestamp
   updated_at?: string; // ISO string format for timestamp
