@@ -1,9 +1,9 @@
-import React, { useState, useEffect } from 'react';
+import React, { useState } from 'react';
 import { Dialog, DialogContent, DialogActions, Button, TextField, Box, MenuItem, Select, InputLabel, FormControl, IconButton, Menu, MenuItem as MenuOption } from '@mui/material';
 import MoreVertIcon from '@mui/icons-material/MoreVert';
-import { DatabasePropertyDefinition, PropertyType, Task as TaskType } from '../types';
-import { useGetDatabaseWithTasks } from '../hooks/useTasks';
+import { PropertyType, Task as TaskType } from '../../types';
 import { TaskComments } from './TaskComments';
+import { PropertyWithDefinition } from '@/src/containers/TaskDialogContainer';
 
 export interface TaskWithId extends TaskType {
   id: string;
@@ -11,63 +11,40 @@ export interface TaskWithId extends TaskType {
 
 interface TaskDialogProps {
   task: TaskWithId;
+  propertiesWithDefinitions: PropertyWithDefinition[]
   open: boolean;
   onClose: () => void;
-  onSave: (updatedTask: TaskWithId) => void;
-  onDelete: (task: TaskType) => void;
+  onSave: (newTitle: string, newDescription: string, newPropertiesWithDefinitions: PropertyWithDefinition[]) => void;
+  onDelete: () => void;
   readOnly: boolean;
   onCommentAdded?: (commentText: string) => void;
 }
 
-const TaskDialog: React.FC<TaskDialogProps> = ({ task, open, onClose, onSave, onDelete, readOnly, onCommentAdded }) => {
-  const [title, setTitle] = useState(task.title);
-  const [description, setDescription] = useState(task.description);
-  const [properties, setProperties] = useState<{ propertyDefinition: DatabasePropertyDefinition, propertyValue: any }[]>([]);
+const TaskDialog: React.FC<TaskDialogProps> = ({ task, propertiesWithDefinitions, open, onClose, onSave, onDelete, readOnly, onCommentAdded }) => {
+  const [newTitle, setNewTitle] = useState(task.title);
+  const [newDescription, setNewDescription] = useState(task.description);
+  const [newPropertiesWithDefinitions, setNewPropertiesWithDefinitions] = useState<PropertyWithDefinition[]>(propertiesWithDefinitions);
   const [newPropertyType, setNewPropertyType] = useState('');
   const [newPropertyName, setNewPropertyName] = useState('');
   const [newPropertyValue, setNewPropertyValue] = useState('');
   const [showNewPropertyForm, setShowNewPropertyForm] = useState(false);
   const [anchorEl, setAnchorEl] = useState<null | HTMLElement>(null);
-  
-  const { data: databaseWithTasks } = useGetDatabaseWithTasks(task?.database_id);
-
-  useEffect(() => {
-    const propDefinitions = databaseWithTasks?.propertyDefinitions;
-    const props = task?.properties;
-    if (!props) return;
-
-    const properties: { propertyDefinition: DatabasePropertyDefinition, propertyValue: any }[] = [];
-
-    Object.entries(props).forEach(([key, value]) => {
-      const [propertyName, propertyValue] = [key, value];
-      const propertyDefinition = propDefinitions?.find(propDef => propDef.name === propertyName);
-      propertyDefinition && properties.push({ propertyDefinition, propertyValue });
-    });
-    setProperties(properties);
-  }, [databaseWithTasks, task]);
 
   const handleSave = () => {
-    if (task) {
-      const updatedProperties = properties.reduce((acc, prop) => {
-        acc[prop.propertyDefinition.name] = prop.propertyValue;
-        return acc;
-      }, {} as { [key: string]: any });
-
-      onSave({ ...task, title, description, properties: updatedProperties });
-    }
+    onSave(newTitle, newDescription, newPropertiesWithDefinitions);
     onClose();
   };
 
   const handlePropertyChange = (propertyName: string, newValue: any) => {
-    setProperties(properties.map(prop =>
-      prop.propertyDefinition.name === propertyName ? { ...prop, propertyValue: newValue } : prop
+    setNewPropertiesWithDefinitions(newPropertiesWithDefinitions.map(prop =>
+      prop.definition.name === propertyName ? { ...prop, value: newValue } : prop
     ));
   };
 
   const handleAddProperty = () => {
-    setProperties([...properties, {
-      propertyDefinition: { name: newPropertyName, type: newPropertyType as PropertyType },
-      propertyValue: newPropertyValue
+    setNewPropertiesWithDefinitions([...newPropertiesWithDefinitions, {
+      definition: { name: newPropertyName, type: newPropertyType as PropertyType },
+      value: newPropertyValue
     }]);
     setNewPropertyType('');
     setNewPropertyName('');
@@ -84,9 +61,7 @@ const TaskDialog: React.FC<TaskDialogProps> = ({ task, open, onClose, onSave, on
   };
 
   const handleDelete = () => {
-    if (task) {
-      onDelete(task);
-    }
+    onDelete();
     onClose();
   };
 
@@ -100,8 +75,8 @@ const TaskDialog: React.FC<TaskDialogProps> = ({ task, open, onClose, onSave, on
             <TextField
               label="Title"
               size="small"
-              value={title}
-              onChange={(e) => setTitle(e.target.value)}
+              value={newTitle}
+              onChange={(e) => setNewTitle(e.target.value)}
               fullWidth
               variant="outlined"
               disabled={readOnly}
@@ -109,8 +84,8 @@ const TaskDialog: React.FC<TaskDialogProps> = ({ task, open, onClose, onSave, on
             <Box sx={{ display: 'flex', gap: 4 }}>
               <TextField
                 label="Description"
-                value={description}
-                onChange={(e) => setDescription(e.target.value)}
+                value={newDescription}
+                onChange={(e) => setNewDescription(e.target.value)}
                 multiline
                 rows={10}
                 fullWidth
@@ -118,28 +93,28 @@ const TaskDialog: React.FC<TaskDialogProps> = ({ task, open, onClose, onSave, on
                 sx={{ flex: 7 }}
               />
               <Box sx={{ flex: 3, display: 'flex', flexDirection: 'column', gap: 2 }}>
-                {properties.map((prop, index) => (
+                {newPropertiesWithDefinitions.map((prop, index) => (
                   <Box key={index} sx={{ display: 'flex', flexDirection: 'column', gap: 2 }}>
-                    {prop.propertyDefinition.type === 'Text' && (
+                    {prop.definition.type === 'Text' && (
                       <TextField
-                        label={prop.propertyDefinition.name}
-                        value={prop.propertyValue}
-                        onChange={(e) => handlePropertyChange(prop.propertyDefinition.name, e.target.value)}
+                        label={prop.definition.name}
+                        value={prop.value}
+                        onChange={(e) => handlePropertyChange(prop.definition.name, e.target.value)}
                         fullWidth
                         disabled={readOnly}
                       />
                     )}
-                    {prop.propertyDefinition.type === 'Select' && (
+                    {prop.definition.type === 'Select' && (
                       <FormControl fullWidth>
-                        <InputLabel id={`${prop.propertyDefinition.name}-label`}>{prop.propertyDefinition.name}</InputLabel>
+                        <InputLabel id={`${prop.definition.name}-label`}>{prop.definition.name}</InputLabel>
                         <Select
-                          labelId={`${prop.propertyDefinition.name}-label`}
-                          value={prop.propertyValue}
-                          onChange={(e) => handlePropertyChange(prop.propertyDefinition.name, e.target.value)}
+                          labelId={`${prop.definition.name}-label`}
+                          value={prop.value}
+                          onChange={(e) => handlePropertyChange(prop.definition.name, e.target.value)}
                           fullWidth
                           disabled={readOnly}
                         >
-                          {prop.propertyDefinition.data?.options?.map(option => (
+                          {prop.definition.data?.options?.map(option => (
                             <MenuItem key={option} value={option}>
                               {option}
                             </MenuItem>
@@ -199,8 +174,9 @@ const TaskDialog: React.FC<TaskDialogProps> = ({ task, open, onClose, onSave, on
               </Box>
             </Box>
             <Box>
+              {/* use component composition instead, pass this from the container compoennts */}
               <TaskComments
-                comments={task?.comments ?? []}
+                comments={task.comments}
                 commentAdded={handleCommentAdded}
               />
             </Box>

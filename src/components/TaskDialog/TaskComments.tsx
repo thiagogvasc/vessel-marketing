@@ -1,6 +1,6 @@
 import React, { useState } from 'react';
 import { Box, TextField, Button, List, ListItem, ListItemText } from '@mui/material';
-import { TaskComment } from '../types';
+import { TaskComment } from '../../types';
 
 interface TaskCommentsProps {
   comments: TaskComment[];
