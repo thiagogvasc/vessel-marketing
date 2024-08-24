@@ -1,6 +1,6 @@
 'use client'
 
-import KanbanView from "@/src/components/KanbanView";
+// import { KanbanViewContain} from "@/src/components/KanbanView";
 import { useGetDatabaseWithTasks } from "@/src/hooks/useTasks";
 import { Box, Container, Paper, Tab, Tabs, Typography } from "@mui/material";
 import { useParams } from "next/navigation";
@@ -34,7 +34,7 @@ export default function Database() {
       
         <Box sx={{ p: 3 }}>
           {data?.views.map(databaseView => {
-            if (databaseView.type === 'kanban') return <KanbanView readOnly={true} key={databaseView.name} databaseId={data?.id} databaseView={databaseView} />
+            // if (databaseView.type === 'kanban') return <KanbanView readOnly={true} key={databaseView.name} databaseId={data?.id} databaseView={databaseView} />
             return <>View type not supported</>
           })}
         </Box>

@@ -26,7 +26,7 @@ import ChevronLeftIcon from '@mui/icons-material/ChevronLeft';
 import ChevronRightIcon from '@mui/icons-material/ChevronRight';
 import { DashboardOutlined, EventNoteOutlined, ListAltOutlined, MeetingRoomOutlined, ViewKanbanOutlined } from '@mui/icons-material';
 import MyDrawer from './MyDrawer';
-import { useGetCurrentUser } from '../hooks/useUsers';
+import { useGetCurrentUser } from '../hooks/react-query/user';
 import theme from '../theme';
 import Image from 'next/image';
 
@@ -80,7 +80,7 @@ const AgentSidebar = () => {
       onClose={handleMenuClose}
     >
       <Box sx={{ px: 2, py: 1.5 }}>
-        <Typography variant="subtitle1">{user?.displayName || user?.email}</Typography>
+        <Typography variant="subtitle1">{user?.email}</Typography>
         <Typography variant="body2" color="textSecondary">{user?.email}</Typography>
       </Box>
       <Divider />
@@ -144,7 +144,7 @@ const AgentSidebar = () => {
               <NotificationsIcon />
             </Badge>
           </IconButton>
-          <Tooltip title={user?.displayName || user?.email}>
+          <Tooltip title={user?.email}>
             <IconButton
               size="large"
               edge="end"
@@ -154,7 +154,7 @@ const AgentSidebar = () => {
               onClick={handleProfileMenuOpen}
               color="inherit"
             >
-              <Avatar alt={user?.displayName || user?.email || ''} />
+              <Avatar alt={user?.email || ''} />
             </IconButton>
           </Tooltip>
         </Toolbar>

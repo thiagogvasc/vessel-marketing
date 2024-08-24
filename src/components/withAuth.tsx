@@ -3,7 +3,7 @@
 import { useRouter } from 'next/navigation';
 import { useAuth } from '../contexts/AuthContext';
 import { useEffect } from 'react';
-import { useGetCurrentUser } from '../hooks/useUsers';
+import { useGetCurrentUser } from '../hooks//react-query/user';
 
 export const withAuth = (Component: React.FC<any>, allowedRoles: string[]) => {
   const AuthenticatedComponent: React.FC<any> = (props) => {

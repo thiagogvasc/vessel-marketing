@@ -1,7 +1,7 @@
 'use client'
 
 import { useEffect, useState } from 'react';
-import { useGetRequestById, useUpdateRequest } from "@/src/hooks/useRequests";
+import { useGetRequestById, useUpdateRequest } from "@/src/hooks/react-query/request";
 import { useParams, useRouter } from "next/navigation";
 import {
   Box,

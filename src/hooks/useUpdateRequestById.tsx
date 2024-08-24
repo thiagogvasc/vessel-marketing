@@ -1,5 +1,5 @@
 import { useMutation, useQueryClient } from 'react-query';
-import { updateRequest } from '../utils/requests/requestsUtils';
+import { updateRequest } from '../supabase/request';
 import { Request } from '../types';
 
 const useUpdateRequest = (id: string) => {

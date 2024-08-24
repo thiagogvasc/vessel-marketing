@@ -1,6 +1,6 @@
 'use client'
 import { useRouter } from "next/navigation";
-import { useGetCurrentUser } from "../hooks/useUsers";
+import { useGetCurrentUser } from "../hooks/react-query/user";
 
 export default function Redirector() {
 	const { data: userData, isLoading } = useGetCurrentUser();

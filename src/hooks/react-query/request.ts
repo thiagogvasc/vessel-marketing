@@ -1,6 +1,6 @@
 import { useQuery, useMutation, useQueryClient } from "react-query";
-import { createRequest, getRequestById, getRequests, updateRequest, addRequestUpdate } from "../utils/requests/requestsUtils";
-import { Request, RequestUpdate } from "../types";
+import { createRequest, getRequestById, getRequests, updateRequest, addRequestUpdate } from "../../supabase/request"
+import { Request, RequestUpdate } from "../../types";
 
 // Hook to get all requests
 export const useGetRequests = () => {

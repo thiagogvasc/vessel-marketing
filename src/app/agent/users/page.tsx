@@ -1,7 +1,7 @@
 'use client'
 
 import { useEffect, useState } from "react";
-import { useGetAllUsers } from "@/src/hooks/useUsers"; // Assuming you have a hook to get users
+import { useGetAllUsers } from "@/src/hooks/react-query/user"; // Assuming you have a hook to get users
 import Link from "next/link";
 import {
   Box,

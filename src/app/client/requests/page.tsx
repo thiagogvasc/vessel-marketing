@@ -1,7 +1,7 @@
 'use client'
 
 import { useEffect, useState } from "react";
-import { useGetRequests } from "@/src/hooks/useRequests";
+import { useGetRequests } from "@/src/hooks/react-query/request";
 import Link from "next/link";
 import {
   Box,
@@ -85,8 +85,8 @@ const Requests = () => {
     if (!a[orderBy] || !b[orderBy]) return 0; // Handle cases where the value is undefined
   
     if (orderBy === "created_at" || orderBy === "updated_at") {
-      const aDate = a[orderBy]?.toDate();
-      const bDate = b[orderBy]?.toDate();
+      const aDate = a[orderBy];
+      const bDate = b[orderBy];
       
       if (aDate && bDate) {
         return aDate < bDate ? -1 : 1;
@@ -239,8 +239,8 @@ const Requests = () => {
                       <TableCell sx={{ color: theme.palette.text.secondary }}>{request.description.substring(0, 50)}...</TableCell>
                       <TableCell sx={{ color: theme.palette.text.secondary }}>{request.status}</TableCell>
                       <TableCell sx={{ color: theme.palette.text.secondary }}>{request.priority}</TableCell>
-                      <TableCell sx={{ color: theme.palette.text.secondary }}>{request.created_at?.toDate().toLocaleString()}</TableCell>
-                      <TableCell sx={{ color: theme.palette.text.secondary }}>{request.updated_at?.toDate().toLocaleString()}</TableCell>
+                      <TableCell sx={{ color: theme.palette.text.secondary }}>{request.created_at}</TableCell>
+                      <TableCell sx={{ color: theme.palette.text.secondary }}>{request.updated_at}</TableCell>
                       <TableCell sx={{ color: theme.palette.text.secondary }}>
                         <IconButton onClick={(e) => handleMenuOpen(request.id as string, e)}>
                           <MoreVert />

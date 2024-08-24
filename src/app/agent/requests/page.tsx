@@ -1,7 +1,7 @@
 'use client'
 
 import { useEffect, useState } from "react";
-import { useGetRequests } from "@/src/hooks/useRequests";
+import { useGetRequests } from "@/src/hooks/react-query/request";
 import Link from "next/link";
 import {
   Box,

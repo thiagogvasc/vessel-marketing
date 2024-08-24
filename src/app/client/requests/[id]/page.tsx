@@ -1,6 +1,6 @@
 'use client'
 
-import { useGetRequestById } from "@/src/hooks/useRequests";
+import { useGetRequestById } from "@/src/hooks/react-query/request";
 import { useParams, useRouter } from "next/navigation";
 import {
   Box,
@@ -107,7 +107,7 @@ export default function Request() {
                   Update History
                 </Typography>
                 <List>
-                  {request.updates && request.updates.length > 0 ? (
+                  {/* {request.updates && request.updates.length > 0 ? (
                     request.updates.map((update, index) => (
                       <React.Fragment key={index}>
                         <ListItem alignItems="flex-start">
@@ -131,7 +131,7 @@ export default function Request() {
                     <Typography variant="body2" color="text.secondary">
                       No updates available
                     </Typography>
-                  )}
+                  )} */}
                 </List>
               </Paper>
             </Box>

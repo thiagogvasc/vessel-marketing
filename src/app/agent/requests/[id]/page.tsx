@@ -1,6 +1,6 @@
 'use client'
 
-import { useAddRequestUpdate, useGetRequestById, useUpdateRequest } from "@/src/hooks/useRequests";
+import { useAddRequestUpdate, useGetRequestById, useUpdateRequest } from "@/src/hooks/react-query/request";
 import { useParams, useRouter } from "next/navigation";
 import {
   Box,
@@ -27,7 +27,7 @@ import {
 import EditIcon from '@mui/icons-material/Edit';
 import { RequestStatus, RequestPriority, RequestUpdate } from '@/src/types';
 import React, { useState } from 'react';
-import { useGetCurrentUser, useGetUserById } from '@/src/hooks/useUsers';
+import { useGetCurrentUser, useGetUserById } from '@/src/hooks/react-query/user';
 import NextMuiLink from "@/src/components/NextMuiLink";
 import NextMuiButton from "@/src/components/NextMuiButton";
 import { Home, NavigateNext } from "@mui/icons-material";

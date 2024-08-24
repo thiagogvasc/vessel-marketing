@@ -25,7 +25,7 @@ import {
 } from "@mui/material";
 import SearchIcon from "@mui/icons-material/Search";
 import { Database } from "@/src/types"; // Assuming there's a Database type in your types file
-import { useGetCurrentUser } from "@/src/hooks/useUsers";
+import { useGetCurrentUser } from "@/src/hooks/react-query/user";
 
 const Databases = () => {
   const { data: user } = useGetCurrentUser();

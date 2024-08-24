@@ -27,9 +27,9 @@ export interface Request {
   priority?: RequestPriority;
   due_date?: Timestamp;
   assigned_to?: string; // reference to Users
-  created_at?: Timestamp;
-  updated_at?: Timestamp;
-  updates: RequestUpdate[];
+  created_at?: string;
+  updated_at?: string;
+  // updates: RequestUpdate[];
 }
 
 export interface RequestUpdate {

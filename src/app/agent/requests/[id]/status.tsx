@@ -1,4 +1,4 @@
-import { useGetRequestById } from "@/src/hooks/useRequests";
+import { useGetRequestById } from "@/src/hooks/react-query/request";
 import Link from "next/link";
 import { useRouter } from "next/router";
 import {

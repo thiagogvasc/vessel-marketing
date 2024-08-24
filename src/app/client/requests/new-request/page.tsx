@@ -2,9 +2,6 @@
 
 import { useState } from 'react';
 import { useRouter } from 'next/navigation';
-import { collection, addDoc, Timestamp } from 'firebase/firestore';
-import { db } from '../../../../../firebaseConfig';
-import { useAuth } from '../../../../contexts/AuthContext';
 import {
   Box,
   Button,
@@ -18,27 +15,31 @@ import {
   Fade,
   Grow,
 } from '@mui/material';
-import { useGetCurrentUser } from '@/src/hooks/useUsers';
+import { useGetCurrentUser } from '@/src/hooks/react-query/user';
 import Link from 'next/link';
+import { useCreateRequest } from '@/src/hooks/react-query/request';
 
 const NewRequest = () => {
   const [title, setTitle] = useState('');
   const [description, setDescription] = useState('');
   const { data: user } = useGetCurrentUser();
+  const mutation = useCreateRequest();
   const router = useRouter();
 
   const handleSubmit = async (event: React.FormEvent) => {
     event.preventDefault();
 
     try {
-      await addDoc(collection(db, 'requests'), {
-        client_id: user?.id,
-        title,
-        description,
-        status: 'pending',
-        created_at: Timestamp.fromDate(new Date()),
-        updated_at: Timestamp.fromDate(new Date()),
-      });
+      if (user?.id) {
+        await mutation.mutateAsync({
+          client_id: user.id,
+          title,
+          description,
+          status: 'Pending',
+          created_at: Date.now().toString(),
+          updated_at: Date.now().toString(),
+        })
+      }
       router.push('/client/requests');
     } catch (error) {
       console.error('Error adding request: ', error);
