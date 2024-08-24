@@ -1,7 +1,10 @@
-'use client'
+"use client";
 
-import { useEffect, useState } from 'react';
-import { useGetRequestById, useUpdateRequest } from "@/src/hooks/react-query/request";
+import { useEffect, useState } from "react";
+import {
+  useGetRequestById,
+  useUpdateRequest,
+} from "@/src/hooks/react-query/request";
 import { useParams, useRouter } from "next/navigation";
 import {
   Box,
@@ -16,13 +19,13 @@ import {
   Select,
   MenuItem,
   Breadcrumbs,
-} from '@mui/material';
-import MuiLink from '@mui/material/Link'
+} from "@mui/material";
+import MuiLink from "@mui/material/Link";
 
-import { Home, NavigateNext } from '@mui/icons-material';
-import ArrowBackIcon from '@mui/icons-material/ArrowBack';
-import SaveIcon from '@mui/icons-material/Save';
-import { RequestStatus, RequestPriority } from '@/src/types';
+import { Home, NavigateNext } from "@mui/icons-material";
+import ArrowBackIcon from "@mui/icons-material/ArrowBack";
+import SaveIcon from "@mui/icons-material/Save";
+import { RequestStatus, RequestPriority } from "@/src/types";
 
 export default function EditRequest() {
   const router = useRouter();
@@ -31,10 +34,12 @@ export default function EditRequest() {
   const { data: request, isLoading } = useGetRequestById(id as string);
   const updateRequestMutation = useUpdateRequest();
 
-  const [title, setTitle] = useState('');
-  const [description, setDescription] = useState('');
-  const [status, setStatus] = useState<RequestStatus>('Pending');
-  const [priority, setPriority] = useState<RequestPriority | undefined>(undefined);
+  const [title, setTitle] = useState("");
+  const [description, setDescription] = useState("");
+  const [status, setStatus] = useState<RequestStatus>("Pending");
+  const [priority, setPriority] = useState<RequestPriority | undefined>(
+    undefined,
+  );
 
   useEffect(() => {
     if (request) {
@@ -46,26 +51,36 @@ export default function EditRequest() {
   }, [request]);
 
   const handleSaveChanges = () => {
-    updateRequestMutation.mutate({
-      id: id as string,
-      updates: { title, description, status, priority },
-    }, {
-      onSuccess: () => {
-        router.push(`/agent/requests/${id}`);
-      }
-    });
+    updateRequestMutation.mutate(
+      {
+        id: id as string,
+        updates: { title, description, status, priority },
+      },
+      {
+        onSuccess: () => {
+          router.push(`/agent/requests/${id}`);
+        },
+      },
+    );
   };
 
   return (
     <Container component="main" maxWidth="xl" sx={{ mt: 4 }}>
       {isLoading ? (
-        <Box sx={{ display: 'flex', justifyContent: 'center', alignItems: 'center', height: '100%' }}>
+        <Box
+          sx={{
+            display: "flex",
+            justifyContent: "center",
+            alignItems: "center",
+            height: "100%",
+          }}
+        >
           <CircularProgress />
         </Box>
       ) : (
         request && (
           <Fade in timeout={500}>
-              <Box sx={{ mt: 3 }}>
+            <Box sx={{ mt: 3 }}>
               <Grid container spacing={2} alignItems="center" sx={{ mb: 2 }}>
                 <Grid item xs>
                   <Typography component="h1" variant="h5" noWrap>
@@ -73,13 +88,17 @@ export default function EditRequest() {
                   </Typography>
                 </Grid>
                 <Grid item>
-                  <Breadcrumbs aria-label="breadcrumb" separator={<NavigateNext fontSize="small" />} sx={{ whiteSpace: 'nowrap' }}>
+                  <Breadcrumbs
+                    aria-label="breadcrumb"
+                    separator={<NavigateNext fontSize="small" />}
+                    sx={{ whiteSpace: "nowrap" }}
+                  >
                     <MuiLink
                       color="inherit"
                       href="/agent/dashboard"
                       onClick={(e) => {
                         e.preventDefault();
-                        router.push('/agent/dashboard');
+                        router.push("/agent/dashboard");
                       }}
                       noWrap
                     >
@@ -91,18 +110,20 @@ export default function EditRequest() {
                       href="/agent/requests"
                       onClick={(e) => {
                         e.preventDefault();
-                        router.push('/agent/requests');
+                        router.push("/agent/requests");
                       }}
                       noWrap
                     >
                       Requests
                     </MuiLink>
-                    <Typography color="textPrimary" noWrap>Request Details</Typography>
+                    <Typography color="textPrimary" noWrap>
+                      Request Details
+                    </Typography>
                   </Breadcrumbs>
                 </Grid>
               </Grid>
-            
-            <Paper elevation={0} sx={{ p: 4, borderRadius: 3 }}>
+
+              <Paper elevation={0} sx={{ p: 4, borderRadius: 3 }}>
                 <TextField
                   label="Title"
                   value={title}
@@ -143,7 +164,9 @@ export default function EditRequest() {
                   </Typography>
                   <Select
                     value={priority}
-                    onChange={(e) => setPriority(e.target.value as RequestPriority)}
+                    onChange={(e) =>
+                      setPriority(e.target.value as RequestPriority)
+                    }
                     displayEmpty
                     fullWidth
                     sx={{ mt: 1 }}
@@ -153,7 +176,9 @@ export default function EditRequest() {
                     <MenuItem value="High">High</MenuItem>
                   </Select>
                 </Box>
-                <Box sx={{ mt: 3, display: 'flex', justifyContent: 'flex-end' }}>
+                <Box
+                  sx={{ mt: 3, display: "flex", justifyContent: "flex-end" }}
+                >
                   <Button
                     variant="contained"
                     startIcon={<SaveIcon />}
@@ -162,8 +187,8 @@ export default function EditRequest() {
                     Save Changes
                   </Button>
                 </Box>
-            </Paper>
-              </Box>
+              </Paper>
+            </Box>
           </Fade>
         )
       )}

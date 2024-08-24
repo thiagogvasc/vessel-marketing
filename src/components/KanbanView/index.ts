@@ -1,1 +1,1 @@
-export { KanbanView } from './KanbanView'
+export { KanbanView } from "./KanbanView";

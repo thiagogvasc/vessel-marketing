@@ -1,7 +1,7 @@
-'use client'
+"use client";
 
 import { useEffect, useState } from "react";
-import { useGetUserById } from "@/src/hooks/useUsers"; // Assuming you have a hook to get user details
+import { useGetUserById } from "@/src/hooks/react-query/user"; // Assuming you have a hook to get user details
 import {
   Box,
   Button,
@@ -13,8 +13,8 @@ import {
   Breadcrumbs,
   Link as MuiLink,
 } from "@mui/material";
-import HomeIcon from '@mui/icons-material/Home';
-import NavigateNextIcon from '@mui/icons-material/NavigateNext';
+import HomeIcon from "@mui/icons-material/Home";
+import NavigateNextIcon from "@mui/icons-material/NavigateNext";
 import { useRouter, useParams } from "next/navigation";
 
 const UserDetail = () => {
@@ -24,20 +24,29 @@ const UserDetail = () => {
 
   return (
     <Container component="main" maxWidth="md" sx={{ mt: 4 }}>
-      <Grid container spacing={2} mb={2} justifyContent="space-between" alignItems="center">
+      <Grid
+        container
+        spacing={2}
+        mb={2}
+        justifyContent="space-between"
+        alignItems="center"
+      >
         <Grid item>
           <Typography component="h1" variant="h5">
             User Details
           </Typography>
         </Grid>
         <Grid item>
-          <Breadcrumbs aria-label="breadcrumb" separator={<NavigateNextIcon fontSize="small" />}>
+          <Breadcrumbs
+            aria-label="breadcrumb"
+            separator={<NavigateNextIcon fontSize="small" />}
+          >
             <MuiLink
               color="inherit"
               href="/"
               onClick={(e) => {
                 e.preventDefault();
-                router.push('/agent/dashboard');
+                router.push("/agent/dashboard");
               }}
               noWrap
             >
@@ -49,18 +58,27 @@ const UserDetail = () => {
               href="/agent/users"
               onClick={(e) => {
                 e.preventDefault();
-                router.push('/agent/users');
+                router.push("/agent/users");
               }}
               noWrap
             >
               Users
             </MuiLink>
-            <Typography color="textPrimary" noWrap>User Details</Typography>
+            <Typography color="textPrimary" noWrap>
+              User Details
+            </Typography>
           </Breadcrumbs>
         </Grid>
       </Grid>
       {isLoading ? (
-        <Box sx={{ display: "flex", justifyContent: "center", alignItems: "center", height: "100%" }}>
+        <Box
+          sx={{
+            display: "flex",
+            justifyContent: "center",
+            alignItems: "center",
+            height: "100%",
+          }}
+        >
           <CircularProgress />
         </Box>
       ) : (
@@ -75,7 +93,7 @@ const UserDetail = () => {
             Email: {user?.email}
           </Typography>
           <Typography component="h2" variant="h6" gutterBottom>
-            Created At: {user?.created_at?.toDate().toLocaleString()}
+            Created At: {user?.created_at}
           </Typography>
         </Paper>
       )}

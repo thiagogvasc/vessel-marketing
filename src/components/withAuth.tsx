@@ -1,9 +1,9 @@
-'use client'
+"use client";
 
-import { useRouter } from 'next/navigation';
-import { useAuth } from '../contexts/AuthContext';
-import { useEffect } from 'react';
-import { useGetCurrentUser } from '../hooks//react-query/user';
+import { useRouter } from "next/navigation";
+import { useAuth } from "../contexts/AuthContext";
+import { useEffect } from "react";
+import { useGetCurrentUser } from "../hooks//react-query/user";
 
 export const withAuth = (Component: React.FC<any>, allowedRoles: string[]) => {
   const AuthenticatedComponent: React.FC<any> = (props) => {
@@ -14,13 +14,12 @@ export const withAuth = (Component: React.FC<any>, allowedRoles: string[]) => {
 
     useEffect(() => {
       if (loading || isLoading) return;
-      
+
       if (!user) {
-        router.push('/login');
+        router.push("/login");
       } else if (!allowedRoles.includes(role!)) {
-        router.push('/unauthorized'); // or redirect to a specific dashboard
+        router.push("/unauthorized"); // or redirect to a specific dashboard
       }
-      
     }, [user, role, loading, router, isLoading]);
 
     if (loading || !user || !allowedRoles.includes(role!)) {

@@ -1,12 +1,20 @@
-'use client'
+"use client";
 
-import React, { useEffect, useState } from 'react';
-import { Droppable } from '@hello-pangea/dnd';
-import { Task, TaskWithId } from './Task';
-import { AggregateColumn } from '../../types';
-import { Box, Typography, IconButton, TextField, Button, Menu, MenuItem } from '@mui/material';
-import AddIcon from '@mui/icons-material/Add';
-import MoreVertIcon from '@mui/icons-material/MoreVert';
+import React, { useEffect, useState } from "react";
+import { Droppable } from "@hello-pangea/dnd";
+import { Task, TaskWithId } from "./Task";
+import { AggregateColumn } from "../../types";
+import {
+  Box,
+  Typography,
+  IconButton,
+  TextField,
+  Button,
+  Menu,
+  MenuItem,
+} from "@mui/material";
+import AddIcon from "@mui/icons-material/Add";
+import MoreVertIcon from "@mui/icons-material/MoreVert";
 
 interface ColumnProps {
   column: AggregateColumn;
@@ -16,8 +24,14 @@ interface ColumnProps {
   columnDeleted?: (columnTitle: string) => void;
 }
 
-export const Column: React.FC<ColumnProps> = ({ column, readOnly, taskAdded, taskClicked, columnDeleted }) => {
-  const [newTaskTitle, setNewTaskTitle] = useState('');
+export const Column: React.FC<ColumnProps> = ({
+  column,
+  readOnly,
+  taskAdded,
+  taskClicked,
+  columnDeleted,
+}) => {
+  const [newTaskTitle, setNewTaskTitle] = useState("");
   const [isAddingTask, setIsAddingTask] = useState(false);
   const [selectedTask, setSelectedTask] = useState<TaskWithId | null>(null);
   const [anchorEl, setAnchorEl] = useState<null | HTMLElement>(null);
@@ -25,19 +39,22 @@ export const Column: React.FC<ColumnProps> = ({ column, readOnly, taskAdded, tas
 
   useEffect(() => {
     if (selectedTask) {
-      const prevTask = column.tasks.find(task => task.id === selectedTask.id) as TaskWithId ?? null
-      setSelectedTask(prevTask)
+      const prevTask =
+        (column.tasks.find(
+          (task) => task.id === selectedTask.id,
+        ) as TaskWithId) ?? null;
+      setSelectedTask(prevTask);
     }
-  }, [column])
+  }, [column]);
 
   const handleAddTask = () => {
-    if (newTaskTitle.trim() === '') {
+    if (newTaskTitle.trim() === "") {
       setIsAddingTask(false);
       return;
     }
 
     taskAdded?.(column.title, newTaskTitle);
-    setNewTaskTitle('');
+    setNewTaskTitle("");
     setIsAddingTask(false);
   };
 
@@ -46,9 +63,9 @@ export const Column: React.FC<ColumnProps> = ({ column, readOnly, taskAdded, tas
   };
 
   const handleTaskTitleKeyDown = (e: React.KeyboardEvent) => {
-    if (e.key === 'Enter') {
+    if (e.key === "Enter") {
       handleAddTask();
-    } else if (e.key === 'Escape') {
+    } else if (e.key === "Escape") {
       setIsAddingTask(false);
     }
   };
@@ -80,11 +97,7 @@ export const Column: React.FC<ColumnProps> = ({ column, readOnly, taskAdded, tas
           <MoreVertIcon />
         </IconButton>
       </Box>
-      <Menu
-        anchorEl={anchorEl}
-        open={isMenuOpen}
-        onClose={handleMenuClose}
-      >
+      <Menu anchorEl={anchorEl} open={isMenuOpen} onClose={handleMenuClose}>
         <MenuItem onClick={handleDeleteColumn}>Delete</MenuItem>
       </Menu>
       <Droppable droppableId={column.title}>
@@ -92,13 +105,37 @@ export const Column: React.FC<ColumnProps> = ({ column, readOnly, taskAdded, tas
           <Box
             ref={provided.innerRef}
             {...provided.droppableProps}
-            sx={{ display:'flex', flexDirection:'column', gap: 1, minHeight: '64px', background: snapshot.isDraggingOver ? 'lightblue' : 'inherit', p: 1, borderRadius: '8px' }}
+            sx={{
+              display: "flex",
+              flexDirection: "column",
+              gap: 1,
+              minHeight: "64px",
+              background: snapshot.isDraggingOver ? "lightblue" : "inherit",
+              p: 1,
+              borderRadius: "8px",
+            }}
           >
-            {column.tasks.map((task, index) => (
-              task?.id && <Task readOnly={readOnly} key={task.id} task={task as TaskWithId} index={index} onClick={handleTaskClick} />
-            ))}
+            {column.tasks.map(
+              (task, index) =>
+                task?.id && (
+                  <Task
+                    readOnly={readOnly}
+                    key={task.id}
+                    task={task as TaskWithId}
+                    index={index}
+                    onClick={handleTaskClick}
+                  />
+                ),
+            )}
             {isAddingTask && (
-              <Box sx={{ p: 2, background: '#fff', borderRadius: '8px', boxShadow: '0 1px 3px rgba(0, 0, 0, 0.2)' }}>
+              <Box
+                sx={{
+                  p: 2,
+                  background: "#fff",
+                  borderRadius: "8px",
+                  boxShadow: "0 1px 3px rgba(0, 0, 0, 0.2)",
+                }}
+              >
                 <TextField
                   placeholder="Task title"
                   value={newTaskTitle}
@@ -110,11 +147,25 @@ export const Column: React.FC<ColumnProps> = ({ column, readOnly, taskAdded, tas
                   fullWidth
                   autoFocus
                 />
-                <Box sx={{ display: 'flex', justifyContent: 'space-between', mt: 1 }}>
-                  <Button variant="contained" color="primary" onClick={handleAddTask}>
+                <Box
+                  sx={{
+                    display: "flex",
+                    justifyContent: "space-between",
+                    mt: 1,
+                  }}
+                >
+                  <Button
+                    variant="contained"
+                    color="primary"
+                    onClick={handleAddTask}
+                  >
                     Add
                   </Button>
-                  <Button variant="outlined" color="secondary" onClick={() => setIsAddingTask(false)}>
+                  <Button
+                    variant="outlined"
+                    color="secondary"
+                    onClick={() => setIsAddingTask(false)}
+                  >
                     Cancel
                   </Button>
                 </Box>

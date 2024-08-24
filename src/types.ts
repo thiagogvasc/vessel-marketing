@@ -1,6 +1,6 @@
 import { Timestamp } from "firebase/firestore";
 
-export type UserRole = 'client' | 'agent';
+export type UserRole = "client" | "agent";
 
 // Types for Users Collection
 export interface User {
@@ -8,14 +8,14 @@ export interface User {
   email: string;
   role: UserRole;
   fullname: string;
-  created_at?: Timestamp;
-  updated_at?: Timestamp;
+  created_at?: string;
+  updated_at?: string;
   profile_picture?: string;
   phone_number?: string;
 }
 
-export type RequestStatus = 'Pending' | 'In Progress' | 'Completed';
-export type RequestPriority = 'Low' | 'Medium' | 'High';
+export type RequestStatus = "Pending" | "In Progress" | "Completed";
+export type RequestPriority = "Low" | "Medium" | "High";
 
 // Types for Requests Collection
 export interface Request {
@@ -47,7 +47,7 @@ export interface ViewFilter {
 
 export interface ViewSort {
   property_id: string;
-  order: 'Asc' | 'Desc';
+  order: "Asc" | "Desc";
 }
 
 export interface GroupByGroup {
@@ -64,16 +64,17 @@ export interface ViewConfig {
 
 export interface DatabaseView {
   id?: string;
+  database_id: string;
   name: string;
   type: string;
   config?: ViewConfig;
 }
 
 export enum PropertyType {
-  Text = 'Text',
-  Number = 'Number',
-  Date = 'Date',
-  Select = 'Select',
+  Text = "Text",
+  Number = "Number",
+  Date = "Date",
+  Select = "Select",
   // MultiSelect = 'Multi-select',
   // Checkbox = 'Checkbox',
   // User = 'User'
@@ -100,9 +101,22 @@ export interface PropertyMetadata {
 }
 
 export interface DatabasePropertyDefinition {
+  id: string;
+  database_id: string;
   name: string;
   type: PropertyType;
   data?: PropertyMetadata;
+}
+
+export interface CreateDatabasePayload extends Database {
+  propertyDefinitions: DatabasePropertyDefinition[];
+  views: DatabaseView[];
+}
+
+export interface DatabaseUI extends Database {
+  propertyDefinitions: DatabasePropertyDefinition[];
+  tasks: Task[];
+  views: DatabaseView[];
 }
 
 export interface Database {
@@ -110,15 +124,12 @@ export interface Database {
   name: string;
   description: string;
   client_id?: string;
-  // workspaceId: string;
-  views: DatabaseView[];
-  propertyDefinitions: DatabasePropertyDefinition[];
 }
 
 export interface TaskComment {
-  id?: string,
-  text: string,
-  author: string,
+  id?: string;
+  text: string;
+  author: string;
   created_at?: string;
 }
 
@@ -126,7 +137,6 @@ export interface Task {
   id?: string; // auto-generated
   database_id: string;
   title: string;
-  comments: TaskComment[];
   description: string;
   created_at?: string; // ISO string format for timestamp
   updated_at?: string; // ISO string format for timestamp
@@ -153,7 +163,6 @@ export interface AggregateBoard {
   updated_at?: Timestamp;
 }
 
-
 // Types for Task_Notes Subcollection (within Tasks)
 export interface TaskNote {
   id?: string; // auto-generated
@@ -170,7 +179,7 @@ export interface Meeting {
   meeting_datetime: Date;
   location: string;
   notes: string;
-  status: 'scheduled' | 'completed' | 'canceled';
+  status: "scheduled" | "completed" | "canceled";
   created_at?: Date;
   updated_at?: Date;
 }
@@ -183,8 +192,8 @@ export interface Deliverable {
   file_path: string;
   description: string;
   title: string;
-  type: 'video' | 'document' | 'image' | 'other';
-  status: 'pending' | 'delivered';
+  type: "video" | "document" | "image" | "other";
+  status: "pending" | "delivered";
   created_at?: Date;
   updated_at?: Date;
 }
@@ -211,7 +220,7 @@ export interface Notification {
   id?: string; // auto-generated
   user_id: string; // reference to Users
   message: string;
-  read_status: 'unread' | 'read';
+  read_status: "unread" | "read";
   created_at?: Date;
 }
 
@@ -229,7 +238,7 @@ export interface Attachment {
   id?: string; // auto-generated
   task_id: string; // reference to Tasks
   file_path: string;
-  file_type: 'document' | 'image' | 'video' | 'other';
+  file_type: "document" | "image" | "video" | "other";
   uploaded_at?: Date;
 }
 

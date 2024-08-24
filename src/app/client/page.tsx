@@ -1,7 +1,5 @@
-'use client'
- 
+"use client";
+
 export default function ClientPage() {
-  return (
-    <>clinet</>
-  );
+  return <>clinet</>;
 }

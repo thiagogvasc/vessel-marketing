@@ -1,4 +1,4 @@
-'use client'
+"use client";
 
 import { useEffect, useState } from "react";
 import { useGetRequests } from "@/src/hooks/react-query/request";
@@ -30,14 +30,13 @@ import {
 } from "@mui/material";
 import AddCircleOutlineIcon from "@mui/icons-material/AddCircleOutline";
 import SearchIcon from "@mui/icons-material/Search";
-import HomeIcon from '@mui/icons-material/Home';
-import NavigateNextIcon from '@mui/icons-material/NavigateNext';
+import HomeIcon from "@mui/icons-material/Home";
+import NavigateNextIcon from "@mui/icons-material/NavigateNext";
 import { useRouter } from "next/navigation";
 import { Request } from "@/src/types";
 import { Add, BorderColor, MoreVert } from "@mui/icons-material";
 import theme from "@/src/theme";
 
- 
 const Requests = () => {
   const router = useRouter();
   const { data: requests, isLoading } = useGetRequests();
@@ -47,7 +46,7 @@ const Requests = () => {
   const [rowsPerPage, setRowsPerPage] = useState(5);
   const [order, setOrder] = useState<"asc" | "desc">("asc");
   const [orderBy, setOrderBy] = useState<keyof Request>("title");
-  console.warn(requests)
+  console.warn(requests);
 
   useEffect(() => {
     if (!isLoading && requests) {
@@ -63,7 +62,9 @@ const Requests = () => {
     setPage(newPage);
   };
 
-  const handleChangeRowsPerPage = (event: React.ChangeEvent<HTMLInputElement>) => {
+  const handleChangeRowsPerPage = (
+    event: React.ChangeEvent<HTMLInputElement>,
+  ) => {
     setRowsPerPage(parseInt(event.target.value, 10));
     setPage(0);
   };
@@ -77,30 +78,29 @@ const Requests = () => {
   const filteredRequests = requests?.filter(
     (request) =>
       request.title.toLowerCase().includes(searchTerm.toLowerCase()) ||
-      request.description.toLowerCase().includes(searchTerm.toLowerCase())
+      request.description.toLowerCase().includes(searchTerm.toLowerCase()),
   );
-
 
   const sortedRequests = filteredRequests?.sort((a, b) => {
     if (!a[orderBy] || !b[orderBy]) return 0; // Handle cases where the value is undefined
-  
+
     if (orderBy === "created_at" || orderBy === "updated_at") {
       const aDate = a[orderBy];
       const bDate = b[orderBy];
-      
+
       if (aDate && bDate) {
         return aDate < bDate ? -1 : 1;
       } else {
         return 0;
       }
     }
-  
+
     return a[orderBy]! < b[orderBy]! ? -1 : 1;
   });
 
   const sortedAndPaginatedRequests = sortedRequests?.slice(
     page * rowsPerPage,
-    page * rowsPerPage + rowsPerPage
+    page * rowsPerPage + rowsPerPage,
   );
 
   const [anchorEl, setAnchorEl] = useState<null | HTMLElement>(null);
@@ -109,171 +109,227 @@ const Requests = () => {
 
   const handleMenuClose = () => {
     setAnchorEl(null);
-  }
+  };
 
-  const handleMenuOpen = (requestId: string, event: React.MouseEvent<HTMLElement>) => {
+  const handleMenuOpen = (
+    requestId: string,
+    event: React.MouseEvent<HTMLElement>,
+  ) => {
     setMenuRequestId(requestId);
     setAnchorEl(event.currentTarget);
   };
 
   return (
     <Container component="main" maxWidth="xl">
-      <Paper elevation={0} sx={{ borderRadius: 2, p:4 , boxShadow: 'rgba(0, 0, 0, 0.04) 0px 5px 22px, rgba(0, 0, 0, 0.03) 0px 0px 0px 0.5px'}}>
-      <Grid container spacing={2} mb={2} justifyContent="space-between" alignItems="center">
-        <Grid item>
-          <Typography component="h1" variant="h5">
-            Requests
-          </Typography>
+      <Paper
+        elevation={0}
+        sx={{
+          borderRadius: 2,
+          p: 4,
+          boxShadow:
+            "rgba(0, 0, 0, 0.04) 0px 5px 22px, rgba(0, 0, 0, 0.03) 0px 0px 0px 0.5px",
+        }}
+      >
+        <Grid
+          container
+          spacing={2}
+          mb={2}
+          justifyContent="space-between"
+          alignItems="center"
+        >
+          <Grid item>
+            <Typography component="h1" variant="h5">
+              Requests
+            </Typography>
+          </Grid>
+          <Grid item>
+            <Button
+              variant="contained"
+              startIcon={<Add />}
+              component={Link}
+              href="/client/requests/new-request"
+            >
+              New Request
+            </Button>
+          </Grid>
         </Grid>
-        <Grid item>
-          <Button
-            variant="contained"
-            startIcon={<Add />}
-            component={Link}
-            href="/client/requests/new-request"
-          >
-            New Request
-          </Button>
-        </Grid>
-      </Grid>
-      <TextField
-        variant="outlined"
-        margin="normal"
-        fullWidth
-        placeholder="Search requests"
-        value={searchTerm}
-        onChange={handleSearchChange}
-        sx={ {
-          '& .MuiOutlinedInput-root': {
-            '& fieldset': {
-              border: '1px solid rgb(239, 241, 245)', // Default border color
+        <TextField
+          variant="outlined"
+          margin="normal"
+          fullWidth
+          placeholder="Search requests"
+          value={searchTerm}
+          onChange={handleSearchChange}
+          sx={{
+            "& .MuiOutlinedInput-root": {
+              "& fieldset": {
+                border: "1px solid rgb(239, 241, 245)", // Default border color
+              },
+              borderRadius: "10px",
             },
-            borderRadius: '10px',
-          },
-        }}
-        InputProps={{
-          startAdornment: (
-            <InputAdornment position="start">
-              <SearchIcon sx={{ color: theme.palette.grey[500]}} />
-            </InputAdornment>
-          ),
-        }}
-      />
-      {isLoading ? (
-        <Box sx={{ display: "flex", justifyContent: "center", alignItems: "center", height: "100%" }}>
-          <CircularProgress />
-        </Box>
-      ) : (
-        <>
-          <TableContainer sx={{ mt: 3 }}>
-            <Table>
-              <TableHead>
-                <TableRow sx={{border:'none'}}>
-                  <TableCell sortDirection={orderBy === "title" ? order : false}>
-                    <TableSortLabel
-                      active={orderBy === "title"}
-                      direction={orderBy === "title" ? order : "asc"}
-                      onClick={() => handleRequestSort("title")}
+          }}
+          InputProps={{
+            startAdornment: (
+              <InputAdornment position="start">
+                <SearchIcon sx={{ color: theme.palette.grey[500] }} />
+              </InputAdornment>
+            ),
+          }}
+        />
+        {isLoading ? (
+          <Box
+            sx={{
+              display: "flex",
+              justifyContent: "center",
+              alignItems: "center",
+              height: "100%",
+            }}
+          >
+            <CircularProgress />
+          </Box>
+        ) : (
+          <>
+            <TableContainer sx={{ mt: 3 }}>
+              <Table>
+                <TableHead>
+                  <TableRow sx={{ border: "none" }}>
+                    <TableCell
+                      sortDirection={orderBy === "title" ? order : false}
                     >
-                      Title
-                    </TableSortLabel>
-                  </TableCell>
-                  <TableCell sortDirection={orderBy === "description" ? order : false}>
-                    <TableSortLabel
-                      active={orderBy === "description"}
-                      direction={orderBy === "description" ? order : "asc"}
-                      onClick={() => handleRequestSort("description")}
+                      <TableSortLabel
+                        active={orderBy === "title"}
+                        direction={orderBy === "title" ? order : "asc"}
+                        onClick={() => handleRequestSort("title")}
+                      >
+                        Title
+                      </TableSortLabel>
+                    </TableCell>
+                    <TableCell
+                      sortDirection={orderBy === "description" ? order : false}
                     >
-                      Description
-                    </TableSortLabel>
-                  </TableCell>
-                  <TableCell sortDirection={orderBy === "status" ? order : false}>
-                    <TableSortLabel
-                      active={orderBy === "status"}
-                      direction={orderBy === "status" ? order : "asc"}
-                      onClick={() => handleRequestSort("status")}
+                      <TableSortLabel
+                        active={orderBy === "description"}
+                        direction={orderBy === "description" ? order : "asc"}
+                        onClick={() => handleRequestSort("description")}
+                      >
+                        Description
+                      </TableSortLabel>
+                    </TableCell>
+                    <TableCell
+                      sortDirection={orderBy === "status" ? order : false}
                     >
-                      Status
-                    </TableSortLabel>
-                  </TableCell>
-                  <TableCell sortDirection={orderBy === "priority" ? order : false}>
-                    <TableSortLabel
-                      active={orderBy === "priority"}
-                      direction={orderBy === "priority" ? order : "asc"}
-                      onClick={() => handleRequestSort("priority")}
+                      <TableSortLabel
+                        active={orderBy === "status"}
+                        direction={orderBy === "status" ? order : "asc"}
+                        onClick={() => handleRequestSort("status")}
+                      >
+                        Status
+                      </TableSortLabel>
+                    </TableCell>
+                    <TableCell
+                      sortDirection={orderBy === "priority" ? order : false}
                     >
-                      Priority
-                    </TableSortLabel>
-                  </TableCell>
-                  <TableCell sortDirection={orderBy === "created_at" ? order : false}>
-                    <TableSortLabel
-                      active={orderBy === "created_at"}
-                      direction={orderBy === "created_at" ? order : "asc"}
-                      onClick={() => handleRequestSort("created_at")}
+                      <TableSortLabel
+                        active={orderBy === "priority"}
+                        direction={orderBy === "priority" ? order : "asc"}
+                        onClick={() => handleRequestSort("priority")}
+                      >
+                        Priority
+                      </TableSortLabel>
+                    </TableCell>
+                    <TableCell
+                      sortDirection={orderBy === "created_at" ? order : false}
                     >
-                      Created At
-                    </TableSortLabel>
-                  </TableCell>
-                  <TableCell sortDirection={orderBy === "updated_at" ? order : false}>
-                    <TableSortLabel
-                      active={orderBy === "updated_at"}
-                      direction={orderBy === "updated_at" ? order : "asc"}
-                      onClick={() => handleRequestSort("updated_at")}
+                      <TableSortLabel
+                        active={orderBy === "created_at"}
+                        direction={orderBy === "created_at" ? order : "asc"}
+                        onClick={() => handleRequestSort("created_at")}
+                      >
+                        Created At
+                      </TableSortLabel>
+                    </TableCell>
+                    <TableCell
+                      sortDirection={orderBy === "updated_at" ? order : false}
                     >
-                      Updated At
-                    </TableSortLabel>
-                  </TableCell>
-                  <TableCell>Actions</TableCell>
-                </TableRow>
-              </TableHead>
-              <TableBody>
-                {sortedAndPaginatedRequests?.map((request) => (
-                  <Grow
-                    in={showRequests}
-                    style={{ transformOrigin: "0 0 0" }}
-                    {...(showRequests ? { timeout: 1000 } : {})}
-                    key={request.id}
-                  >
-                    <TableRow>
-                      <TableCell>{request.title}</TableCell>
-                      <TableCell sx={{ color: theme.palette.text.secondary }}>{request.description.substring(0, 50)}...</TableCell>
-                      <TableCell sx={{ color: theme.palette.text.secondary }}>{request.status}</TableCell>
-                      <TableCell sx={{ color: theme.palette.text.secondary }}>{request.priority}</TableCell>
-                      <TableCell sx={{ color: theme.palette.text.secondary }}>{request.created_at}</TableCell>
-                      <TableCell sx={{ color: theme.palette.text.secondary }}>{request.updated_at}</TableCell>
-                      <TableCell sx={{ color: theme.palette.text.secondary }}>
-                        <IconButton onClick={(e) => handleMenuOpen(request.id as string, e)}>
-                          <MoreVert />
-                        </IconButton>
-                        <Menu
-                          anchorEl={anchorEl}
-                          open={isMenuOpen && menuRequestId === request.id}
-                          onClose={handleMenuClose}
-                        >
-                          <MenuItem onClick={() => { handleMenuClose(); router.push(`/client/requests/${request.id}`); }}>View</MenuItem>
-                        </Menu>
-                      </TableCell>
-                    </TableRow>
-                  </Grow>
-                  
-                ))}
-              </TableBody>
-            </Table>
-          </TableContainer>
-          <TablePagination
-            rowsPerPageOptions={[5, 10, 25]}
-            component="div"
-            count={filteredRequests?.length || 0}
-            rowsPerPage={rowsPerPage}
-            page={page}
-            onPageChange={handleChangePage}
-            onRowsPerPageChange={handleChangeRowsPerPage}
-          />
-        </>
-      )}
-    </Paper>
+                      <TableSortLabel
+                        active={orderBy === "updated_at"}
+                        direction={orderBy === "updated_at" ? order : "asc"}
+                        onClick={() => handleRequestSort("updated_at")}
+                      >
+                        Updated At
+                      </TableSortLabel>
+                    </TableCell>
+                    <TableCell>Actions</TableCell>
+                  </TableRow>
+                </TableHead>
+                <TableBody>
+                  {sortedAndPaginatedRequests?.map((request) => (
+                    <Grow
+                      in={showRequests}
+                      style={{ transformOrigin: "0 0 0" }}
+                      {...(showRequests ? { timeout: 1000 } : {})}
+                      key={request.id}
+                    >
+                      <TableRow>
+                        <TableCell>{request.title}</TableCell>
+                        <TableCell sx={{ color: theme.palette.text.secondary }}>
+                          {request.description.substring(0, 50)}...
+                        </TableCell>
+                        <TableCell sx={{ color: theme.palette.text.secondary }}>
+                          {request.status}
+                        </TableCell>
+                        <TableCell sx={{ color: theme.palette.text.secondary }}>
+                          {request.priority}
+                        </TableCell>
+                        <TableCell sx={{ color: theme.palette.text.secondary }}>
+                          {request.created_at}
+                        </TableCell>
+                        <TableCell sx={{ color: theme.palette.text.secondary }}>
+                          {request.updated_at}
+                        </TableCell>
+                        <TableCell sx={{ color: theme.palette.text.secondary }}>
+                          <IconButton
+                            onClick={(e) =>
+                              handleMenuOpen(request.id as string, e)
+                            }
+                          >
+                            <MoreVert />
+                          </IconButton>
+                          <Menu
+                            anchorEl={anchorEl}
+                            open={isMenuOpen && menuRequestId === request.id}
+                            onClose={handleMenuClose}
+                          >
+                            <MenuItem
+                              onClick={() => {
+                                handleMenuClose();
+                                router.push(`/client/requests/${request.id}`);
+                              }}
+                            >
+                              View
+                            </MenuItem>
+                          </Menu>
+                        </TableCell>
+                      </TableRow>
+                    </Grow>
+                  ))}
+                </TableBody>
+              </Table>
+            </TableContainer>
+            <TablePagination
+              rowsPerPageOptions={[5, 10, 25]}
+              component="div"
+              count={filteredRequests?.length || 0}
+              rowsPerPage={rowsPerPage}
+              page={page}
+              onPageChange={handleChangePage}
+              onRowsPerPageChange={handleChangeRowsPerPage}
+            />
+          </>
+        )}
+      </Paper>
     </Container>
   );
-}
+};
 
 export default Requests;

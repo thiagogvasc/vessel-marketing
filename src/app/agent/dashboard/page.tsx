@@ -1,5 +1,3 @@
-
 export default function AgentDashboard() {
-  
-  return (<>Agent Dashboard</>);
+  return <>Agent Dashboard</>;
 }

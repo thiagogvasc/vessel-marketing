@@ -1,7 +1,7 @@
-'use client'
+"use client";
 
 import { useEffect, useState } from "react";
-import { useGetDatabases } from "@/src/hooks/useDatabases";
+import { useGetDatabases } from "@/src/hooks/react-query/database";
 import Link from "next/link";
 import {
   Box,
@@ -22,13 +22,9 @@ import {
   InputAdornment,
   TableSortLabel,
   Paper,
-  Breadcrumbs,
   Link as MuiLink,
 } from "@mui/material";
-import AddCircleOutlineIcon from "@mui/icons-material/AddCircleOutline";
 import SearchIcon from "@mui/icons-material/Search";
-import HomeIcon from '@mui/icons-material/Home';
-import NavigateNextIcon from '@mui/icons-material/NavigateNext';
 import { useRouter } from "next/navigation";
 import { Database } from "@/src/types"; // Assuming there's a Database type in your types file
 import { Add } from "@mui/icons-material";
@@ -57,7 +53,9 @@ const Databases = () => {
     setPage(newPage);
   };
 
-  const handleChangeRowsPerPage = (event: React.ChangeEvent<HTMLInputElement>) => {
+  const handleChangeRowsPerPage = (
+    event: React.ChangeEvent<HTMLInputElement>,
+  ) => {
     setRowsPerPage(parseInt(event.target.value, 10));
     setPage(0);
   };
@@ -68,9 +66,8 @@ const Databases = () => {
     setOrderBy(property);
   };
 
-  const filteredDatabases = databases?.filter(
-    (database) =>
-      database.name.toLowerCase().includes(searchTerm.toLowerCase())
+  const filteredDatabases = databases?.filter((database) =>
+    database.name.toLowerCase().includes(searchTerm.toLowerCase()),
   );
 
   const sortedDatabases = filteredDatabases?.sort((a, b) => {
@@ -81,28 +78,42 @@ const Databases = () => {
 
   const sortedAndPaginatedDatabases = sortedDatabases?.slice(
     page * rowsPerPage,
-    page * rowsPerPage + rowsPerPage
+    page * rowsPerPage + rowsPerPage,
   );
 
   return (
     <Container component="main" maxWidth="xl">
-      <Paper elevation={0} sx={{ borderRadius: 2, p:4 , boxShadow: 'rgba(0, 0, 0, 0.04) 0px 5px 22px, rgba(0, 0, 0, 0.03) 0px 0px 0px 0.5px'}}>
-      <Grid container spacing={2} mb={2} justifyContent="space-between" alignItems="center">
-        <Grid item>
-          <Typography component="h1" variant="h5">
-            Projects
-          </Typography>
+      <Paper
+        elevation={0}
+        sx={{
+          borderRadius: 2,
+          p: 4,
+          boxShadow:
+            "rgba(0, 0, 0, 0.04) 0px 5px 22px, rgba(0, 0, 0, 0.03) 0px 0px 0px 0.5px",
+        }}
+      >
+        <Grid
+          container
+          spacing={2}
+          mb={2}
+          justifyContent="space-between"
+          alignItems="center"
+        >
+          <Grid item>
+            <Typography component="h1" variant="h5">
+              Projects
+            </Typography>
+          </Grid>
+          <Grid item>
+            <Button
+              variant="contained"
+              startIcon={<Add />}
+              onClick={() => router.push("/agent/databases/new-database")} // Route to add new database
+            >
+              Add Project
+            </Button>
+          </Grid>
         </Grid>
-        <Grid item>
-          <Button
-            variant="contained"
-            startIcon={<Add />}
-            onClick={() => router.push('/agent/databases/new-database')} // Route to add new database
-          >
-            Add Project
-          </Button>
-        </Grid>
-      </Grid>
         <TextField
           variant="outlined"
           margin="normal"
@@ -110,12 +121,12 @@ const Databases = () => {
           placeholder="Search databases"
           value={searchTerm}
           onChange={handleSearchChange}
-          sx={ {
-            '& .MuiOutlinedInput-root': {
-              '& fieldset': {
-                border: '1px solid rgb(239, 241, 245)', // Default border color
+          sx={{
+            "& .MuiOutlinedInput-root": {
+              "& fieldset": {
+                border: "1px solid rgb(239, 241, 245)", // Default border color
               },
-              borderRadius: '10px',
+              borderRadius: "10px",
             },
           }}
           InputProps={{
@@ -127,7 +138,14 @@ const Databases = () => {
           }}
         />
         {isLoading ? (
-          <Box sx={{ display: "flex", justifyContent: "center", alignItems: "center", height: "100%" }}>
+          <Box
+            sx={{
+              display: "flex",
+              justifyContent: "center",
+              alignItems: "center",
+              height: "100%",
+            }}
+          >
             <CircularProgress />
           </Box>
         ) : (
@@ -136,7 +154,9 @@ const Databases = () => {
               <Table>
                 <TableHead>
                   <TableRow>
-                    <TableCell sortDirection={orderBy === "name" ? order : false}>
+                    <TableCell
+                      sortDirection={orderBy === "name" ? order : false}
+                    >
                       <TableSortLabel
                         active={orderBy === "name"}
                         direction={orderBy === "name" ? order : "asc"}
@@ -159,7 +179,11 @@ const Databases = () => {
                       <TableRow>
                         <TableCell>{database.name}</TableCell>
                         <TableCell>
-                          <Button variant="outlined" component={Link} href={`/agent/databases/${database.id}`}>
+                          <Button
+                            variant="outlined"
+                            component={Link}
+                            href={`/agent/databases/${database.id}`}
+                          >
                             View
                           </Button>
                         </TableCell>
@@ -183,6 +207,6 @@ const Databases = () => {
       </Paper>
     </Container>
   );
-}
+};
 
 export default Databases;

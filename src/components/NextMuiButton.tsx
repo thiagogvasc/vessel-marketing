@@ -1,12 +1,16 @@
-import React from 'react';
-import { Button, ButtonProps } from '@mui/material';
-import { useRouter } from 'next/navigation';
+import React from "react";
+import { Button, ButtonProps } from "@mui/material";
+import { useRouter } from "next/navigation";
 
 interface NextMuiButtonProps extends ButtonProps {
   href: string;
 }
 
-const NextMuiButton: React.FC<NextMuiButtonProps> = ({ href, children, ...props }) => {
+const NextMuiButton: React.FC<NextMuiButtonProps> = ({
+  href,
+  children,
+  ...props
+}) => {
   const router = useRouter();
 
   const handleClick = (e: React.MouseEvent<HTMLButtonElement>) => {

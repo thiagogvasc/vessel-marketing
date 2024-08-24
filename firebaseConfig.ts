@@ -16,8 +16,8 @@ const firebaseConfig = {
 
 // const app = initializeApp(firebaseConfig);
 
-const db: any = null
-const auth: any = null
-const storage: any = null
+const db: any = null;
+const auth: any = null;
+const storage: any = null;
 
 export { db, auth, storage };

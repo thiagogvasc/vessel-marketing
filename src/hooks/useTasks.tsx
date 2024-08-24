@@ -1,276 +1,253 @@
-import { useQuery, useMutation, useQueryClient } from 'react-query';
-import { fetchTasks, addTask, updateTask, fetchBoard, updateTaskOrder, fetchAggregateBoard, getDatabaseTasks, getDatabaseById, addKanbanColumn, updateKanbanViewManualSort, deleteTask, deleteKanbanColumn } from '../utils/firestoreUtils';
-import { Task, Column, AggregateColumn, AggregateBoard, Database, PropertyType, GroupByGroup } from '../types';
-import { Updater } from 'react-query/types/core/utils';
+import { useQuery, useMutation, useQueryClient } from "react-query";
+import {
+  fetchTasks,
+  addTask,
+  updateTask,
+  fetchBoard,
+  updateTaskOrder,
+  fetchAggregateBoard,
+  getDatabaseTasks,
+  getDatabaseById,
+  addKanbanColumn,
+  updateKanbanViewManualSort,
+  deleteTask,
+  deleteKanbanColumn,
+} from "../utils/firestoreUtils";
+import {
+  Task,
+  Column,
+  AggregateColumn,
+  AggregateBoard,
+  Database,
+  PropertyType,
+  GroupByGroup,
+} from "../types";
+import { Updater } from "react-query/types/core/utils";
 
-// Fetch all tasks for a board
-export const useGetDatabaseWithTasks = (databaseId: string | null | undefined) => {
-  // const queryClient = useQueryClient();
-
-  return useQuery(['database-tasks', databaseId], () => {
-    console.warn('start fetching database', databaseId)
-    return databaseId ? getDatabaseTasks(databaseId) : Promise.resolve(null);;
-  }, { enabled: !!databaseId, refetchOnMount: false });
-};
-
-
-export const useGetDatabaseById = (databaseId: string | undefined | null) => {
-  return useQuery(["databases", databaseId], () => databaseId ? getDatabaseById(databaseId) : Promise.resolve(null), {
-    enabled: !!databaseId, // only run the query if id is truthy
-    refetchOnMount: false
-  });
-};
-
-// Add a new task
-export const useDeleteTask = (databaseId: string, viewName: string) => {
+export const useUpdateKanbanViewManualSort = (
+  databaseId: string,
+  viewId: string,
+) => {
   const queryClient = useQueryClient();
-
   return useMutation(
-    async (taskToDelete: Task) => {
-      try {
-        console.warn('calling delete task')
-        const deletedTask = await deleteTask(taskToDelete, databaseId, viewName);
-        return deletedTask;
-      } catch (err) {
-        console.warn(err)
-        throw err
-      }
+    async ({
+      columns,
+      taskId,
+      updatedTask,
+    }: {
+      columns: AggregateColumn[];
+      taskId: string;
+      updatedTask: Partial<Task>;
+    }) => {
+      return await updateKanbanViewManualSort(
+        databaseId,
+        viewId,
+        columns,
+        taskId,
+        updatedTask,
+      );
     },
-
     {
-      onSuccess: (task) => {
-        const previousDatabaseTasks = queryClient.getQueryData(['database-tasks', databaseId]) as Database & { tasks: Task[]};
-        queryClient.setQueryData<Database & { tasks: Task[]}>(['database-tasks', databaseId], (old) => ({
-          ...previousDatabaseTasks,
-          views: previousDatabaseTasks.views.map((view) => {
-            if (view.name === viewName) {
-              return {
-                ...view,
-                config: {
-                  ...view.config,
-                  groups: view.config?.groups?.map(group => {
-                    if (group.group_by_value === task.properties[view.config?.group_by as string]) {
-                      return {
-                        ...group,
-                        task_order: group.task_order.filter(taskId => taskId !== task.id)
-                      }
-                    } else {
-                      return group;
-                    }
-                  })
-                }
-              }
-            } else {
-              return view;
-            }
-          }),
-          tasks: previousDatabaseTasks.tasks.filter(t => t.id !== task.id)
-        }))
-      }
-    }
-  );
-};
-
-
-// Add a new task
-export const useAddTask = (databaseId: string, viewName: string) => {
-  const queryClient = useQueryClient();
-
-  return useMutation(
-    async (task: Omit<Task, 'id' | 'created_at' | 'updated_at'>) => {
-      try {
-        console.warn('calling add task')
-        const addedTask = await addTask(task, databaseId, viewName);
-        console.warn('here')
-        return addedTask;
-      } catch (err) {
-        console.warn(err)
-        throw err
-      }
-    },
-
-    {
-      onMutate: () => {
-        console.warn('hi')
-      },
-      onSettled: () => {
-        console.warn('settled')
-      },
-      onSuccess: (task) => {
-        const previousDatabaseTasks = queryClient.getQueryData(['database-tasks', databaseId]) as Database & { tasks: Task[]};
-        console.warn('setting query data')
-        queryClient.setQueryData<Database & { tasks: Task[]}>(['database-tasks', databaseId], (old) => ({
-          ...previousDatabaseTasks,
-          views: previousDatabaseTasks.views.map((view) => {
-            if (view.name === viewName) {
-              return {
-                ...view,
-                config: {
-                  ...view.config,
-                  groups: view.config?.groups?.map(group => {
-                    if (group.group_by_value === task.properties[view.config?.group_by as string]) {
-                      return {
-                        ...group,
-                        task_order: [...group.task_order, task.id as string]
-                      }
-                    } else {
-                      return group;
-                    }
-                  })
-                }
-              }
-            } else {
-              return view;
-            }
-          }),
-          tasks: [...previousDatabaseTasks?.tasks, task]
-        }))
-      }
-    }
-  );
-};
-
-
-export const useUpdateKanbanViewManualSort = (databaseId: string, viewId: string) => {
-  const queryClient = useQueryClient();
-  return useMutation(
-    async ({ columns, taskId, updatedTask }: { columns: AggregateColumn[], taskId: string, updatedTask: Partial<Task> }) => {
-      return await updateKanbanViewManualSort(databaseId, viewId, columns, taskId, updatedTask);
-    }, {
       onSuccess: (data) => {
-        const previousDatabaseTasks = queryClient.getQueryData(['database-tasks', databaseId]) as Database & { tasks: Task[]};
-        const view = previousDatabaseTasks.views.find(view => view.id === viewId);
-        view?.config?.groups && (view.config.groups = data.columns.map(column => ({ group_by_value: column.title, task_order: column.tasks.map(task => task.id as string)})));
-        const updatedViews = previousDatabaseTasks.views.map(v => (v.name === view?.name ? view : v));
+        const previousDatabaseTasks = queryClient.getQueryData([
+          "database-tasks",
+          databaseId,
+        ]) as Database & { tasks: Task[] };
+        const view = previousDatabaseTasks.views.find(
+          (view) => view.id === viewId,
+        );
+        view?.config?.groups &&
+          (view.config.groups = data.columns.map((column) => ({
+            group_by_value: column.title,
+            task_order: column.tasks.map((task) => task.id as string),
+          })));
+        const updatedViews = previousDatabaseTasks.views.map((v) =>
+          v.name === view?.name ? view : v,
+        );
 
-        queryClient.setQueryData<Database & { tasks: Task[]}>(['database-tasks', databaseId], (old) => ({
-          ...previousDatabaseTasks,
-          views: updatedViews,
-          tasks: old?.tasks.map(task => {
-            if (task?.id === data.id) {
-              return {
-                id: data.id,
-                database_id: data.updatedTask.database_id ?? '',
-                description: data.updatedTask.description ?? '',
-                properties: data.updatedTask.properties,
-                title: data.updatedTask.title,
-                created_at: data.updatedTask.created_at,
-                updated_at: data.updatedTask.updated_at
-              } as Task
-            }
-            return task
-          }) ?? []
-        }))
-      }
-    }
+        queryClient.setQueryData<Database & { tasks: Task[] }>(
+          ["database-tasks", databaseId],
+          (old) => ({
+            ...previousDatabaseTasks,
+            views: updatedViews,
+            tasks:
+              old?.tasks.map((task) => {
+                if (task?.id === data.id) {
+                  return {
+                    id: data.id,
+                    database_id: data.updatedTask.database_id ?? "",
+                    description: data.updatedTask.description ?? "",
+                    properties: data.updatedTask.properties,
+                    title: data.updatedTask.title,
+                    created_at: data.updatedTask.created_at,
+                    updated_at: data.updatedTask.updated_at,
+                  } as Task;
+                }
+                return task;
+              }) ?? [],
+          }),
+        );
+      },
+    },
   );
-}
+};
 
 export const useAddKanbanColumn = (databaseId: string, viewName: string) => {
   const queryClient = useQueryClient();
   return useMutation(
-    async ({ newOption }: { databaseId: string; viewName: string, newOption: string }) => {
+    async ({
+      newOption,
+    }: {
+      databaseId: string;
+      viewName: string;
+      newOption: string;
+    }) => {
       const newColumn = await addKanbanColumn(databaseId, viewName, newOption);
       return newColumn as string;
     },
     {
       onSuccess: (newOption) => {
-        const previousDatabaseTasks = queryClient.getQueryData(['database-tasks', databaseId]) as Database & { tasks: Task[]};
-        const view = previousDatabaseTasks.views.find(view => view.name === viewName);
-        queryClient.setQueryData<Database & { tasks: Task[]}>(['database-tasks', databaseId], (old) => ({
-          ...previousDatabaseTasks,
-          propertyDefinitions: previousDatabaseTasks.propertyDefinitions.map(propDef => {
-            if (propDef.name === view?.config?.group_by) {
-              return {
-                ...propDef,
-                data: {
-                  ...propDef.data,
-                  options: [...(propDef.data?.options ?? []), newOption]
+        const previousDatabaseTasks = queryClient.getQueryData([
+          "database-tasks",
+          databaseId,
+        ]) as Database & { tasks: Task[] };
+        const view = previousDatabaseTasks.views.find(
+          (view) => view.name === viewName,
+        );
+        queryClient.setQueryData<Database & { tasks: Task[] }>(
+          ["database-tasks", databaseId],
+          (old) => ({
+            ...previousDatabaseTasks,
+            propertyDefinitions: previousDatabaseTasks.propertyDefinitions.map(
+              (propDef) => {
+                if (propDef.name === view?.config?.group_by) {
+                  return {
+                    ...propDef,
+                    data: {
+                      ...propDef.data,
+                      options: [...(propDef.data?.options ?? []), newOption],
+                    },
+                  };
                 }
+                return propDef;
+              },
+            ),
+            views: previousDatabaseTasks.views.map((view) => {
+              if (view.name === viewName) {
+                return {
+                  ...view,
+                  config: {
+                    ...view.config,
+                    groups: [
+                      ...(view.config?.groups ?? []),
+                      { group_by_value: newOption, task_order: [] },
+                    ],
+                  },
+                };
+              } else {
+                return view;
               }
-            }
-            return propDef
+            }),
           }),
-          views: previousDatabaseTasks.views.map((view) => {
-            if (view.name === viewName) {
-              return {
-                ...view,
-                config: {
-                  ...view.config,
-                  groups: [...view.config?.groups ?? [], { group_by_value: newOption, task_order: []}]
-                }
-              }
-            } else {
-              return view;
-            }
-          })
-        }))
-      }
-    }
+        );
+      },
+    },
   );
 };
 
 export const useDeleteKanbanColumn = (databaseId: string, viewName: string) => {
   const queryClient = useQueryClient();
   return useMutation(
-    async ({ optionToDelete }: { databaseId: string; viewName: string, optionToDelete: string }) => {
-      const deletedOption = await deleteKanbanColumn(databaseId, viewName, optionToDelete);
+    async ({
+      optionToDelete,
+    }: {
+      databaseId: string;
+      viewName: string;
+      optionToDelete: string;
+    }) => {
+      const deletedOption = await deleteKanbanColumn(
+        databaseId,
+        viewName,
+        optionToDelete,
+      );
       return deletedOption as string;
     },
     {
       onSuccess: (optionToDelete) => {
-        const previousDatabaseTasks = queryClient.getQueryData(['database-tasks', databaseId]) as Database & { tasks: Task[]};
-        const view = previousDatabaseTasks.views.find(view => view.name === viewName);
-        queryClient.setQueryData<Database & { tasks: Task[]}>(['database-tasks', databaseId], (old) => ({
-          ...previousDatabaseTasks,
-          propertyDefinitions: previousDatabaseTasks.propertyDefinitions.map(propDef => {
-            if (propDef.name === view?.config?.group_by) {
-              return {
-                ...propDef,
-                data: {
-                  ...propDef.data,
-                  options: propDef.data?.options?.filter(option => option !== optionToDelete) ?? []
+        const previousDatabaseTasks = queryClient.getQueryData([
+          "database-tasks",
+          databaseId,
+        ]) as Database & { tasks: Task[] };
+        const view = previousDatabaseTasks.views.find(
+          (view) => view.name === viewName,
+        );
+        queryClient.setQueryData<Database & { tasks: Task[] }>(
+          ["database-tasks", databaseId],
+          (old) => ({
+            ...previousDatabaseTasks,
+            propertyDefinitions: previousDatabaseTasks.propertyDefinitions.map(
+              (propDef) => {
+                if (propDef.name === view?.config?.group_by) {
+                  return {
+                    ...propDef,
+                    data: {
+                      ...propDef.data,
+                      options:
+                        propDef.data?.options?.filter(
+                          (option) => option !== optionToDelete,
+                        ) ?? [],
+                    },
+                  };
                 }
+                return propDef;
+              },
+            ),
+            views: previousDatabaseTasks.views.map((view) => {
+              if (view.name === viewName) {
+                return {
+                  ...view,
+                  config: {
+                    ...view.config,
+                    groups: view.config?.groups?.filter(
+                      (group) => group.group_by_value !== optionToDelete,
+                    ),
+                  },
+                };
+              } else {
+                return view;
               }
-            }
-            return propDef
+            }),
           }),
-          views: previousDatabaseTasks.views.map((view) => {
-            if (view.name === viewName) {
-              return {
-                ...view,
-                config: {
-                  ...view.config,
-                  groups: view.config?.groups?.filter(group => group.group_by_value !== optionToDelete)
-                }
-              }
-            } else {
-              return view;
-            }
-          })
-        }))
-      }
-    }
+        );
+      },
+    },
   );
 };
 
-export const useReorderColumn = () => {
-
-};
+export const useReorderColumn = () => {};
 
 // Update an existing task
 export const useUpdateTask = (databaseId: string, viewName: string) => {
   const queryClient = useQueryClient();
 
   return useMutation(
-    ({ id, updatedTask }: { id: string; updatedTask: Partial<Omit<Task, 'id' | 'created_at'>>}) => updateTask(id, updatedTask, databaseId, viewName),
+    ({
+      id,
+      updatedTask,
+    }: {
+      id: string;
+      updatedTask: Partial<Omit<Task, "id" | "created_at">>;
+    }) => updateTask(id, updatedTask, databaseId, viewName),
     {
       onSuccess: (updatedTaskData, variables) => {
-        const previousDatabaseTasks = queryClient.getQueryData(['database-tasks', databaseId]) as Database & { tasks: Task[]};
+        const previousDatabaseTasks = queryClient.getQueryData([
+          "database-tasks",
+          databaseId,
+        ]) as Database & { tasks: Task[] };
         const newViews = previousDatabaseTasks.views.map((view) => {
           const changedProperties = updatedTaskData.updatedTask.properties;
           if (!changedProperties) return view;
-      
+
           Object.keys(changedProperties).forEach((propertyName) => {
             if (view.config?.group_by === propertyName) {
               // Remove task from the old group
@@ -283,17 +260,20 @@ export const useUpdateTask = (databaseId: string, viewName: string) => {
                   groupToRemoveTaskFrom = group;
                 }
               });
-      
+
               if (indexToRemove !== -1 && groupToRemoveTaskFrom) {
-                (groupToRemoveTaskFrom as GroupByGroup).task_order.splice(indexToRemove, 1);
+                (groupToRemoveTaskFrom as GroupByGroup).task_order.splice(
+                  indexToRemove,
+                  1,
+                );
               }
-      
+
               // Add task to the new group
               const newGroupByValue = changedProperties[view.config.group_by];
               const newGroup = view.config.groups?.find(
-                (group) => group.group_by_value === newGroupByValue
+                (group) => group.group_by_value === newGroupByValue,
               );
-      
+
               if (newGroup) {
                 newGroup.task_order.push(updatedTaskData.id);
               } else {
@@ -308,29 +288,33 @@ export const useUpdateTask = (databaseId: string, viewName: string) => {
               }
             }
           });
-      
+
           return view;
         });
 
-        queryClient.setQueryData<Database & { tasks: Task[]}>(['database-tasks', databaseId], (old) => ({
-          ...previousDatabaseTasks,
-          views: newViews,
-          tasks: old?.tasks.map(task => {
-            if (task?.id === updatedTaskData.id) {
-              return {
-                id: updatedTaskData.id,
-                database_id: updatedTaskData.updatedTask.database_id ?? '',
-                description:updatedTaskData.updatedTask.description ?? '',
-                properties: updatedTaskData.updatedTask.properties,
-                title: updatedTaskData.updatedTask.title,
-                created_at: updatedTaskData.updatedTask.created_at,
-                updated_at: updatedTaskData.updatedTask.updated_at
-              } as Task
-            }
-            return task
-          }) ?? []
-        }))
+        queryClient.setQueryData<Database & { tasks: Task[] }>(
+          ["database-tasks", databaseId],
+          (old) => ({
+            ...previousDatabaseTasks,
+            views: newViews,
+            tasks:
+              old?.tasks.map((task) => {
+                if (task?.id === updatedTaskData.id) {
+                  return {
+                    id: updatedTaskData.id,
+                    database_id: updatedTaskData.updatedTask.database_id ?? "",
+                    description: updatedTaskData.updatedTask.description ?? "",
+                    properties: updatedTaskData.updatedTask.properties,
+                    title: updatedTaskData.updatedTask.title,
+                    created_at: updatedTaskData.updatedTask.created_at,
+                    updated_at: updatedTaskData.updatedTask.updated_at,
+                  } as Task;
+                }
+                return task;
+              }) ?? [],
+          }),
+        );
       },
-    }
+    },
   );
 };

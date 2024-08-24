@@ -1,9 +1,9 @@
-'use client'
+"use client";
 
-import React, { useState } from 'react';
-import Link from 'next/link';
-import { useAuth } from '../contexts/AuthContext';
-import { useRouter } from 'next/navigation';
+import React, { useState } from "react";
+import Link from "next/link";
+import { useAuth } from "../contexts/AuthContext";
+import { useRouter } from "next/navigation";
 import {
   ListItemIcon,
   Toolbar,
@@ -18,17 +18,22 @@ import {
   Badge,
   Avatar,
   Tooltip,
-} from '@mui/material';
-import LogoutIcon from '@mui/icons-material/Logout';
-import NotificationsIcon from '@mui/icons-material/Notifications';
-import SettingsIcon from '@mui/icons-material/Settings';
-import ChevronLeftIcon from '@mui/icons-material/ChevronLeft';
-import ChevronRightIcon from '@mui/icons-material/ChevronRight';
-import { DashboardOutlined, GroupOutlined, ListAltOutlined, ViewKanbanOutlined } from '@mui/icons-material';
-import MyDrawer from './MyDrawer';
-import { useGetCurrentUser } from '../hooks/react-query/user';
-import theme from '../theme';
-import Image from 'next/image';
+} from "@mui/material";
+import LogoutIcon from "@mui/icons-material/Logout";
+import NotificationsIcon from "@mui/icons-material/Notifications";
+import SettingsIcon from "@mui/icons-material/Settings";
+import ChevronLeftIcon from "@mui/icons-material/ChevronLeft";
+import ChevronRightIcon from "@mui/icons-material/ChevronRight";
+import {
+  DashboardOutlined,
+  GroupOutlined,
+  ListAltOutlined,
+  ViewKanbanOutlined,
+} from "@mui/icons-material";
+import MyDrawer from "./MyDrawer";
+import { useGetCurrentUser } from "../hooks/react-query/user";
+import theme from "../theme";
+import Image from "next/image";
 
 const drawerWidth = 240;
 
@@ -41,15 +46,35 @@ const AgentSidebar = () => {
   const { data: userData } = useGetCurrentUser();
 
   const links = [
-    { text: 'Dashboard', iconComponent: DashboardOutlined, disabled: false, href: '/agent/dashboard'},
-    { text: 'Users', iconComponent: GroupOutlined, disabled: false, href: '/agent/users'},
-    { text: 'Requests', iconComponent: ListAltOutlined, disabled: false, href: '/agent/requests'},
-    { text: 'Projects', iconComponent: ViewKanbanOutlined, disabled: false, href: '/agent/databases'},
-  ]
+    {
+      text: "Dashboard",
+      iconComponent: DashboardOutlined,
+      disabled: false,
+      href: "/agent/dashboard",
+    },
+    {
+      text: "Users",
+      iconComponent: GroupOutlined,
+      disabled: false,
+      href: "/agent/users",
+    },
+    {
+      text: "Requests",
+      iconComponent: ListAltOutlined,
+      disabled: false,
+      href: "/agent/requests",
+    },
+    {
+      text: "Projects",
+      iconComponent: ViewKanbanOutlined,
+      disabled: false,
+      href: "/agent/databases",
+    },
+  ];
 
   const handleLogout = async () => {
     await logout();
-    router.push('/');
+    router.push("/");
   };
 
   const handleProfileMenuOpen = (event: React.MouseEvent<HTMLElement>) => {
@@ -66,21 +91,23 @@ const AgentSidebar = () => {
 
   const isMenuOpen = Boolean(anchorEl);
 
-  const menuId = 'primary-search-account-menu';
+  const menuId = "primary-search-account-menu";
 
   const renderMenu = (
     <Menu
       anchorEl={anchorEl}
-      anchorOrigin={{ vertical: 'bottom', horizontal: 'right' }}
+      anchorOrigin={{ vertical: "bottom", horizontal: "right" }}
       id={menuId}
       keepMounted
-      transformOrigin={{ vertical: 'top', horizontal: 'right' }}
+      transformOrigin={{ vertical: "top", horizontal: "right" }}
       open={isMenuOpen}
       onClose={handleMenuClose}
     >
       <Box sx={{ px: 2, py: 1.5 }}>
         <Typography variant="subtitle1">{user?.email}</Typography>
-        <Typography variant="body2" color="textSecondary">{user?.email}</Typography>
+        <Typography variant="body2" color="textSecondary">
+          {user?.email}
+        </Typography>
       </Box>
       <Divider />
       <MenuItem onClick={handleMenuClose} component={Link} href="/profile">
@@ -110,35 +137,66 @@ const AgentSidebar = () => {
       <AppBar
         position="fixed"
         sx={{
-          width: `calc(100% - ${open ? drawerWidth + 'px' : theme.spacing(9)})`,
-          ml: `${open ? drawerWidth + 'px' : theme.spacing(9)}`,
-          background: '#fcfbfe',
-          color: 'black',
-          transition: theme.transitions.create('width', {
+          width: `calc(100% - ${open ? drawerWidth + "px" : theme.spacing(9)})`,
+          ml: `${open ? drawerWidth + "px" : theme.spacing(9)}`,
+          background: "#fcfbfe",
+          color: "black",
+          transition: theme.transitions.create("width", {
             easing: theme.transitions.easing.sharp,
             duration: theme.transitions.duration.enteringScreen,
           }),
         }}
         elevation={0}
       >
-        <Toolbar sx={{ position: 'relative'}}>
-          <Box sx={{ backgroundColor: 'white', position: 'absolute', top: '50%', left: -19, zIndex: 1000, transform: 'translate(0, -50%)'}}>
-            <IconButton size='small' onClick={toggleDrawer} sx={{  ":hover": {backgroundColor: 'rgba(0, 0, 0, 0.04)'}, backgroundColor: 'white', border: '1px solid rgb(239, 241, 245)'}}>
+        <Toolbar sx={{ position: "relative" }}>
+          <Box
+            sx={{
+              backgroundColor: "white",
+              position: "absolute",
+              top: "50%",
+              left: -19,
+              zIndex: 1000,
+              transform: "translate(0, -50%)",
+            }}
+          >
+            <IconButton
+              size="small"
+              onClick={toggleDrawer}
+              sx={{
+                ":hover": { backgroundColor: "rgba(0, 0, 0, 0.04)" },
+                backgroundColor: "white",
+                border: "1px solid rgb(239, 241, 245)",
+              }}
+            >
               {open ? <ChevronLeftIcon /> : <ChevronRightIcon />}
             </IconButton>
           </Box>
 
           {!open && (
             <>
-              <Image alt="vessel marketing" src='/logovessel.png' width={50} height={50} />
-              <Typography variant="h6" noWrap component="div" sx={{ flexGrow: 1 }}>
+              <Image
+                alt="vessel marketing"
+                src="/logovessel.png"
+                width={50}
+                height={50}
+              />
+              <Typography
+                variant="h6"
+                noWrap
+                component="div"
+                sx={{ flexGrow: 1 }}
+              >
                 Vessel Marketing
               </Typography>
             </>
           )}
-          
+
           <Box sx={{ flexGrow: 1 }} />
-          <IconButton size="large" aria-label="show new notifications" color="inherit">
+          <IconButton
+            size="large"
+            aria-label="show new notifications"
+            color="inherit"
+          >
             <Badge badgeContent={4} color="error">
               <NotificationsIcon />
             </Badge>
@@ -153,13 +211,13 @@ const AgentSidebar = () => {
               onClick={handleProfileMenuOpen}
               color="inherit"
             >
-              <Avatar alt={user?.email || ''} />
+              <Avatar alt={user?.email || ""} />
             </IconButton>
           </Tooltip>
         </Toolbar>
       </AppBar>
-      
-      {userData && 
+
+      {userData && (
         <MyDrawer
           drawerWidth={drawerWidth}
           open={open}
@@ -168,7 +226,7 @@ const AgentSidebar = () => {
           handleLogout={handleLogout}
           user={userData}
         />
-      }
+      )}
 
       {renderMenu}
     </>

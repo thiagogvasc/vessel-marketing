@@ -1,15 +1,26 @@
-'use client';
+"use client";
 
-import { createContext, useContext, useEffect, useState, ReactNode } from 'react';
-import { supabase } from '../../supabaseClient'; // Adjust the path to your supabaseClient
-import { User as SupabaseUser } from '@supabase/supabase-js';
-import { addUser } from '../supabase/user';
+import {
+  createContext,
+  useContext,
+  useEffect,
+  useState,
+  ReactNode,
+} from "react";
+import { supabase } from "../../supabaseClient"; // Adjust the path to your supabaseClient
+import { User as SupabaseUser } from "@supabase/supabase-js";
+import { addUser } from "../supabase/user";
 
 interface AuthContextType {
   user: SupabaseUser | null;
   loading: boolean;
   login: (email: string, password: string) => Promise<{ error: string | null }>;
-  register: (email: string, password: string, fullName: string, phoneNumber: string) => Promise<{ error: string | null }>;
+  register: (
+    email: string,
+    password: string,
+    fullName: string,
+    phoneNumber: string,
+  ) => Promise<{ error: string | null }>;
   logout: () => Promise<{ error: string | null }>;
 }
 
@@ -21,17 +32,21 @@ export const AuthProvider = ({ children }: { children: ReactNode }) => {
 
   useEffect(() => {
     const fetchSession = async () => {
-      const { data: { session }} = await supabase.auth.getSession();
+      const {
+        data: { session },
+      } = await supabase.auth.getSession();
       setUser(session?.user ?? null);
       setLoading(false);
     };
 
     fetchSession();
 
-    const { data: authListener } = supabase.auth.onAuthStateChange((event, session) => {
-      setUser(session?.user ?? null);
-      setLoading(false);
-    });
+    const { data: authListener } = supabase.auth.onAuthStateChange(
+      (event, session) => {
+        setUser(session?.user ?? null);
+        setLoading(false);
+      },
+    );
 
     return () => {
       authListener?.subscription.unsubscribe();
@@ -43,36 +58,41 @@ export const AuthProvider = ({ children }: { children: ReactNode }) => {
       email,
       password,
     });
-    console.warn(data)
+    console.warn(data);
     if (error) {
-      console.error('Login error:', error.message);
+      console.error("Login error:", error.message);
       return { error: error.message };
     }
     return { error: null };
   };
 
-  const register = async (email: string, password: string, fullName: string, phoneNumber: string) => {
+  const register = async (
+    email: string,
+    password: string,
+    fullName: string,
+    phoneNumber: string,
+  ) => {
     const { data, error } = await supabase.auth.signUp({
       email,
       password,
     });
 
     if (error) {
-      console.error('Registration error:', error.message);
+      console.error("Registration error:", error.message);
       return { error: error.message };
     }
 
     if (data.user) {
       const { error: addUserError } = await addUser({
         id: data.user.id,
-        email: data.user.email ?? '',
+        email: data.user.email ?? "",
         fullname: fullName,
         phone_number: phoneNumber,
-        role: 'client',
+        role: "client",
       });
 
       if (addUserError) {
-        console.error('Error adding user to database:', addUserError.message);
+        console.error("Error adding user to database:", addUserError.message);
         return { error: addUserError.message };
       }
     }
@@ -83,7 +103,7 @@ export const AuthProvider = ({ children }: { children: ReactNode }) => {
   const logout = async () => {
     const { error } = await supabase.auth.signOut();
     if (error) {
-      console.error('Logout error:', error.message);
+      console.error("Logout error:", error.message);
       return { error: error.message };
     }
     setUser(null);
@@ -100,7 +120,7 @@ export const AuthProvider = ({ children }: { children: ReactNode }) => {
 export const useAuth = () => {
   const context = useContext(AuthContext);
   if (context === undefined) {
-    throw new Error('useAuth must be used within an AuthProvider');
+    throw new Error("useAuth must be used within an AuthProvider");
   }
   return context;
 };

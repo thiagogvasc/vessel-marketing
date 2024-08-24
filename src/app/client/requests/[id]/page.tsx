@@ -1,4 +1,4 @@
-'use client'
+"use client";
 
 import { useGetRequestById } from "@/src/hooks/react-query/request";
 import { useParams, useRouter } from "next/navigation";
@@ -19,12 +19,12 @@ import {
   Divider,
   Breadcrumbs,
   Link as MuiLink,
-} from '@mui/material';
+} from "@mui/material";
 import React from "react";
-import HomeIcon from '@mui/icons-material/Home';
-import NavigateNextIcon from '@mui/icons-material/NavigateNext';
+import HomeIcon from "@mui/icons-material/Home";
+import NavigateNextIcon from "@mui/icons-material/NavigateNext";
 
-const statusSteps = ['Pending', 'In Progress', 'Completed'];
+const statusSteps = ["Pending", "In Progress", "Completed"];
 
 export default function Request() {
   const router = useRouter();
@@ -34,11 +34,11 @@ export default function Request() {
 
   const getStatusStep = (status: string) => {
     switch (status) {
-      case 'pending':
+      case "pending":
         return 0;
-      case 'in_progress':
+      case "in_progress":
         return 1;
-      case 'completed':
+      case "completed":
         return 2;
       default:
         return 0;
@@ -48,7 +48,14 @@ export default function Request() {
   return (
     <Container component="main" maxWidth="xl" sx={{ mt: 4 }}>
       {isLoading ? (
-        <Box sx={{ display: 'flex', justifyContent: 'center', alignItems: 'center', height: '100%' }}>
+        <Box
+          sx={{
+            display: "flex",
+            justifyContent: "center",
+            alignItems: "center",
+            height: "100%",
+          }}
+        >
           <CircularProgress />
         </Box>
       ) : (
@@ -57,18 +64,27 @@ export default function Request() {
             <Box sx={{ borderRadius: 3, p: 0 }}>
               <Grid container spacing={2} alignItems="center" sx={{ mb: 2 }}>
                 <Grid item xs>
-                  <Typography component="h1" variant="h5" sx={{ fontWeight: 'bold' }} noWrap>
+                  <Typography
+                    component="h1"
+                    variant="h5"
+                    sx={{ fontWeight: "bold" }}
+                    noWrap
+                  >
                     Request Details
                   </Typography>
                 </Grid>
                 <Grid item>
-                  <Breadcrumbs aria-label="breadcrumb" separator={<NavigateNextIcon fontSize="small" />} sx={{ whiteSpace: 'nowrap' }}>
+                  <Breadcrumbs
+                    aria-label="breadcrumb"
+                    separator={<NavigateNextIcon fontSize="small" />}
+                    sx={{ whiteSpace: "nowrap" }}
+                  >
                     <MuiLink
                       color="inherit"
                       href="/"
                       onClick={(e) => {
                         e.preventDefault();
-                        router.push('/');
+                        router.push("/");
                       }}
                       noWrap
                     >
@@ -80,13 +96,15 @@ export default function Request() {
                       href="/client/requests"
                       onClick={(e) => {
                         e.preventDefault();
-                        router.push('/client/requests');
+                        router.push("/client/requests");
                       }}
                       noWrap
                     >
                       Requests
                     </MuiLink>
-                    <Typography color="textPrimary" noWrap>Request Details</Typography>
+                    <Typography color="textPrimary" noWrap>
+                      Request Details
+                    </Typography>
                   </Breadcrumbs>
                 </Grid>
               </Grid>
@@ -94,7 +112,10 @@ export default function Request() {
                 <Typography variant="h6" gutterBottom>
                   Current Status
                 </Typography>
-                <Stepper activeStep={getStatusStep(request.status)} alternativeLabel>
+                <Stepper
+                  activeStep={getStatusStep(request.status)}
+                  alternativeLabel
+                >
                   {statusSteps.map((label) => (
                     <Step key={label}>
                       <StepLabel>{label}</StepLabel>

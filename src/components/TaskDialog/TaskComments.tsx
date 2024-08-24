@@ -1,6 +1,13 @@
-import React, { useState } from 'react';
-import { Box, TextField, Button, List, ListItem, ListItemText } from '@mui/material';
-import { TaskComment } from '../../types';
+import React, { useState } from "react";
+import {
+  Box,
+  TextField,
+  Button,
+  List,
+  ListItem,
+  ListItemText,
+} from "@mui/material";
+import { TaskComment } from "../../types";
 
 interface TaskCommentsProps {
   comments: TaskComment[];
@@ -8,12 +15,12 @@ interface TaskCommentsProps {
 }
 
 export const TaskComments = ({ comments, commentAdded }: TaskCommentsProps) => {
-  const [newCommentText, setNewCommentText] = useState('');
+  const [newCommentText, setNewCommentText] = useState("");
 
   const handleAddComment = () => {
-    if (newCommentText.trim() !== '') {
+    if (newCommentText.trim() !== "") {
       commentAdded?.(newCommentText);
-      setNewCommentText('');
+      setNewCommentText("");
     }
   };
 
@@ -25,7 +32,12 @@ export const TaskComments = ({ comments, commentAdded }: TaskCommentsProps) => {
         onChange={(e) => setNewCommentText(e.target.value)}
         fullWidth
       />
-      <Button variant="contained" color="primary" onClick={handleAddComment} style={{ marginTop: '10px' }}>
+      <Button
+        variant="contained"
+        color="primary"
+        onClick={handleAddComment}
+        style={{ marginTop: "10px" }}
+      >
         Add Comment
       </Button>
       <List>
@@ -37,4 +49,4 @@ export const TaskComments = ({ comments, commentAdded }: TaskCommentsProps) => {
       </List>
     </Box>
   );
-}
+};

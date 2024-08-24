@@ -1,9 +1,23 @@
-import React, { useState } from 'react';
-import { Dialog, DialogContent, DialogActions, Button, TextField, Box, MenuItem, Select, InputLabel, FormControl, IconButton, Menu, MenuItem as MenuOption } from '@mui/material';
-import MoreVertIcon from '@mui/icons-material/MoreVert';
-import { PropertyType, Task as TaskType } from '../../types';
-import { TaskComments } from './TaskComments';
-import { PropertyWithDefinition } from '@/src/containers/TaskDialogContainer';
+import React, { useState } from "react";
+import {
+  Dialog,
+  DialogContent,
+  DialogActions,
+  Button,
+  TextField,
+  Box,
+  MenuItem,
+  Select,
+  InputLabel,
+  FormControl,
+  IconButton,
+  Menu,
+  MenuItem as MenuOption,
+} from "@mui/material";
+import MoreVertIcon from "@mui/icons-material/MoreVert";
+import { PropertyType, Task as TaskType } from "../../types";
+import { TaskComments } from "./TaskComments";
+import { PropertyWithDefinition } from "@/src/containers/TaskDialogContainer";
 
 export interface TaskWithId extends TaskType {
   id: string;
@@ -11,22 +25,36 @@ export interface TaskWithId extends TaskType {
 
 interface TaskDialogProps {
   task: TaskWithId;
-  propertiesWithDefinitions: PropertyWithDefinition[]
+  propertiesWithDefinitions: PropertyWithDefinition[];
   open: boolean;
   onClose: () => void;
-  onSave: (newTitle: string, newDescription: string, newPropertiesWithDefinitions: PropertyWithDefinition[]) => void;
+  onSave: (
+    newTitle: string,
+    newDescription: string,
+    newPropertiesWithDefinitions: PropertyWithDefinition[],
+  ) => void;
   onDelete: () => void;
   readOnly: boolean;
   onCommentAdded?: (commentText: string) => void;
 }
 
-const TaskDialog: React.FC<TaskDialogProps> = ({ task, propertiesWithDefinitions, open, onClose, onSave, onDelete, readOnly, onCommentAdded }) => {
+const TaskDialog: React.FC<TaskDialogProps> = ({
+  task,
+  propertiesWithDefinitions,
+  open,
+  onClose,
+  onSave,
+  onDelete,
+  readOnly,
+  onCommentAdded,
+}) => {
   const [newTitle, setNewTitle] = useState(task.title);
   const [newDescription, setNewDescription] = useState(task.description);
-  const [newPropertiesWithDefinitions, setNewPropertiesWithDefinitions] = useState<PropertyWithDefinition[]>(propertiesWithDefinitions);
-  const [newPropertyType, setNewPropertyType] = useState('');
-  const [newPropertyName, setNewPropertyName] = useState('');
-  const [newPropertyValue, setNewPropertyValue] = useState('');
+  const [newPropertiesWithDefinitions, setNewPropertiesWithDefinitions] =
+    useState<PropertyWithDefinition[]>(propertiesWithDefinitions);
+  const [newPropertyType, setNewPropertyType] = useState("");
+  const [newPropertyName, setNewPropertyName] = useState("");
+  const [newPropertyValue, setNewPropertyValue] = useState("");
   const [showNewPropertyForm, setShowNewPropertyForm] = useState(false);
   const [anchorEl, setAnchorEl] = useState<null | HTMLElement>(null);
 
@@ -36,19 +64,29 @@ const TaskDialog: React.FC<TaskDialogProps> = ({ task, propertiesWithDefinitions
   };
 
   const handlePropertyChange = (propertyName: string, newValue: any) => {
-    setNewPropertiesWithDefinitions(newPropertiesWithDefinitions.map(prop =>
-      prop.definition.name === propertyName ? { ...prop, value: newValue } : prop
-    ));
+    setNewPropertiesWithDefinitions(
+      newPropertiesWithDefinitions.map((prop) =>
+        prop.definition.name === propertyName
+          ? { ...prop, value: newValue }
+          : prop,
+      ),
+    );
   };
 
   const handleAddProperty = () => {
-    setNewPropertiesWithDefinitions([...newPropertiesWithDefinitions, {
-      definition: { name: newPropertyName, type: newPropertyType as PropertyType },
-      value: newPropertyValue
-    }]);
-    setNewPropertyType('');
-    setNewPropertyName('');
-    setNewPropertyValue('');
+    setNewPropertiesWithDefinitions([
+      ...newPropertiesWithDefinitions,
+      {
+        definition: {
+          name: newPropertyName,
+          type: newPropertyType as PropertyType,
+        },
+        value: newPropertyValue,
+      },
+    ]);
+    setNewPropertyType("");
+    setNewPropertyName("");
+    setNewPropertyValue("");
     setShowNewPropertyForm(false);
   };
 
@@ -65,13 +103,22 @@ const TaskDialog: React.FC<TaskDialogProps> = ({ task, propertiesWithDefinitions
     onClose();
   };
 
-  const handleCommentAdded = (commentText: string) => onCommentAdded?.(commentText);
+  const handleCommentAdded = (commentText: string) =>
+    onCommentAdded?.(commentText);
 
   return (
     <Dialog open={open} onClose={onClose} fullWidth maxWidth="lg">
       <DialogContent>
-        <Box sx={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
-          <Box sx={{ display: 'flex', flexDirection: 'column', gap: 2, flex: 1 }}>
+        <Box
+          sx={{
+            display: "flex",
+            justifyContent: "space-between",
+            alignItems: "center",
+          }}
+        >
+          <Box
+            sx={{ display: "flex", flexDirection: "column", gap: 2, flex: 1 }}
+          >
             <TextField
               label="Title"
               size="small"
@@ -81,7 +128,7 @@ const TaskDialog: React.FC<TaskDialogProps> = ({ task, propertiesWithDefinitions
               variant="outlined"
               disabled={readOnly}
             />
-            <Box sx={{ display: 'flex', gap: 4 }}>
+            <Box sx={{ display: "flex", gap: 4 }}>
               <TextField
                 label="Description"
                 value={newDescription}
@@ -92,29 +139,51 @@ const TaskDialog: React.FC<TaskDialogProps> = ({ task, propertiesWithDefinitions
                 disabled={readOnly}
                 sx={{ flex: 7 }}
               />
-              <Box sx={{ flex: 3, display: 'flex', flexDirection: 'column', gap: 2 }}>
+              <Box
+                sx={{
+                  flex: 3,
+                  display: "flex",
+                  flexDirection: "column",
+                  gap: 2,
+                }}
+              >
                 {newPropertiesWithDefinitions.map((prop, index) => (
-                  <Box key={index} sx={{ display: 'flex', flexDirection: 'column', gap: 2 }}>
-                    {prop.definition.type === 'Text' && (
+                  <Box
+                    key={index}
+                    sx={{ display: "flex", flexDirection: "column", gap: 2 }}
+                  >
+                    {prop.definition.type === "Text" && (
                       <TextField
                         label={prop.definition.name}
                         value={prop.value}
-                        onChange={(e) => handlePropertyChange(prop.definition.name, e.target.value)}
+                        onChange={(e) =>
+                          handlePropertyChange(
+                            prop.definition.name,
+                            e.target.value,
+                          )
+                        }
                         fullWidth
                         disabled={readOnly}
                       />
                     )}
-                    {prop.definition.type === 'Select' && (
+                    {prop.definition.type === "Select" && (
                       <FormControl fullWidth>
-                        <InputLabel id={`${prop.definition.name}-label`}>{prop.definition.name}</InputLabel>
+                        <InputLabel id={`${prop.definition.name}-label`}>
+                          {prop.definition.name}
+                        </InputLabel>
                         <Select
                           labelId={`${prop.definition.name}-label`}
                           value={prop.value}
-                          onChange={(e) => handlePropertyChange(prop.definition.name, e.target.value)}
+                          onChange={(e) =>
+                            handlePropertyChange(
+                              prop.definition.name,
+                              e.target.value,
+                            )
+                          }
                           fullWidth
                           disabled={readOnly}
                         >
-                          {prop.definition.data?.options?.map(option => (
+                          {prop.definition.data?.options?.map((option) => (
                             <MenuItem key={option} value={option}>
                               {option}
                             </MenuItem>
@@ -127,13 +196,20 @@ const TaskDialog: React.FC<TaskDialogProps> = ({ task, propertiesWithDefinitions
                 <Button
                   variant="outlined"
                   onClick={() => setShowNewPropertyForm(!showNewPropertyForm)}
-                  sx={{ alignSelf: 'flex-start' }}
+                  sx={{ alignSelf: "flex-start" }}
                   disabled={readOnly}
                 >
                   Add Property
                 </Button>
                 {showNewPropertyForm && (
-                  <Box sx={{ display: 'flex', flexDirection: 'column', gap: 2, mt: 2 }}>
+                  <Box
+                    sx={{
+                      display: "flex",
+                      flexDirection: "column",
+                      gap: 2,
+                      mt: 2,
+                    }}
+                  >
                     <TextField
                       label="Property Name"
                       value={newPropertyName}
@@ -142,7 +218,9 @@ const TaskDialog: React.FC<TaskDialogProps> = ({ task, propertiesWithDefinitions
                       disabled={readOnly}
                     />
                     <FormControl fullWidth>
-                      <InputLabel id="new-property-type-label">Property Type</InputLabel>
+                      <InputLabel id="new-property-type-label">
+                        Property Type
+                      </InputLabel>
                       <Select
                         labelId="new-property-type-label"
                         value={newPropertyType}
@@ -164,7 +242,7 @@ const TaskDialog: React.FC<TaskDialogProps> = ({ task, propertiesWithDefinitions
                     <Button
                       variant="contained"
                       onClick={handleAddProperty}
-                      sx={{ alignSelf: 'flex-start' }}
+                      sx={{ alignSelf: "flex-start" }}
                       disabled={readOnly}
                     >
                       Add

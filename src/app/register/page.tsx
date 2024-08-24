@@ -1,8 +1,8 @@
-'use client'
+"use client";
 
-import { useEffect, useState } from 'react';
-import { useRouter } from 'next/navigation';
-import { useAuth } from '../../contexts/AuthContext';
+import { useEffect, useState } from "react";
+import { useRouter } from "next/navigation";
+import { useAuth } from "../../contexts/AuthContext";
 import {
   Box,
   Button,
@@ -16,34 +16,45 @@ import {
   Link as MuiLink,
   Alert,
   Link,
-} from '@mui/material';
-import LockOutlinedIcon from '@mui/icons-material/LockOutlined';
-import { Formik, Form, Field, ErrorMessage } from 'formik';
-import * as Yup from 'yup';
+} from "@mui/material";
+import LockOutlinedIcon from "@mui/icons-material/LockOutlined";
+import { Formik, Form, Field, ErrorMessage } from "formik";
+import * as Yup from "yup";
 
 const Register = () => {
-  const [error, setError] = useState('');
+  const [error, setError] = useState("");
   const { user, register } = useAuth();
   const router = useRouter();
 
   const handleRegisterSuccess = (res: any) => {
     console.warn(res);
-    router.push('/login');
-  }; 
+    router.push("/login");
+  };
 
   const handleRegisterFailure = (err: any) => {
     console.warn(err);
-    setError(err.message || 'Failed to register');
+    setError(err.message || "Failed to register");
   };
 
-  const handleSubmit = async (values: { email: string; password: string; confirmPassword: string; fullName: string; phoneNumber: string }) => {
-    setError('');
+  const handleSubmit = async (values: {
+    email: string;
+    password: string;
+    confirmPassword: string;
+    fullName: string;
+    phoneNumber: string;
+  }) => {
+    setError("");
     if (values.password !== values.confirmPassword) {
-      setError('Passwords do not match');
+      setError("Passwords do not match");
       return;
     }
     try {
-      const res = await register(values.email, values.password, values.fullName, values.phoneNumber);
+      const res = await register(
+        values.email,
+        values.password,
+        values.fullName,
+        values.phoneNumber,
+      );
       handleRegisterSuccess(res);
     } catch (err) {
       handleRegisterFailure(err);
@@ -51,32 +62,58 @@ const Register = () => {
   };
 
   const validationSchema = Yup.object({
-    fullName: Yup.string().required('Required'),
-    email: Yup.string().email('Invalid email address').required('Required'),
-    phoneNumber: Yup.string().required('Required'),
-    password: Yup.string().required('Required').min(6, 'Password must be at least 6 characters long'),
+    fullName: Yup.string().required("Required"),
+    email: Yup.string().email("Invalid email address").required("Required"),
+    phoneNumber: Yup.string().required("Required"),
+    password: Yup.string()
+      .required("Required")
+      .min(6, "Password must be at least 6 characters long"),
     confirmPassword: Yup.string()
-      .oneOf([Yup.ref('password')], 'Passwords must match')
-      .required('Required'),
+      .oneOf([Yup.ref("password")], "Passwords must match")
+      .required("Required"),
   });
 
   return (
     <Container component="main" maxWidth="xs" sx={{ pt: 12 }}>
-      <Paper elevation={0} sx={{ borderRadius: 3, p: 4 , boxShadow: 'rgba(0, 0, 0, 0.04) 0px 5px 22px, rgba(0, 0, 0, 0.03) 0px 0px 0px 0.5px'}}>
-        <Box sx={{ display: 'flex', flexDirection: 'column', alignItems: 'center' }}>
-          <Avatar sx={{ m: 1, bgcolor: 'primary.main' }}>
+      <Paper
+        elevation={0}
+        sx={{
+          borderRadius: 3,
+          p: 4,
+          boxShadow:
+            "rgba(0, 0, 0, 0.04) 0px 5px 22px, rgba(0, 0, 0, 0.03) 0px 0px 0px 0.5px",
+        }}
+      >
+        <Box
+          sx={{
+            display: "flex",
+            flexDirection: "column",
+            alignItems: "center",
+          }}
+        >
+          <Avatar sx={{ m: 1, bgcolor: "primary.main" }}>
             <LockOutlinedIcon />
           </Avatar>
-          <Typography component="h1" variant="h5" sx={{ fontWeight: 'bold', mb: 2 }}>
+          <Typography
+            component="h1"
+            variant="h5"
+            sx={{ fontWeight: "bold", mb: 2 }}
+          >
             Register
           </Typography>
           {error && (
-            <Alert severity="error" sx={{ mt: 2, width: '100%' }}>
+            <Alert severity="error" sx={{ mt: 2, width: "100%" }}>
               {error}
             </Alert>
           )}
           <Formik
-            initialValues={{ email: '', password: '', confirmPassword: '', fullName: '', phoneNumber: '' }}
+            initialValues={{
+              email: "",
+              password: "",
+              confirmPassword: "",
+              fullName: "",
+              phoneNumber: "",
+            }}
             validationSchema={validationSchema}
             onSubmit={handleSubmit}
           >
@@ -152,7 +189,10 @@ const Register = () => {
                       type="password"
                       id="confirmPassword"
                       autoComplete="new-password"
-                      error={touched.confirmPassword && Boolean(errors.confirmPassword)}
+                      error={
+                        touched.confirmPassword &&
+                        Boolean(errors.confirmPassword)
+                      }
                       helperText={<ErrorMessage name="confirmPassword" />}
                     />
                   </Grid>

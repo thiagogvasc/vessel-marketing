@@ -1,27 +1,42 @@
-'use client'
+"use client";
 
-import { useState } from 'react';
-import { useRouter } from 'next/navigation';
-import { Button, Container, Grid, TextField, Typography, FormControl, InputLabel, Select, MenuItem } from '@mui/material';
-import { Database, PropertyType } from '@/src/types';
-import { useAddDatabase } from '@/src/hooks/useDatabases';
+import { useState } from "react";
+import { useRouter } from "next/navigation";
+import {
+  Button,
+  Container,
+  Grid,
+  TextField,
+  Typography,
+  FormControl,
+  InputLabel,
+  Select,
+  MenuItem,
+} from "@mui/material";
+import { CreateDatabasePayload, PropertyType } from "@/src/types";
+import { useAddDatabase } from "@/src/hooks/react-query/database";
+import { v4 as uuidv4 } from "uuid";
 
 const NewDatabase = () => {
   const router = useRouter();
-  const [name, setName] = useState('');
-  const [description, setDescription] = useState(''); // Added state for description
-  const [viewType, setViewType] = useState('Kanban View');
-  const [clientId, setClientId] = useState('');
+  const [name, setName] = useState("");
+  const [description, setDescription] = useState(""); // Added state for description
+  const [viewType, setViewType] = useState("Kanban View");
+  const [clientId, setClientId] = useState("");
   const addDatabaseMutation = useAddDatabase();
 
   const handleAddDatabase = async () => {
     try {
-      const newDatabase: Omit<Database, 'id'> = {
+      const database_id = uuidv4();
+      const createDatabasePayload: CreateDatabasePayload = {
+        id: database_id,
         name: name,
         ...(clientId.length > 0 && { client_id: clientId }),
         description: description, // Use description state here
         propertyDefinitions: [
           {
+            id: uuidv4(),
+            database_id,
             name: "status",
             type: PropertyType.Select,
             data: {
@@ -31,6 +46,8 @@ const NewDatabase = () => {
         ],
         views: [
           {
+            id: uuidv4(),
+            database_id,
             name: "My Kanban View",
             type: "kanban",
             config: {
@@ -46,11 +63,11 @@ const NewDatabase = () => {
           },
         ],
       };
-      addDatabaseMutation.mutateAsync(newDatabase).then(() => {
-        router.push('/agent/databases');
-      })
+      addDatabaseMutation.mutateAsync(createDatabasePayload).then(() => {
+        router.push("/agent/databases");
+      });
     } catch (error) {
-      console.error('Failed to add database:', error);
+      console.error("Failed to add database:", error);
     }
   };
 
@@ -89,9 +106,15 @@ const NewDatabase = () => {
               label="Initial View Type"
             >
               <MenuItem value="Kanban View">Kanban View</MenuItem>
-              <MenuItem value="Table View" disabled>Table View</MenuItem>
-              <MenuItem value="List View" disabled>List View</MenuItem>
-              <MenuItem value="Calendar View" disabled>Calendar View</MenuItem>
+              <MenuItem value="Table View" disabled>
+                Table View
+              </MenuItem>
+              <MenuItem value="List View" disabled>
+                List View
+              </MenuItem>
+              <MenuItem value="Calendar View" disabled>
+                Calendar View
+              </MenuItem>
             </Select>
           </FormControl>
         </Grid>

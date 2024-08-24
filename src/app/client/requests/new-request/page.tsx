@@ -1,7 +1,7 @@
-'use client';
+"use client";
 
-import { useState } from 'react';
-import { useRouter } from 'next/navigation';
+import { useState } from "react";
+import { useRouter } from "next/navigation";
 import {
   Box,
   Button,
@@ -14,14 +14,14 @@ import {
   Link as MuiLink,
   Fade,
   Grow,
-} from '@mui/material';
-import { useGetCurrentUser } from '@/src/hooks/react-query/user';
-import Link from 'next/link';
-import { useCreateRequest } from '@/src/hooks/react-query/request';
+} from "@mui/material";
+import { useGetCurrentUser } from "@/src/hooks/react-query/user";
+import Link from "next/link";
+import { useCreateRequest } from "@/src/hooks/react-query/request";
 
 const NewRequest = () => {
-  const [title, setTitle] = useState('');
-  const [description, setDescription] = useState('');
+  const [title, setTitle] = useState("");
+  const [description, setDescription] = useState("");
   const { data: user } = useGetCurrentUser();
   const mutation = useCreateRequest();
   const router = useRouter();
@@ -35,22 +35,27 @@ const NewRequest = () => {
           client_id: user.id,
           title,
           description,
-          status: 'Pending',
+          status: "Pending",
           created_at: Date.now().toString(),
           updated_at: Date.now().toString(),
-        })
+        });
       }
-      router.push('/client/requests');
+      router.push("/client/requests");
     } catch (error) {
-      console.error('Error adding request: ', error);
-      alert('Failed to add request');
+      console.error("Error adding request: ", error);
+      alert("Failed to add request");
     }
   };
 
   return (
     <Fade in timeout={500}>
       <Container component="main" maxWidth="xl" sx={{ mt: 4 }}>
-        <Grid container justifyContent="space-between" alignItems="center" sx={{ mb: 2 }}>
+        <Grid
+          container
+          justifyContent="space-between"
+          alignItems="center"
+          sx={{ mb: 2 }}
+        >
           <Grid item>
             <Typography component="h1" variant="h5">
               Add Request
@@ -58,7 +63,11 @@ const NewRequest = () => {
           </Grid>
           <Grid item>
             <Breadcrumbs aria-label="breadcrumb">
-              <MuiLink component={Link} color="inherit" href="/client/dashboard">
+              <MuiLink
+                component={Link}
+                color="inherit"
+                href="/client/dashboard"
+              >
                 Dashboard
               </MuiLink>
               <MuiLink component={Link} color="inherit" href="/client/requests">
@@ -70,7 +79,12 @@ const NewRequest = () => {
         </Grid>
         <Grow in timeout={1000}>
           <Paper elevation={0} sx={{ px: 4, py: 2, borderRadius: 3 }}>
-            <Box component="form" onSubmit={handleSubmit} noValidate sx={{ mt: 2 }}>
+            <Box
+              component="form"
+              onSubmit={handleSubmit}
+              noValidate
+              sx={{ mt: 2 }}
+            >
               <TextField
                 variant="outlined"
                 margin="normal"
