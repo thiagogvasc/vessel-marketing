@@ -55,24 +55,6 @@ export const useGetDatabaseViews = (databaseId: string | null | undefined) => {
   );
 };
 
-export const useGetDatabasePropertyDefinitions = (
-  databaseId: string | null | undefined,
-) => {
-  return useQuery(
-    ["databases", databaseId, "property-definitions"],
-    () => {
-      console.warn(
-        "start fetching  property definitions for database",
-        databaseId,
-      );
-      return databaseId
-        ? getPropertyDefinitionsByDatabaseId(databaseId)
-        : Promise.resolve(null);
-    },
-    { enabled: !!databaseId, refetchOnMount: false },
-  );
-};
-
 export const useGetDatabaseById = (databaseId: string | undefined | null) => {
   return useQuery(
     ["databases", databaseId],
