@@ -1,12 +1,7 @@
 import React, { useEffect, useState } from "react";
-import {
-  DatabasePropertyDefinition,
-  Task as TaskType,
-} from "../types";
+import { DatabasePropertyDefinition, Task as TaskType } from "../types";
 import TaskDialog from "../components/TaskDialog/TaskDialog";
-import {
-  useDeleteKanbanTask,
-} from "../hooks/react-query/database_view";
+import { useDeleteKanbanTask } from "../hooks/react-query/database_view";
 import { useGetDatabasePropertyDefinitions } from "../hooks/react-query/database";
 import { useUpdateTask } from "../hooks/react-query/database_view";
 import { TaskCommentsContainer } from "./TaskCommentsContainer";
@@ -87,7 +82,9 @@ export const TaskDialogContainer = ({
     <TaskDialog
       readOnly={false}
       task={task}
-      TaskCommentsComponent={<TaskCommentsContainer database_id={databaseId} task_id={task.id} />}
+      TaskCommentsComponent={
+        <TaskCommentsContainer database_id={databaseId} task_id={task.id} />
+      }
       propertiesWithDefinitions={properties}
       open={open}
       onClose={handleTaskDialogClose}

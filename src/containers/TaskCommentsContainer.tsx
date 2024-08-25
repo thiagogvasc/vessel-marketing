@@ -1,17 +1,24 @@
 import React from "react";
-import { useAddTaskComment, useDeleteTaskComment, useGetCommentsByTaskId, useUpdateTaskComment } from "../hooks/react-query/task_comment";
+import {
+  useAddTaskComment,
+  useDeleteTaskComment,
+  useGetCommentsByTaskId,
+  useUpdateTaskComment,
+} from "../hooks/react-query/task_comment";
 import { useAuth } from "../contexts/AuthContext";
-import { v4 as uuidv4 } from 'uuid';
+import { v4 as uuidv4 } from "uuid";
 import { TaskComment } from "../types";
 import { TaskComments } from "../components/TaskDialog/TaskComments";
-
 
 interface TaskCommentsContainerProps {
   database_id: string;
   task_id: string;
 }
 
-export const TaskCommentsContainer = ({ database_id, task_id }: TaskCommentsContainerProps) => {
+export const TaskCommentsContainer = ({
+  database_id,
+  task_id,
+}: TaskCommentsContainerProps) => {
   const { user } = useAuth();
   const { data: comments } = useGetCommentsByTaskId(database_id, task_id);
   const addCommentMutation = useAddTaskComment(database_id, task_id);
@@ -31,11 +38,11 @@ export const TaskCommentsContainer = ({ database_id, task_id }: TaskCommentsCont
 
   const handleCommentDelete = (commentId: string) => {
     deleteCommentMutation.mutateAsync(commentId);
-  }
+  };
 
   const handleCommentUpdate = (id: string, newText: string) => {
-    updateCommentMutation.mutateAsync({ id, changes: { text: newText }});
-  }
+    updateCommentMutation.mutateAsync({ id, changes: { text: newText } });
+  };
 
   return (
     <TaskComments

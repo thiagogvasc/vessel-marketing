@@ -19,7 +19,11 @@ interface TaskCommentProps {
   onDelete?: (id: string) => void;
 }
 
-export const TaskComment = ({ comment, onUpdate, onDelete }: TaskCommentProps) => {
+export const TaskComment = ({
+  comment,
+  onUpdate,
+  onDelete,
+}: TaskCommentProps) => {
   const [anchorEl, setAnchorEl] = useState<null | HTMLElement>(null);
   const [isEditing, setIsEditing] = useState(false);
   const [editingCommentText, setEditingCommentText] = useState(comment.text);
@@ -81,7 +85,11 @@ export const TaskComment = ({ comment, onUpdate, onDelete }: TaskCommentProps) =
           </IconButton>
         )}
       </ListItemSecondaryAction>
-      <Menu anchorEl={anchorEl} open={Boolean(anchorEl)} onClose={handleMenuClose}>
+      <Menu
+        anchorEl={anchorEl}
+        open={Boolean(anchorEl)}
+        onClose={handleMenuClose}
+      >
         <MenuItem onClick={handleEdit}>Edit</MenuItem>
         <MenuItem onClick={handleDelete}>Delete</MenuItem>
       </Menu>

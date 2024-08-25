@@ -27,11 +27,11 @@ export const TaskComments = ({
 
   const handleCommentUpdate = (id: string, newText: string) => {
     commentUpdated?.(id, newText);
-  }
+  };
 
   const handleCommentDelete = (id: string) => {
     commentDeleted?.(id);
-  }
+  };
 
   return (
     <Box>

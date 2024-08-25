@@ -1,4 +1,9 @@
-import { addTaskComment, deleteTaskComment, getCommentsByTaskId, updateTaskComment } from "@/src/supabase/task_comment";
+import {
+  addTaskComment,
+  deleteTaskComment,
+  getCommentsByTaskId,
+  updateTaskComment,
+} from "@/src/supabase/task_comment";
 import { Task, TaskComment } from "@/src/types";
 import { useMutation, useQuery, useQueryClient } from "react-query";
 
@@ -15,7 +20,6 @@ export const useGetCommentsByTaskId = (
     },
   );
 };
-
 
 export const useAddTaskComment = (databaseId: string, taskId: string) => {
   const queryClient = useQueryClient();
@@ -39,16 +43,18 @@ export const useDeleteTaskComment = (databaseId: string, taskId: string) => {
   });
 };
 
-
 export const useUpdateTaskComment = (databaseId: string, taskId: string) => {
   const queryClient = useQueryClient();
 
-  return useMutation(({ id, changes }: { id: string, changes: Partial<TaskComment> }) => updateTaskComment(id, changes), {
-    onSettled: () => {
-      queryClient.invalidateQueries({
-        queryKey: ["databases", databaseId, "tasks", taskId, "comments"],
-      });
+  return useMutation(
+    ({ id, changes }: { id: string; changes: Partial<TaskComment> }) =>
+      updateTaskComment(id, changes),
+    {
+      onSettled: () => {
+        queryClient.invalidateQueries({
+          queryKey: ["databases", databaseId, "tasks", taskId, "comments"],
+        });
+      },
     },
-  });
+  );
 };
-

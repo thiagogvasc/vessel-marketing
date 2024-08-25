@@ -247,9 +247,7 @@ const TaskDialog: React.FC<TaskDialogProps> = ({
                 )}
               </Box>
             </Box>
-            <Box>
-              {TaskCommentsComponent}
-            </Box>
+            <Box>{TaskCommentsComponent}</Box>
           </Box>
           <IconButton onClick={handleMenuOpen} disabled={readOnly}>
             <MoreVertIcon />
