@@ -1,26 +1,15 @@
-import { useQuery, useMutation, useQueryClient } from "react-query";
+import { useMutation, useQueryClient } from "react-query";
 import {
-  updateTask,
-  fetchBoard,
-  updateTaskOrder,
-  fetchAggregateBoard,
-  getDatabaseTasks,
-  getDatabaseById,
   addKanbanColumn,
   updateKanbanViewManualSort,
-  deleteTask,
   deleteKanbanColumn,
 } from "../utils/firestoreUtils";
 import {
   Task,
-  Column,
   AggregateColumn,
-  AggregateBoard,
   Database,
-  PropertyType,
-  GroupByGroup,
 } from "../types";
-import { Updater } from "react-query/types/core/utils";
+
 
 export const useUpdateKanbanViewManualSort = (
   databaseId: string,
@@ -223,96 +212,3 @@ export const useDeleteKanbanColumn = (databaseId: string, viewName: string) => {
 };
 
 export const useReorderColumn = () => {};
-
-// Update an existing task
-export const useUpdateTask = (databaseId: string, viewName: string) => {
-  const queryClient = useQueryClient();
-
-  return useMutation(
-    ({
-      id,
-      updatedTask,
-    }: {
-      id: string;
-      updatedTask: Partial<Omit<Task, "id" | "created_at">>;
-    }) => updateTask(id, updatedTask, databaseId, viewName),
-    {
-      onSuccess: (updatedTaskData, variables) => {
-        const previousDatabaseTasks = queryClient.getQueryData([
-          "database-tasks",
-          databaseId,
-        ]) as Database & { tasks: Task[] };
-        const newViews = previousDatabaseTasks.views.map((view) => {
-          const changedProperties = updatedTaskData.updatedTask.properties;
-          if (!changedProperties) return view;
-
-          Object.keys(changedProperties).forEach((propertyName) => {
-            if (view.config?.group_by === propertyName) {
-              // Remove task from the old group
-              let indexToRemove = -1;
-              let groupToRemoveTaskFrom: GroupByGroup | null = null;
-              view.config.groups?.forEach((group) => {
-                const taskIndex = group.task_order.indexOf(updatedTaskData.id);
-                if (taskIndex !== -1) {
-                  indexToRemove = taskIndex;
-                  groupToRemoveTaskFrom = group;
-                }
-              });
-
-              if (indexToRemove !== -1 && groupToRemoveTaskFrom) {
-                (groupToRemoveTaskFrom as GroupByGroup).task_order.splice(
-                  indexToRemove,
-                  1,
-                );
-              }
-
-              // Add task to the new group
-              const newGroupByValue = changedProperties[view.config.group_by];
-              const newGroup = view.config.groups?.find(
-                (group) => group.group_by_value === newGroupByValue,
-              );
-
-              if (newGroup) {
-                newGroup.task_order.push(updatedTaskData.id);
-              } else {
-                // If the group does not exist, create it
-                view.config.groups = [
-                  ...(view.config.groups || []),
-                  {
-                    group_by_value: newGroupByValue,
-                    task_order: [updatedTaskData.id],
-                  },
-                ];
-              }
-            }
-          });
-
-          return view;
-        });
-
-        queryClient.setQueryData<Database & { tasks: Task[] }>(
-          ["database-tasks", databaseId],
-          (old) => ({
-            ...previousDatabaseTasks,
-            views: newViews,
-            tasks:
-              old?.tasks.map((task) => {
-                if (task?.id === updatedTaskData.id) {
-                  return {
-                    id: updatedTaskData.id,
-                    database_id: updatedTaskData.updatedTask.database_id ?? "",
-                    description: updatedTaskData.updatedTask.description ?? "",
-                    properties: updatedTaskData.updatedTask.properties,
-                    title: updatedTaskData.updatedTask.title,
-                    created_at: updatedTaskData.updatedTask.created_at,
-                    updated_at: updatedTaskData.updatedTask.updated_at,
-                  } as Task;
-                }
-                return task;
-              }) ?? [],
-          }),
-        );
-      },
-    },
-  );
-};

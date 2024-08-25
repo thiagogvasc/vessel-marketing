@@ -10,20 +10,10 @@ export const usePropertiesWithDefinitions = (
     PropertyWithDefinition[]
   >([]);
   useEffect(() => {
-    const properties: PropertyWithDefinition[] = [];
-
-    Object.entries(taskProperties).forEach(([key, value]) => {
-      const [propertyName, propertyValue] = [key, value];
-      const propertyDefinition = propertyDefinitions?.find(
-        (propDef) => propDef.name === propertyName,
-      );
-      propertyDefinition &&
-        properties.push({
-          definition: propertyDefinition,
-          value: propertyValue,
-        });
-    });
-    setNewPropertiesWithDefinitions(properties);
+    setNewPropertiesWithDefinitions(propertyDefinitions?.map(propertyDefinition => ({
+			definition: propertyDefinition,
+			value: taskProperties[propertyDefinition.name]
+		})) ?? []);
   }, [propertyDefinitions, taskProperties]);
 
   return { propertiesWithDefinitions };
