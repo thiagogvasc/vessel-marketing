@@ -10,37 +10,32 @@ export interface PropertyWithDefinition {
 }
 
 interface TaskPropertiesContainerProps {
-	database_id: string;
-	taskProperties: {[key: string]: any};
+  database_id: string;
+  taskProperties: { [key: string]: any };
 }
 
-export const TaskPropertiesContainer: React.FC<TaskPropertiesContainerProps> = ({
-		database_id,
-		taskProperties,
-}) => {
-	const { data: propertyDefinitions } = useGetDatabasePropertyDefinitions(database_id);
-	const { propertiesWithDefinitions } = usePropertiesWithDefinitions(taskProperties, propertyDefinitions);
+export const TaskPropertiesContainer: React.FC<
+  TaskPropertiesContainerProps
+> = ({ database_id, taskProperties }) => {
+  const { data: propertyDefinitions } =
+    useGetDatabasePropertyDefinitions(database_id);
+  const { propertiesWithDefinitions } = usePropertiesWithDefinitions(
+    taskProperties,
+    propertyDefinitions,
+  );
 
-	const handlePropertyChange = (propertyName: string, newValue: any) => {
-		// mutateAsync changes:{properties: {propertyName: newValue}}
-	};
+  const handlePropertyChange = (propertyName: string, newValue: any) => {
+    // mutateAsync changes:{properties: {propertyName: newValue}}
+  };
 
-	const handleAddProperty = () => {
-		
-	};
+  const handleAddProperty = () => {};
 
-	const handleDeleteProperty = () => {
+  const handleDeleteProperty = () => {};
 
-	}
+  const handleEditProperty = () => {};
 
-	const handleEditProperty = () => {
-
-	}
-
-	console.warn({propertiesWithDefinitions})
-	return (
-		<TaskProperties
-			propertiesWithDefinitions={propertiesWithDefinitions}
-		/>
-	);
+  console.warn({ propertiesWithDefinitions });
+  return (
+    <TaskProperties propertiesWithDefinitions={propertiesWithDefinitions} />
+  );
 };

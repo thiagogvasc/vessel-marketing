@@ -27,10 +27,7 @@ interface TaskDialogProps {
   TaskPropertiesComponent: React.ReactNode;
   open: boolean;
   onClose: () => void;
-  onSave: (
-    newTitle: string,
-    newDescription: string,
-  ) => void;
+  onSave: (newTitle: string, newDescription: string) => void;
   onDelete: () => void;
   readOnly: boolean;
 }

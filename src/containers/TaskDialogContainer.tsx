@@ -28,10 +28,7 @@ export const TaskDialogContainer = ({
   const updateTaskMutation = useUpdateTask(task.database_id, viewId);
   const deleteTaskMutation = useDeleteKanbanTask(task.database_id, viewId);
 
-  const handleTaskUpdated = async (
-    title: string,
-    description: string,
-  ) => {
+  const handleTaskUpdated = async (title: string, description: string) => {
     await updateTaskMutation.mutateAsync({
       id: task.id,
       updatedTask: { title, description },
@@ -51,7 +48,10 @@ export const TaskDialogContainer = ({
         <TaskCommentsContainer database_id={databaseId} task_id={task.id} />
       }
       TaskPropertiesComponent={
-        <TaskPropertiesContainer database_id={databaseId} taskProperties={task.properties} />
+        <TaskPropertiesContainer
+          database_id={databaseId}
+          taskProperties={task.properties}
+        />
       }
       open={open}
       onClose={handleTaskDialogClose}

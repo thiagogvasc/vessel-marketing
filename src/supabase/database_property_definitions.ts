@@ -21,18 +21,20 @@ export async function getPropertyDefinitionsByDatabaseId(databaseId: string) {
   }
 }
 
-
 export const addPropertyDefinition = async (
   propertyDefinition: DatabasePropertyDefinition,
 ): Promise<DatabasePropertyDefinition> => {
-  const { data: propertyDefinitionData, error: propertyDefinitionError } = await supabase
-    .from("database_property_definition")
-    .insert(propertyDefinition)
-    .select("*")
-    .single();
+  const { data: propertyDefinitionData, error: propertyDefinitionError } =
+    await supabase
+      .from("database_property_definition")
+      .insert(propertyDefinition)
+      .select("*")
+      .single();
 
   if (propertyDefinitionError) {
-    throw new Error(`Failed to add property definition: ${propertyDefinitionError.message}`);
+    throw new Error(
+      `Failed to add property definition: ${propertyDefinitionError.message}`,
+    );
   }
 
   return propertyDefinitionData;
@@ -45,10 +47,11 @@ export const deletePropertyDefinition = async (id: string): Promise<void> => {
     .eq("id", id);
 
   if (deleteError) {
-    throw new Error(`Failed to delete database property definition: ${deleteError.message}`);
+    throw new Error(
+      `Failed to delete database property definition: ${deleteError.message}`,
+    );
   }
 };
-
 
 export const updatePropertyDefinition = async (
   id: string,
@@ -60,6 +63,8 @@ export const updatePropertyDefinition = async (
     .eq("id", id);
 
   if (updateError) {
-    throw new Error(`Failed to update database property definition: ${updateError.message}`);
+    throw new Error(
+      `Failed to update database property definition: ${updateError.message}`,
+    );
   }
 };
