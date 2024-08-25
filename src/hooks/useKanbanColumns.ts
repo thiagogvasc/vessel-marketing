@@ -1,9 +1,10 @@
 import { useEffect, useState } from "react";
-import { AggregateColumn, Database, DatabaseView, Task } from "../types";
+import { AggregateColumn, Database, DatabasePropertyDefinition, DatabaseView, Task } from "../types";
 
 export const useKanbanColumns = (
   databaseTasks: Task[] | null | undefined,
   databaseView: DatabaseView | null,
+  propertyDefinitions: DatabasePropertyDefinition[] | null | undefined,
 ) => {
   const [columns, setColumns] = useState<AggregateColumn[]>([]);
   console.warn({ databaseView, databaseTasks });

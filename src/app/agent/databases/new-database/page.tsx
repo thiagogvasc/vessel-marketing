@@ -28,6 +28,7 @@ const NewDatabase = () => {
   const handleAddDatabase = async () => {
     try {
       const database_id = uuidv4();
+      const statusPropertyId = uuidv4();
       const createDatabasePayload: CreateDatabasePayload = {
         id: database_id,
         name: name,
@@ -35,7 +36,7 @@ const NewDatabase = () => {
         description: description, // Use description state here
         propertyDefinitions: [
           {
-            id: uuidv4(),
+            id: statusPropertyId,
             database_id,
             name: "status",
             type: PropertyType.Select,
@@ -53,7 +54,7 @@ const NewDatabase = () => {
             config: {
               filters: [],
               sorts: [],
-              group_by: "status",
+              group_by: statusPropertyId,
               groups: [
                 { group_by_value: "To Do", task_order: [] },
                 { group_by_value: "In Progress", task_order: [] },

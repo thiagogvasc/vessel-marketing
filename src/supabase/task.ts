@@ -45,7 +45,7 @@ export const addKanbanTask = async (
     config: {
       ...viewData.config,
       groups: viewData.config.groups.map((group: any) => {
-        if (group.group_by_value === newTask.properties["status"]) {
+        if (group.group_by_value === newTask.properties[viewData.config.group_by]) {
           return {
             ...group,
             task_order: [...group.task_order, taskData.id],

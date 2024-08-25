@@ -1,19 +1,16 @@
 import React from "react";
-import { Task as TaskType } from "../types";
+import { Task, Task as TaskType } from "../types";
 import TaskDialog from "../components/TaskDialog/TaskDialog";
 import { useDeleteKanbanTask } from "../hooks/react-query/database_view";
 import { useUpdateTask } from "../hooks/react-query/database_view";
 import { TaskCommentsContainer } from "./TaskCommentsContainer";
 import { TaskPropertiesContainer } from "./TaskPropertiesContainer";
 
-export interface TaskWithId extends TaskType {
-  id: string;
-}
 
 interface TaskDialogContainerProps {
   databaseId: string;
   viewId: string;
-  task: TaskWithId;
+  task: Task;
   open: boolean;
   dialogClosed?: () => void;
 }
@@ -25,13 +22,13 @@ export const TaskDialogContainer = ({
   viewId,
   dialogClosed,
 }: TaskDialogContainerProps) => {
-  const updateTaskMutation = useUpdateTask(task.database_id, viewId);
+  const updateTaskMutation = useUpdateTask(task.database_id, task.id, viewId);
   const deleteTaskMutation = useDeleteKanbanTask(task.database_id, viewId);
 
-  const handleTaskUpdated = async (title: string, description: string) => {
+  const handleTaskUpdated = async (changes: Partial<Task>) => {
     await updateTaskMutation.mutateAsync({
       id: task.id,
-      changes: { title, description },
+      changes,
     });
   };
 
@@ -57,7 +54,7 @@ export const TaskDialogContainer = ({
       }
       open={open}
       onClose={handleTaskDialogClose}
-      onSave={handleTaskUpdated}
+      onUpdate={handleTaskUpdated}
       onDelete={handleTaskDeleted}
     />
   );

@@ -31,10 +31,10 @@ export const TaskPropertiesContainer: React.FC<
 	const addPropertyDefinitionMutation = useAddPropertyDefinition(database_id);
 	const deletePropertyDefinitionMutation = useDeletePropertyDefinition(database_id);
 	const updatePropertyDefinitionMutation = useUpdatePropertyDefinition(database_id);
-	const updateTaskMutation = useUpdateTask(database_id, view_id);
+	const updateTaskMutation = useUpdateTask(database_id, task_id, view_id);
 
-  const handlePropertyChange = (propertyName: string, newValue: any) => {
-		updateTaskMutation.mutateAsync({id: task_id, changes: { [propertyName]: newValue }});
+  const handlePropertyChange = (propertyId: string, newValue: any) => {
+		updateTaskMutation.mutateAsync({id: task_id, changes: { properties: { ...taskProperties, [propertyId]: newValue }}});
   };
 
   const handleAddProperty = (name: string, type: string, value: unknown) => {
@@ -46,7 +46,7 @@ export const TaskPropertiesContainer: React.FC<
 			data: {}
 		}
 		addPropertyDefinitionMutation.mutateAsync(propertyDefinition);
-		updateTaskMutation.mutateAsync({ id: task_id, changes: { properties: { ...taskProperties, [name]: value }}});
+		updateTaskMutation.mutateAsync({ id: task_id, changes: { properties: { ...taskProperties, [propertyDefinition.id]: value }}});
 	};
 
   const handleDeleteProperty = (id: string) => {

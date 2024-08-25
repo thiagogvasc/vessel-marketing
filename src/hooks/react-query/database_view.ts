@@ -20,9 +20,12 @@ export const useDeleteKanbanTask = (databaseId: string, viewId: string) => {
         console.warn(err);
         throw err;
       }
-    },
-
+    },  
     {
+      onSettled: () => {
+        queryClient.invalidateQueries(['databases', databaseId, 'tasks'])
+        queryClient.invalidateQueries(['databases', databaseId, 'views'])
+      },
       onSuccess: (task) => {
         // const previousDatabaseTasks = queryClient.getQueryData([
         //   "database-tasks",
@@ -89,8 +92,8 @@ export const useAddKanbanTask = (databaseId: string, viewId: string) => {
         console.warn("hi");
       },
       onSettled: () => {
-        console.warn("settled");
-        queryClient.invalidateQueries({ queryKey: ["databases", databaseId] });
+        queryClient.invalidateQueries(['databases', databaseId, 'tasks'])
+        queryClient.invalidateQueries(['databases', databaseId, 'views'])
       },
       onSuccess: (task) => {
         // const previousDatabaseTasks = queryClient.getQueryData([
@@ -136,7 +139,7 @@ export const useAddKanbanTask = (databaseId: string, viewId: string) => {
 };
 
 // Update an existing task
-export const useUpdateTask = (databaseId: string, viewId: string) => {
+export const useUpdateTask = (databaseId: string, taskId: string, viewId: string) => {
   const queryClient = useQueryClient();
 
   return useMutation(
@@ -147,6 +150,12 @@ export const useUpdateTask = (databaseId: string, viewId: string) => {
       id: string;
       changes: Partial<Task>;
     }) => updateTask(id, changes, viewId),
+    {
+      onSettled: () => {
+        queryClient.invalidateQueries(['databases', databaseId, 'tasks'])
+        queryClient.invalidateQueries(['databases', databaseId, 'views'])
+      }
+    }
     // {
     //   onSuccess: (updatedTaskData, variables) => {
     //     // const previousDatabaseTasks = queryClient.getQueryData([

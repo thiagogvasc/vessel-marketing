@@ -1,18 +1,20 @@
 "use client";
 
-import React, { useState } from "react";
+import React, { useEffect, useState } from "react";
 import {
   useAddKanbanColumn,
   useDeleteKanbanColumn,
   useUpdateKanbanViewManualSort,
 } from "../hooks/useTasks";
-import { DatabaseView } from "../types";
+import { DatabaseView, Task } from "../types";
 import { TaskWithId } from "../components/KanbanView/Task";
 import { KanbanView } from "../components/KanbanView";
 import { useKanbanColumns } from "../hooks/useKanbanColumns";
 import { TaskDialogContainer } from "./TaskDialogContainer";
 import { useGetDatabaseTasks } from "../hooks/react-query/database";
 import { useAddKanbanTask } from "../hooks/react-query/database_view";
+import { v4 as uuidv4 } from 'uuid';
+import { useGetDatabasePropertyDefinitions } from "../hooks/react-query/database_property_definition";
 
 interface KanbanViewProps {
   databaseId: string;
@@ -28,6 +30,7 @@ export const AgentKanbanViewContainer: React.FC<KanbanViewProps> = ({
   const { data: databaseTasks, isLoading: isTasksLoading } =
     useGetDatabaseTasks(databaseId as string);
   console.warn("here", databaseTasks);
+  const { data: propertyDefinition } = useGetDatabasePropertyDefinitions(databaseId);
   const updateKanbanViewManualSort = useUpdateKanbanViewManualSort(
     databaseId,
     databaseView.id as string,
@@ -42,10 +45,15 @@ export const AgentKanbanViewContainer: React.FC<KanbanViewProps> = ({
     databaseView.name,
   );
 
-  const { columns, setColumns } = useKanbanColumns(databaseTasks, databaseView);
-  console.warn({ columns });
+  const { columns, setColumns } = useKanbanColumns(databaseTasks, databaseView, propertyDefinition);
   const [isTaskDialogOpen, setIsTaskDialogOpen] = useState(false);
-  const [selectedTask, setSelectedTask] = useState<TaskWithId | null>(null);
+  const [selectedTask, setSelectedTask] = useState<Task | null>(null);
+  useEffect(() => {
+    if (selectedTask && databaseTasks) {
+      const newSelectedTask = databaseTasks.find(task => task.id === selectedTask.id);
+      newSelectedTask && setSelectedTask(newSelectedTask);
+    }
+  }, [databaseTasks])
 
   const handleDragEnd = (result: any) => {
     if (!result.destination) return;
@@ -103,12 +111,15 @@ export const AgentKanbanViewContainer: React.FC<KanbanViewProps> = ({
   };
 
   const handleTaskAdded = async (columnTitle: string, newTaskTitle: string) => {
-    await addTaskMutation.mutateAsync({
+    if (!databaseView.config?.group_by) return;
+    const newTask: Task = {
+      id: uuidv4(),
       database_id: databaseId,
       title: newTaskTitle,
-      description: "",
-      properties: { status: columnTitle },
-    });
+      description: '',
+      properties: { [databaseView.config.group_by]: columnTitle }
+    }
+    await addTaskMutation.mutateAsync(newTask);
   };
 
   const handleColumnDeleted = async (columnTitle: string) => {

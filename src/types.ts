@@ -135,7 +135,7 @@ export interface TaskComment {
 }
 
 export interface Task {
-  id?: string; // auto-generated
+  id: string; // auto-generated
   database_id: string;
   title: string;
   description: string;

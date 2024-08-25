@@ -15,7 +15,7 @@ import {
   MenuItem as MenuOption,
 } from "@mui/material";
 import MoreVertIcon from "@mui/icons-material/MoreVert";
-import { Task as TaskType } from "../../types";
+import { Task, Task as TaskType } from "../../types";
 
 export interface TaskWithId extends TaskType {
   id: string;
@@ -27,7 +27,7 @@ interface TaskDialogProps {
   TaskPropertiesComponent: React.ReactNode;
   open: boolean;
   onClose: () => void;
-  onSave: (newTitle: string, newDescription: string) => void;
+  onUpdate?: (changes: Partial<Task>) => void;
   onDelete: () => void;
   readOnly: boolean;
 }
@@ -38,7 +38,7 @@ const TaskDialog: React.FC<TaskDialogProps> = ({
   TaskPropertiesComponent,
   open,
   onClose,
-  onSave,
+  onUpdate,
   onDelete,
   readOnly,
 }) => {
@@ -46,20 +46,18 @@ const TaskDialog: React.FC<TaskDialogProps> = ({
   const [newDescription, setNewDescription] = useState(task.description);
   const [anchorEl, setAnchorEl] = useState<null | HTMLElement>(null);
 
-  const handleSave = () => {
-    onSave(newTitle, newDescription);
-    onClose();
-  };
 
-  // const handlePropertyChange = (propertyName: string, newValue: any) => {
-  //   setNewPropertiesWithDefinitions(
-  //     newPropertiesWithDefinitions.map((prop) =>
-  //       prop.definition.name === propertyName
-  //         ? { ...prop, value: newValue }
-  //         : prop,
-  //     ),
-  //   );
-  // };
+  const handleTitleBlur = () => {
+    if (newTitle !== task.title) {
+      onUpdate?.({ title: newTitle });
+    }
+  }
+
+  const handleDescriptionBlur = () => {
+    if (newDescription !== task.description) {
+      onUpdate?.({ description: newDescription });
+    }
+  }
 
   const handleMenuOpen = (event: React.MouseEvent<HTMLElement>) => {
     setAnchorEl(event.currentTarget);
@@ -92,6 +90,7 @@ const TaskDialog: React.FC<TaskDialogProps> = ({
               size="small"
               value={newTitle}
               onChange={(e) => setNewTitle(e.target.value)}
+              onBlur={handleTitleBlur}
               fullWidth
               variant="outlined"
               disabled={readOnly}
@@ -101,6 +100,7 @@ const TaskDialog: React.FC<TaskDialogProps> = ({
                 label="Description"
                 value={newDescription}
                 onChange={(e) => setNewDescription(e.target.value)}
+                onBlur={handleDescriptionBlur}
                 multiline
                 rows={10}
                 fullWidth
@@ -132,14 +132,6 @@ const TaskDialog: React.FC<TaskDialogProps> = ({
           </Menu>
         </Box>
       </DialogContent>
-      <DialogActions>
-        <Button onClick={onClose} color="secondary">
-          Cancel
-        </Button>
-        <Button onClick={handleSave} color="primary" disabled={readOnly}>
-          Save
-        </Button>
-      </DialogActions>
     </Dialog>
   );
 };
