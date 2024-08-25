@@ -1,7 +1,7 @@
 "use client";
 
 import { useEffect, useState } from "react";
-import { useGetDatabases } from "@/src/hooks/react-query/database";
+import { useDeleteDatabase, useGetDatabases } from "@/src/hooks/react-query/database";
 import Link from "next/link";
 import {
   Box,
@@ -32,6 +32,7 @@ import { Add } from "@mui/icons-material";
 const Databases = () => {
   const router = useRouter();
   const { data: databases, isLoading } = useGetDatabases();
+  const deleteDatabaseMutation = useDeleteDatabase();
   const [showDatabases, setShowDatabases] = useState(false);
   const [searchTerm, setSearchTerm] = useState("");
   const [page, setPage] = useState(0);
@@ -80,6 +81,12 @@ const Databases = () => {
     page * rowsPerPage,
     page * rowsPerPage + rowsPerPage,
   );
+
+  const handleProjectDelete = (id: string | undefined) => {
+    if (id) {
+      deleteDatabaseMutation.mutateAsync(id);
+    }
+  }
 
   return (
     <Container component="main" maxWidth="xl">
@@ -185,6 +192,12 @@ const Databases = () => {
                             href={`/agent/databases/${database.id}`}
                           >
                             View
+                          </Button>
+                          <Button
+                            variant="outlined"
+                            onClick={() => handleProjectDelete(database.id)}
+                          >
+                            Delete
                           </Button>
                         </TableCell>
                       </TableRow>

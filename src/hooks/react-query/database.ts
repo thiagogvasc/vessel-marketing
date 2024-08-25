@@ -1,6 +1,7 @@
 import { useMutation, useQuery, useQueryClient } from "react-query";
 import {
   addDatabase,
+  deleteDatabase,
   getDatabaseById,
   getDatabases,
   getDatabasesByClientId,
@@ -80,6 +81,18 @@ export const useAddDatabase = () => {
         throw err;
       }
     },
+    {
+      onSettled: (_, variables) => {
+        queryClient.refetchQueries(["databases"]);
+      },
+    },
+  );
+};
+
+export const useDeleteDatabase = () => {
+  const queryClient = useQueryClient();
+  return useMutation(
+    async (id: string) => deleteDatabase(id),
     {
       onSettled: (_, variables) => {
         queryClient.refetchQueries(["databases"]);
