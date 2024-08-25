@@ -21,7 +21,7 @@ export const useGetDatabasePropertyDefinitions = (
         ? getPropertyDefinitionsByDatabaseId(databaseId)
         : Promise.resolve(null);
     },
-    { enabled: !!databaseId, refetchOnMount: false },
+    { enabled: !!databaseId, staleTime: 60000 },
   );
 };
 

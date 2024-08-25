@@ -21,6 +21,6 @@ export const useGetUserById = (userId: string | undefined) => {
         })
         .catch((err) => Promise.reject(err));
     },
-    { enabled: !!userId, refetchOnMount: false },
+    { enabled: !!userId, staleTime: 60000 },
   );
 };

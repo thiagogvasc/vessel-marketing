@@ -13,7 +13,7 @@ import { getPropertyDefinitionsByDatabaseId } from "@/src/supabase/database_prop
 
 export const useGetDatabases = () => {
   return useQuery(["databases", "list"], () => getDatabases(), {
-    refetchOnMount: false,
+    staleTime: 60000
   });
 };
 
@@ -25,7 +25,7 @@ export const useGetDatabasesByClientId = (
     () =>
       client_id ? getDatabasesByClientId(client_id) : Promise.resolve(null),
     {
-      refetchOnMount: false,
+      staleTime: 60000
     },
   );
 };
@@ -39,7 +39,7 @@ export const useGetDatabaseTasks = (databaseId: string | null | undefined) => {
         ? getTasksByDatabaseId(databaseId)
         : Promise.resolve(null);
     },
-    { enabled: !!databaseId, refetchOnMount: false },
+    { enabled: !!databaseId, staleTime: 60000 },
   );
 };
 
@@ -52,7 +52,7 @@ export const useGetDatabaseViews = (databaseId: string | null | undefined) => {
         ? getViewsByDatabaseId(databaseId)
         : Promise.resolve(null);
     },
-    { enabled: !!databaseId, refetchOnMount: false },
+    { enabled: !!databaseId, staleTime: 60000 },
   );
 };
 
@@ -62,7 +62,7 @@ export const useGetDatabaseById = (databaseId: string | undefined | null) => {
     () => (databaseId ? getDatabaseById(databaseId) : Promise.resolve(null)),
     {
       enabled: !!databaseId, // only run the query if id is truthy
-      refetchOnMount: false,
+      staleTime: 60000,
     },
   );
 };

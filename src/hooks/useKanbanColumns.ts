@@ -4,10 +4,8 @@ import { AggregateColumn, Database, DatabasePropertyDefinition, DatabaseView, Ta
 export const useKanbanColumns = (
   databaseTasks: Task[] | null | undefined,
   databaseView: DatabaseView | null,
-  propertyDefinitions: DatabasePropertyDefinition[] | null | undefined,
 ) => {
   const [columns, setColumns] = useState<AggregateColumn[]>([]);
-  console.warn({ databaseView, databaseTasks });
   useEffect(() => {
     if (databaseTasks && databaseView) {
       const initialColumns: AggregateColumn[] = [];

@@ -16,7 +16,7 @@ export const useGetCommentsByTaskId = (
     () => (taskId ? getCommentsByTaskId(taskId) : Promise.resolve(null)),
     {
       enabled: !!(databaseId && taskId),
-      refetchOnMount: false,
+      staleTime: 60000,
     },
   );
 };
