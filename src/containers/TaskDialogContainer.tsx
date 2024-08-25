@@ -1,19 +1,15 @@
 import React, { useEffect, useState } from "react";
 import {
   DatabasePropertyDefinition,
-  TaskComment,
   Task as TaskType,
 } from "../types";
 import TaskDialog from "../components/TaskDialog/TaskDialog";
 import {
-  useAddTaskComment,
   useDeleteKanbanTask,
 } from "../hooks/react-query/database_view";
 import { useGetDatabasePropertyDefinitions } from "../hooks/react-query/database";
 import { useUpdateTask } from "../hooks/react-query/database_view";
-import { useGetCommentsByTaskId } from "../hooks/react-query/task_comment";
-import { v4 as uuidv4 } from "uuid";
-import { useAuth } from "../contexts/AuthContext";
+import { TaskCommentsContainer } from "./TaskCommentsContainer";
 
 export interface TaskWithId extends TaskType {
   id: string;
@@ -41,11 +37,8 @@ export const TaskDialogContainer = ({
 }: TaskDialogContainerProps) => {
   const { data: propertyDefinitions } =
     useGetDatabasePropertyDefinitions(databaseId);
-  const { data: taskComments } = useGetCommentsByTaskId(databaseId, task.id);
-  const { user } = useAuth();
   const updateTaskMutation = useUpdateTask(task.database_id, viewId);
   const deleteTaskMutation = useDeleteKanbanTask(task.database_id, viewId);
-  const addCommentMutation = useAddTaskComment(task.database_id, task.id);
 
   const [properties, setProperties] = useState<PropertyWithDefinition[]>([]);
   useEffect(() => {
@@ -90,28 +83,16 @@ export const TaskDialogContainer = ({
 
   const handleTaskDialogClose = () => dialogClosed?.();
 
-  const handleCommentAdded = (commentText: string) => {
-    if (!user) return;
-    const newComment: TaskComment = {
-      id: uuidv4(),
-      author_id: user.id,
-      task_id: task.id,
-      text: commentText,
-    };
-    addCommentMutation.mutateAsync(newComment);
-  };
-
   return (
     <TaskDialog
       readOnly={false}
       task={task}
-      taskComments={taskComments ?? []}
+      TaskCommentsComponent={<TaskCommentsContainer database_id={databaseId} task_id={task.id} />}
       propertiesWithDefinitions={properties}
       open={open}
       onClose={handleTaskDialogClose}
       onSave={handleTaskUpdated}
       onDelete={handleTaskDeleted}
-      onCommentAdded={handleCommentAdded}
     />
   );
 };

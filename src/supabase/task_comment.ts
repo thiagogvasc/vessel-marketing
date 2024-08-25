@@ -28,6 +28,17 @@ export const deleteTaskComment = async (commentId: string): Promise<void> => {
   }
 };
 
+export const updateTaskComment = async (id: string, changes: Partial<TaskComment>): Promise<void> => {
+  const { error: updateError } = await supabase
+    .from("task_comment")
+    .update(changes)
+    .eq("id", id);
+
+  if (updateError) {
+    throw new Error(`Failed to update task comment: ${updateError.message}`);
+  }
+};
+
 export async function getCommentsByTaskId(taskId: string) {
   try {
     // Fetch all tasks related to the database

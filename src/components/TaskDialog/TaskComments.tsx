@@ -1,20 +1,21 @@
 import React, { useState } from "react";
-import {
-  Box,
-  TextField,
-  Button,
-  List,
-  ListItem,
-  ListItemText,
-} from "@mui/material";
-import { TaskComment } from "../../types";
+import { Box, TextField, Button, List } from "@mui/material";
+import { TaskComment } from "./TaskComment";
+import { TaskComment as TaskCommentType } from "../../types";
 
 interface TaskCommentsProps {
-  comments: TaskComment[];
+  comments: TaskCommentType[];
   commentAdded?: (commentText: string) => void;
+  commentUpdated?: (id: string, newText: string) => void;
+  commentDeleted?: (id: string) => void;
 }
 
-export const TaskComments = ({ comments, commentAdded }: TaskCommentsProps) => {
+export const TaskComments = ({
+  comments,
+  commentAdded,
+  commentUpdated,
+  commentDeleted,
+}: TaskCommentsProps) => {
   const [newCommentText, setNewCommentText] = useState("");
 
   const handleAddComment = () => {
@@ -23,6 +24,14 @@ export const TaskComments = ({ comments, commentAdded }: TaskCommentsProps) => {
       setNewCommentText("");
     }
   };
+
+  const handleCommentUpdate = (id: string, newText: string) => {
+    commentUpdated?.(id, newText);
+  }
+
+  const handleCommentDelete = (id: string) => {
+    commentDeleted?.(id);
+  }
 
   return (
     <Box>
@@ -42,9 +51,12 @@ export const TaskComments = ({ comments, commentAdded }: TaskCommentsProps) => {
       </Button>
       <List>
         {comments.map((comment, index) => (
-          <ListItem key={index}>
-            <ListItemText primary={comment.text} />
-          </ListItem>
+          <TaskComment
+            key={index}
+            comment={comment}
+            onUpdate={handleCommentUpdate}
+            onDelete={handleCommentDelete}
+          />
         ))}
       </List>
     </Box>

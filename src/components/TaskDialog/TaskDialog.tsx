@@ -15,8 +15,7 @@ import {
   MenuItem as MenuOption,
 } from "@mui/material";
 import MoreVertIcon from "@mui/icons-material/MoreVert";
-import { PropertyType, TaskComment, Task as TaskType } from "../../types";
-import { TaskComments } from "./TaskComments";
+import { Task as TaskType } from "../../types";
 import { PropertyWithDefinition } from "@/src/containers/TaskDialogContainer";
 
 export interface TaskWithId extends TaskType {
@@ -25,7 +24,7 @@ export interface TaskWithId extends TaskType {
 
 interface TaskDialogProps {
   task: TaskWithId;
-  taskComments: TaskComment[];
+  TaskCommentsComponent: React.ReactNode;
   propertiesWithDefinitions: PropertyWithDefinition[];
   open: boolean;
   onClose: () => void;
@@ -36,19 +35,17 @@ interface TaskDialogProps {
   ) => void;
   onDelete: () => void;
   readOnly: boolean;
-  onCommentAdded?: (commentText: string) => void;
 }
 
 const TaskDialog: React.FC<TaskDialogProps> = ({
   task,
-  taskComments,
+  TaskCommentsComponent,
   propertiesWithDefinitions,
   open,
   onClose,
   onSave,
   onDelete,
   readOnly,
-  onCommentAdded,
 }) => {
   const [newTitle, setNewTitle] = useState(task.title);
   const [newDescription, setNewDescription] = useState(task.description);
@@ -104,9 +101,6 @@ const TaskDialog: React.FC<TaskDialogProps> = ({
     onDelete();
     onClose();
   };
-
-  const handleCommentAdded = (commentText: string) =>
-    onCommentAdded?.(commentText);
 
   return (
     <Dialog open={open} onClose={onClose} fullWidth maxWidth="lg">
@@ -254,11 +248,7 @@ const TaskDialog: React.FC<TaskDialogProps> = ({
               </Box>
             </Box>
             <Box>
-              {/* use component composition instead, pass this from the container compoennts */}
-              <TaskComments
-                comments={taskComments}
-                commentAdded={handleCommentAdded}
-              />
+              {TaskCommentsComponent}
             </Box>
           </Box>
           <IconButton onClick={handleMenuOpen} disabled={readOnly}>

@@ -227,32 +227,3 @@ export const useUpdateTask = (databaseId: string, viewId: string) => {
     // },
   );
 };
-
-export const useAddTaskComment = (databaseId: string, taskId: string) => {
-  const queryClient = useQueryClient();
-
-  return useMutation((comment: TaskComment) => addTaskComment(comment), {
-    onMutate: (comment) => {
-      // const previousDatabaseWithTasks = queryClient.getQueryData<
-      //   Database & { tasks: Task[] }
-      // >(["database-tasks", databaseId]);
-      // previousDatabaseWithTasks &&
-      //   queryClient.setQueryData<Database & { tasks: Task[] }>(
-      //     ["database-tasks", databaseId],
-      //     () => ({
-      //       ...previousDatabaseWithTasks,
-      //       tasks: previousDatabaseWithTasks?.tasks.map((task) => ({
-      //         ...task,
-      //         comments: [...task.comments, comment],
-      //       })),
-      //     }),
-      //   );
-    },
-
-    onSettled: () => {
-      queryClient.invalidateQueries({
-        queryKey: ["databases", databaseId, "tasks", taskId, "comments"],
-      });
-    },
-  });
-};
