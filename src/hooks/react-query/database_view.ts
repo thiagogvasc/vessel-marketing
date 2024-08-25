@@ -142,11 +142,11 @@ export const useUpdateTask = (databaseId: string, viewId: string) => {
   return useMutation(
     ({
       id,
-      updatedTask,
+      changes,
     }: {
       id: string;
-      updatedTask: Partial<Omit<Task, "id" | "created_at">>;
-    }) => updateTask(id, updatedTask, viewId),
+      changes: Partial<Task>;
+    }) => updateTask(id, changes, viewId),
     // {
     //   onSuccess: (updatedTaskData, variables) => {
     //     // const previousDatabaseTasks = queryClient.getQueryData([

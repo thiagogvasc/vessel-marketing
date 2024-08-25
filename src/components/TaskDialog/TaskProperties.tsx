@@ -1,50 +1,48 @@
 import React, { useState } from "react";
 import {
   Button,
-  TextField,
   Box,
+  Menu,
   MenuItem,
-  Select,
-  InputLabel,
+  TextField,
   FormControl,
+  InputLabel,
+  Select,
 } from "@mui/material";
 import { PropertyWithDefinition } from "@/src/containers/TaskPropertiesContainer";
+import { DatabasePropertyDefinition } from "@/src/types";
 
 interface TaskPropertiesProps {
   propertiesWithDefinitions: PropertyWithDefinition[];
   onPropertyChange?: (propertyName: string, newValue: any) => void;
   onAddProperty?: (name: string, type: string, value: any) => void;
-  onEditProperty?: () => void;
-  onPropertyDelete?: () => void;
+  onEditProperty?: (id: string, changes: Partial<DatabasePropertyDefinition>) => void;
+  onPropertyDelete?: (id: string) => void;
 }
 
 export const TaskProperties: React.FC<TaskPropertiesProps> = ({
   propertiesWithDefinitions,
   onPropertyChange,
+  onAddProperty,
+  onEditProperty,
+  onPropertyDelete
 }) => {
-  const [newPropertyType, setNewPropertyType] = useState("");
-  const [newPropertyName, setNewPropertyName] = useState("");
-  const [newPropertyValue, setNewPropertyValue] = useState("");
-  const [showNewPropertyForm, setShowNewPropertyForm] = useState(false);
+  const [anchorEl, setAnchorEl] = useState<null | HTMLElement>(null);
 
-  const handlePropertyChange = (propertyName: string, newValue: any) => {
-    onPropertyChange?.(propertyName, newValue);
+  const handleClick = (event: React.MouseEvent<HTMLButtonElement>) => {
+    setAnchorEl(event.currentTarget);
   };
-  const handleAddProperty = () => {
-    // setNewPropertiesWithDefinitions([
-    //   ...newPropertiesWithDefinitions,
-    //   {
-    //     definition: {
-    //       name: newPropertyName,
-    //       type: newPropertyType as PropertyType,
-    //     },
-    //     value: newPropertyValue,
-    //   },
-    // ]);
-    // setNewPropertyType("");
-    // setNewPropertyName("");
-    // setNewPropertyValue("");
-    // setShowNewPropertyForm(false);
+
+  const handleClose = () => {
+    setAnchorEl(null);
+  };
+
+  const handleAddProperty = (type: string) => {
+    const defaultName = `New ${type} Property`;
+    const defaultValue = type === "Text" ? "" : type === "Select" ? "Option 1" : "";
+    
+    onAddProperty?.(defaultName, type, defaultValue);
+    handleClose();
   };
 
   return (
@@ -59,7 +57,7 @@ export const TaskProperties: React.FC<TaskPropertiesProps> = ({
               label={prop.definition.name}
               value={prop.value}
               onChange={(e) =>
-                handlePropertyChange(prop.definition.name, e.target.value)
+                onPropertyChange?.(prop.definition.name, e.target.value)
               }
               fullWidth
             />
@@ -73,7 +71,7 @@ export const TaskProperties: React.FC<TaskPropertiesProps> = ({
                 labelId={`${prop.definition.name}-label`}
                 value={prop.value}
                 onChange={(e) =>
-                  handlePropertyChange(prop.definition.name, e.target.value)
+                  onPropertyChange?.(prop.definition.name, e.target.value)
                 }
                 fullWidth
               >
@@ -89,53 +87,20 @@ export const TaskProperties: React.FC<TaskPropertiesProps> = ({
       ))}
       <Button
         variant="outlined"
-        onClick={() => setShowNewPropertyForm(!showNewPropertyForm)}
+        onClick={handleClick}
         sx={{ alignSelf: "flex-start" }}
       >
         Add Property
       </Button>
-      {showNewPropertyForm && (
-        <Box
-          sx={{
-            display: "flex",
-            flexDirection: "column",
-            gap: 2,
-            mt: 2,
-          }}
-        >
-          <TextField
-            label="Property Name"
-            value={newPropertyName}
-            onChange={(e) => setNewPropertyName(e.target.value)}
-            fullWidth
-          />
-          <FormControl fullWidth>
-            <InputLabel id="new-property-type-label">Property Type</InputLabel>
-            <Select
-              labelId="new-property-type-label"
-              value={newPropertyType}
-              onChange={(e) => setNewPropertyType(e.target.value)}
-              fullWidth
-            >
-              <MenuItem value="Text">Text</MenuItem>
-              <MenuItem value="Select">Select</MenuItem>
-            </Select>
-          </FormControl>
-          <TextField
-            label="Property Value"
-            value={newPropertyValue}
-            onChange={(e) => setNewPropertyValue(e.target.value)}
-            fullWidth
-          />
-          <Button
-            variant="contained"
-            onClick={handleAddProperty}
-            sx={{ alignSelf: "flex-start" }}
-          >
-            Add
-          </Button>
-        </Box>
-      )}
+      <Menu
+        anchorEl={anchorEl}
+        open={Boolean(anchorEl)}
+        onClose={handleClose}
+      >
+        <MenuItem onClick={() => handleAddProperty("Text")}>Text</MenuItem>
+        <MenuItem onClick={() => handleAddProperty("Select")}>Select</MenuItem>
+        {/* Add more property types here if needed */}
+      </Menu>
     </>
   );
 };

@@ -133,7 +133,7 @@ export const deleteKanbanTask = async (
 
 export const updateTask = async (
   id: string,
-  updatedTask: Partial<Omit<Task, "id">>,
+  updatedTask: Partial<Task>,
   viewId: string,
 ): Promise<{ id: string; updatedTask: Partial<Omit<Task, "id">> }> => {
   const { error: updateTaskError } = await supabase

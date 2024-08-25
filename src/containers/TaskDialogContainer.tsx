@@ -31,7 +31,7 @@ export const TaskDialogContainer = ({
   const handleTaskUpdated = async (title: string, description: string) => {
     await updateTaskMutation.mutateAsync({
       id: task.id,
-      updatedTask: { title, description },
+      changes: { title, description },
     });
   };
 
@@ -49,7 +49,9 @@ export const TaskDialogContainer = ({
       }
       TaskPropertiesComponent={
         <TaskPropertiesContainer
+          task_id={task.id}
           database_id={databaseId}
+          view_id={viewId}
           taskProperties={task.properties}
         />
       }
