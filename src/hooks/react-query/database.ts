@@ -13,7 +13,7 @@ import { getPropertyDefinitionsByDatabaseId } from "@/src/supabase/database_prop
 
 export const useGetDatabases = () => {
   return useQuery(["databases", "list"], () => getDatabases(), {
-    staleTime: 60000
+    staleTime: 60000,
   });
 };
 
@@ -25,7 +25,7 @@ export const useGetDatabasesByClientId = (
     () =>
       client_id ? getDatabasesByClientId(client_id) : Promise.resolve(null),
     {
-      staleTime: 60000
+      staleTime: 60000,
     },
   );
 };
@@ -91,12 +91,9 @@ export const useAddDatabase = () => {
 
 export const useDeleteDatabase = () => {
   const queryClient = useQueryClient();
-  return useMutation(
-    async (id: string) => deleteDatabase(id),
-    {
-      onSettled: (_, variables) => {
-        queryClient.refetchQueries(["databases"]);
-      },
+  return useMutation(async (id: string) => deleteDatabase(id), {
+    onSettled: (_, variables) => {
+      queryClient.refetchQueries(["databases"]);
     },
-  );
+  });
 };

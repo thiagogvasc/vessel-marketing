@@ -10,10 +10,12 @@ export const usePropertiesWithDefinitions = (
     PropertyWithDefinition[]
   >([]);
   useEffect(() => {
-    setNewPropertiesWithDefinitions(propertyDefinitions?.map(propertyDefinition => ({
-			definition: propertyDefinition,
-			value: taskProperties[propertyDefinition.id]
-		})) ?? []);
+    setNewPropertiesWithDefinitions(
+      propertyDefinitions?.map((propertyDefinition) => ({
+        definition: propertyDefinition,
+        value: taskProperties[propertyDefinition.id],
+      })) ?? [],
+    );
   }, [propertyDefinitions, taskProperties]);
 
   return { propertiesWithDefinitions };

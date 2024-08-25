@@ -46,18 +46,17 @@ const TaskDialog: React.FC<TaskDialogProps> = ({
   const [newDescription, setNewDescription] = useState(task.description);
   const [anchorEl, setAnchorEl] = useState<null | HTMLElement>(null);
 
-
   const handleTitleBlur = () => {
     if (newTitle !== task.title) {
       onUpdate?.({ title: newTitle });
     }
-  }
+  };
 
   const handleDescriptionBlur = () => {
     if (newDescription !== task.description) {
       onUpdate?.({ description: newDescription });
     }
-  }
+  };
 
   const handleMenuOpen = (event: React.MouseEvent<HTMLElement>) => {
     setAnchorEl(event.currentTarget);

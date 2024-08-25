@@ -79,7 +79,6 @@ export const addDatabase = async (
   return database;
 };
 
-
 export const deleteDatabase = async (id: string): Promise<void> => {
   const { error: deleteError } = await supabase
     .from("database")

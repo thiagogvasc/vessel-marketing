@@ -19,7 +19,8 @@ export const useGetRequestById = (id: string | undefined | null) => {
     ["request", id],
     () => (id ? getRequestById(id) : Promise.resolve(null)),
     {
-      enabled: !!id, staleTime: 60000 // only run the query if id is truthy
+      enabled: !!id,
+      staleTime: 60000, // only run the query if id is truthy
     },
   );
 };

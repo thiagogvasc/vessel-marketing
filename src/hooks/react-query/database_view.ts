@@ -1,4 +1,8 @@
-import { addKanbanColumn, deleteKanbanColumn, updateKanbanViewManualSort } from "@/src/supabase/database_view";
+import {
+  addKanbanColumn,
+  deleteKanbanColumn,
+  updateKanbanViewManualSort,
+} from "@/src/supabase/database_view";
 import {
   addKanbanTask,
   deleteKanbanTask,
@@ -20,11 +24,11 @@ export const useDeleteKanbanTask = (databaseId: string, viewId: string) => {
         console.warn(err);
         throw err;
       }
-    },  
+    },
     {
       onSettled: () => {
-        queryClient.invalidateQueries(['databases', databaseId, 'tasks'])
-        queryClient.invalidateQueries(['databases', databaseId, 'views'])
+        queryClient.invalidateQueries(["databases", databaseId, "tasks"]);
+        queryClient.invalidateQueries(["databases", databaseId, "views"]);
       },
     },
   );
@@ -46,35 +50,32 @@ export const useAddKanbanTask = (databaseId: string, viewId: string) => {
     },
     {
       onSettled: () => {
-        queryClient.invalidateQueries(['databases', databaseId, 'tasks'])
-        queryClient.invalidateQueries(['databases', databaseId, 'views'])
+        queryClient.invalidateQueries(["databases", databaseId, "tasks"]);
+        queryClient.invalidateQueries(["databases", databaseId, "views"]);
       },
     },
   );
 };
 
 // Update an existing task
-export const useUpdateTask = (databaseId: string, taskId: string, viewId: string) => {
+export const useUpdateTask = (
+  databaseId: string,
+  taskId: string,
+  viewId: string,
+) => {
   const queryClient = useQueryClient();
 
   return useMutation(
-    ({
-      id,
-      changes,
-    }: {
-      id: string;
-      changes: Partial<Task>;
-    }) => updateTask(id, changes, viewId),
+    ({ id, changes }: { id: string; changes: Partial<Task> }) =>
+      updateTask(id, changes, viewId),
     {
       onSettled: () => {
-        queryClient.invalidateQueries(['databases', databaseId, 'tasks'])
-        queryClient.invalidateQueries(['databases', databaseId, 'views'])
-      }
-    }
+        queryClient.invalidateQueries(["databases", databaseId, "tasks"]);
+        queryClient.invalidateQueries(["databases", databaseId, "views"]);
+      },
+    },
   );
 };
-
-
 
 export const useUpdateKanbanViewManualSort = (
   databaseId: string,
@@ -95,18 +96,17 @@ export const useUpdateKanbanViewManualSort = (
         viewId,
         columns,
         taskId,
-        taskChanges
+        taskChanges,
       );
     },
     {
       onSettled: () => {
-        queryClient.invalidateQueries(['databases', databaseId, 'tasks']);
-        queryClient.invalidateQueries(['databases', databaseId, 'views']);
-      }
-    }
+        queryClient.invalidateQueries(["databases", databaseId, "tasks"]);
+        queryClient.invalidateQueries(["databases", databaseId, "views"]);
+      },
+    },
   );
 };
-
 
 export const useAddKanbanColumn = (databaseId: string, viewName: string) => {
   const queryClient = useQueryClient();
@@ -123,12 +123,16 @@ export const useAddKanbanColumn = (databaseId: string, viewName: string) => {
     },
     {
       onSettled: () => {
-        console.warn('invalidating property definitions')
-        queryClient.invalidateQueries(['databases', databaseId, 'tasks'])
-        queryClient.invalidateQueries(['databases', databaseId, 'views'])
-        queryClient.invalidateQueries(["databases", databaseId, "property-definitions"])
-      }
-    }
+        console.warn("invalidating property definitions");
+        queryClient.invalidateQueries(["databases", databaseId, "tasks"]);
+        queryClient.invalidateQueries(["databases", databaseId, "views"]);
+        queryClient.invalidateQueries([
+          "databases",
+          databaseId,
+          "property-definitions",
+        ]);
+      },
+    },
   );
 };
 
@@ -151,10 +155,14 @@ export const useDeleteKanbanColumn = (databaseId: string, viewName: string) => {
     },
     {
       onSettled: () => {
-        queryClient.invalidateQueries(['databases', databaseId, 'tasks'])
-        queryClient.invalidateQueries(['databases', databaseId, 'views'])
-        queryClient.invalidateQueries(['databases', databaseId, 'property-definitions'])
-      }
-    }
+        queryClient.invalidateQueries(["databases", databaseId, "tasks"]);
+        queryClient.invalidateQueries(["databases", databaseId, "views"]);
+        queryClient.invalidateQueries([
+          "databases",
+          databaseId,
+          "property-definitions",
+        ]);
+      },
+    },
   );
 };

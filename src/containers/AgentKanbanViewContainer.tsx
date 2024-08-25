@@ -7,8 +7,13 @@ import { KanbanView } from "../components/KanbanView";
 import { useKanbanColumns } from "../hooks/useKanbanColumns";
 import { TaskDialogContainer } from "./TaskDialogContainer";
 import { useGetDatabaseTasks } from "../hooks/react-query/database";
-import { useAddKanbanColumn, useAddKanbanTask, useDeleteKanbanColumn, useUpdateKanbanViewManualSort } from "../hooks/react-query/database_view";
-import { v4 as uuidv4 } from 'uuid';
+import {
+  useAddKanbanColumn,
+  useAddKanbanTask,
+  useDeleteKanbanColumn,
+  useUpdateKanbanViewManualSort,
+} from "../hooks/react-query/database_view";
+import { v4 as uuidv4 } from "uuid";
 import { useGetDatabasePropertyDefinitions } from "../hooks/react-query/database_property_definition";
 
 interface KanbanViewProps {
@@ -43,10 +48,12 @@ export const AgentKanbanViewContainer: React.FC<KanbanViewProps> = ({
   const [selectedTask, setSelectedTask] = useState<Task | null>(null);
   useEffect(() => {
     if (selectedTask && databaseTasks) {
-      const newSelectedTask = databaseTasks.find(task => task.id === selectedTask.id);
+      const newSelectedTask = databaseTasks.find(
+        (task) => task.id === selectedTask.id,
+      );
       newSelectedTask && setSelectedTask(newSelectedTask);
     }
-  }, [databaseTasks])
+  }, [databaseTasks]);
 
   const handleDragEnd = (result: any) => {
     if (!result.destination) return;
@@ -73,7 +80,7 @@ export const AgentKanbanViewContainer: React.FC<KanbanViewProps> = ({
         }),
       );
 
-      console.warn('sending columns to db', columns)
+      console.warn("sending columns to db", columns);
       const groupByField = databaseView.config?.group_by;
       if (groupByField) {
         updateKanbanViewManualSort.mutateAsync({
@@ -110,9 +117,9 @@ export const AgentKanbanViewContainer: React.FC<KanbanViewProps> = ({
       id: uuidv4(),
       database_id: databaseId,
       title: newTaskTitle,
-      description: '',
-      properties: { [databaseView.config.group_by]: columnTitle }
-    }
+      description: "",
+      properties: { [databaseView.config.group_by]: columnTitle },
+    };
     await addTaskMutation.mutateAsync(newTask);
   };
 

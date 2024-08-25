@@ -1,10 +1,15 @@
 import React from "react";
 import { TaskProperties } from "../components/TaskDialog/TaskProperties";
-import { useAddPropertyDefinition, useDeletePropertyDefinition, useGetDatabasePropertyDefinitions, useUpdatePropertyDefinition } from "../hooks/react-query/database_property_definition";
+import {
+  useAddPropertyDefinition,
+  useDeletePropertyDefinition,
+  useGetDatabasePropertyDefinitions,
+  useUpdatePropertyDefinition,
+} from "../hooks/react-query/database_property_definition";
 import { DatabasePropertyDefinition, PropertyType } from "../types";
 import { usePropertiesWithDefinitions } from "../hooks/usePropertiesWithDefinitions";
 import { useUpdateTask } from "../hooks/react-query/database_view";
-import { v4 as uuidv4 } from 'uuid';
+import { v4 as uuidv4 } from "uuid";
 
 export interface PropertyWithDefinition {
   definition: DatabasePropertyDefinition;
@@ -13,8 +18,8 @@ export interface PropertyWithDefinition {
 
 interface TaskPropertiesContainerProps {
   database_id: string;
-	view_id: string;
-	task_id: string;
+  view_id: string;
+  task_id: string;
   taskProperties: { [key: string]: any };
 }
 
@@ -28,42 +33,50 @@ export const TaskPropertiesContainer: React.FC<
     propertyDefinitions,
   );
 
-	const addPropertyDefinitionMutation = useAddPropertyDefinition(database_id);
-	const deletePropertyDefinitionMutation = useDeletePropertyDefinition(database_id);
-	const updatePropertyDefinitionMutation = useUpdatePropertyDefinition(database_id);
-	const updateTaskMutation = useUpdateTask(database_id, task_id, view_id);
+  const addPropertyDefinitionMutation = useAddPropertyDefinition(database_id);
+  const deletePropertyDefinitionMutation =
+    useDeletePropertyDefinition(database_id);
+  const updatePropertyDefinitionMutation =
+    useUpdatePropertyDefinition(database_id);
+  const updateTaskMutation = useUpdateTask(database_id, task_id, view_id);
 
   const handlePropertyChange = (propertyId: string, newValue: any) => {
-		updateTaskMutation.mutateAsync({id: task_id, changes: { properties: { ...taskProperties, [propertyId]: newValue }}});
+    updateTaskMutation.mutateAsync({
+      id: task_id,
+      changes: { properties: { ...taskProperties, [propertyId]: newValue } },
+    });
   };
 
   const handleAddProperty = (name: string, type: string, value: unknown) => {
-		const propertyDefinition: DatabasePropertyDefinition = {
-			id: uuidv4(),
-			database_id,
-			name,
-			type: type as PropertyType,
-			data: {}
-		}
-		addPropertyDefinitionMutation.mutateAsync(propertyDefinition);
-		updateTaskMutation.mutateAsync({ id: task_id, changes: { properties: { ...taskProperties, [propertyDefinition.id]: value }}});
-	};
+    const propertyDefinition: DatabasePropertyDefinition = {
+      id: uuidv4(),
+      database_id,
+      name,
+      type: type as PropertyType,
+      data: {},
+    };
+    addPropertyDefinitionMutation.mutateAsync(propertyDefinition);
+    updateTaskMutation.mutateAsync({
+      id: task_id,
+      changes: {
+        properties: { ...taskProperties, [propertyDefinition.id]: value },
+      },
+    });
+  };
 
   const handleDeleteProperty = (id: string) => {
-		deletePropertyDefinitionMutation.mutateAsync(id);
-	};
+    deletePropertyDefinitionMutation.mutateAsync(id);
+  };
 
-  const handleEditProperty = () => {
-
-	};
+  const handleEditProperty = () => {};
 
   return (
-    <TaskProperties 
-			propertiesWithDefinitions={propertiesWithDefinitions} 
-			onPropertyChange={handlePropertyChange}
-			onAddProperty={handleAddProperty}
-			onEditProperty={handleEditProperty}
-			onPropertyDelete={handleDeleteProperty}
-		/>
+    <TaskProperties
+      propertiesWithDefinitions={propertiesWithDefinitions}
+      onPropertyChange={handlePropertyChange}
+      onAddProperty={handleAddProperty}
+      onEditProperty={handleEditProperty}
+      onPropertyDelete={handleDeleteProperty}
+    />
   );
 };

@@ -13,7 +13,7 @@ export async function getPropertyDefinitionsByDatabaseId(databaseId: string) {
       throw new Error("Error fetching dataabse_proepty definitions");
     }
 
-    console.warn('fecthed property definitions', propertyDefinitions);
+    console.warn("fecthed property definitions", propertyDefinitions);
     return propertyDefinitions as DatabasePropertyDefinition[];
   } catch (error) {
     console.error("Error fetching  propertie defintions:", error);

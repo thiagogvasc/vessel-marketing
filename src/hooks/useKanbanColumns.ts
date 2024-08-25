@@ -1,5 +1,11 @@
 import { useEffect, useState } from "react";
-import { AggregateColumn, Database, DatabasePropertyDefinition, DatabaseView, Task } from "../types";
+import {
+  AggregateColumn,
+  Database,
+  DatabasePropertyDefinition,
+  DatabaseView,
+  Task,
+} from "../types";
 
 export const useKanbanColumns = (
   databaseTasks: Task[] | null | undefined,

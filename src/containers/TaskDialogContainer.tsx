@@ -6,7 +6,6 @@ import { useUpdateTask } from "../hooks/react-query/database_view";
 import { TaskCommentsContainer } from "./TaskCommentsContainer";
 import { TaskPropertiesContainer } from "./TaskPropertiesContainer";
 
-
 interface TaskDialogContainerProps {
   databaseId: string;
   viewId: string;

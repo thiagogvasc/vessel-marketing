@@ -1,7 +1,10 @@
 "use client";
 
 import { useEffect, useState } from "react";
-import { useDeleteDatabase, useGetDatabases } from "@/src/hooks/react-query/database";
+import {
+  useDeleteDatabase,
+  useGetDatabases,
+} from "@/src/hooks/react-query/database";
 import Link from "next/link";
 import {
   Box,
@@ -86,7 +89,7 @@ const Databases = () => {
     if (id) {
       deleteDatabaseMutation.mutateAsync(id);
     }
-  }
+  };
 
   return (
     <Container component="main" maxWidth="xl">

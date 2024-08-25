@@ -1,5 +1,10 @@
 import { supabase } from "@/supabaseClient";
-import { AggregateColumn, DatabasePropertyDefinition, DatabaseView, Task } from "../types";
+import {
+  AggregateColumn,
+  DatabasePropertyDefinition,
+  DatabaseView,
+  Task,
+} from "../types";
 import { updateTask } from "./task";
 import { getPropertyDefinitionsByDatabaseId } from "./database_property_definitions";
 
@@ -63,14 +68,14 @@ export const updateKanbanViewManualSort = async (
   taskId: string,
   taskChanges: Partial<Task>,
 ) => {
-  const viewData = await getDatabaseViewById(viewId) as DatabaseView;
+  const viewData = (await getDatabaseViewById(viewId)) as DatabaseView;
   const config = { ...viewData.config };
 
   config.groups = columns.map((column) => ({
     group_by_value: column.title,
     task_order: column.tasks.map((task) => task.id as string),
   }));
-  console.warn('updated config', config)
+  console.warn("updated config", config);
   const { error: updateError } = await supabase
     .from("database_view")
     .update({ config })
@@ -92,32 +97,34 @@ export const updateKanbanViewManualSort = async (
   }
 };
 
-
 export const addKanbanColumn = async (
   databaseId: string,
   viewId: string,
   newOption: string,
 ) => {
   try {
-    const propertyDefinitions = await getPropertyDefinitionsByDatabaseId(databaseId) as DatabasePropertyDefinition[];
-    const viewData = await getDatabaseViewById(viewId) as DatabaseView;
+    const propertyDefinitions = (await getPropertyDefinitionsByDatabaseId(
+      databaseId,
+    )) as DatabasePropertyDefinition[];
+    const viewData = (await getDatabaseViewById(viewId)) as DatabaseView;
 
     const newConfig = {
       ...viewData.config,
       groups: [
-        ...viewData.config?.groups ?? [], 
+        ...(viewData.config?.groups ?? []),
         {
           group_by_value: newOption,
           task_order: [],
-        }
-      ]
+        },
+      ],
     };
 
     await updateDatabaseView(viewId, { config: newConfig });
-    
 
-    const groupByProperty = propertyDefinitions.find(prop => prop.id === viewData.config?.group_by)
-    
+    const groupByProperty = propertyDefinitions.find(
+      (prop) => prop.id === viewData.config?.group_by,
+    );
+
     if (
       groupByProperty &&
       groupByProperty.data &&
@@ -129,9 +136,9 @@ export const addKanbanColumn = async (
 
         // Update the document with the modified propertyDefinitions and views array
         const { error: updateError } = await supabase
-          .from('database_property_definition')
+          .from("database_property_definition")
           .update(groupByProperty)
-          .eq('id', groupByProperty.id);
+          .eq("id", groupByProperty.id);
 
         if (updateError) throw updateError;
 
@@ -144,27 +151,31 @@ export const addKanbanColumn = async (
   }
 };
 
-
 export const deleteKanbanColumn = async (
   databaseId: string,
   viewId: string,
   optionToDelete: string,
 ) => {
   try {
-    const propertyDefinitions = await getPropertyDefinitionsByDatabaseId(databaseId) as DatabasePropertyDefinition[];
-    const viewData = await getDatabaseViewById(viewId) as DatabaseView;
+    const propertyDefinitions = (await getPropertyDefinitionsByDatabaseId(
+      databaseId,
+    )) as DatabasePropertyDefinition[];
+    const viewData = (await getDatabaseViewById(viewId)) as DatabaseView;
 
     // Update the view config by removing the specified group
     const newConfig = {
       ...viewData.config,
-      groups: viewData.config?.groups?.filter(
-        (group) => group.group_by_value !== optionToDelete
-      ) ?? [],
+      groups:
+        viewData.config?.groups?.filter(
+          (group) => group.group_by_value !== optionToDelete,
+        ) ?? [],
     };
 
     await updateDatabaseView(viewId, { config: newConfig });
 
-    const groupByProperty = propertyDefinitions.find(prop => prop.id === viewData.config?.group_by);
+    const groupByProperty = propertyDefinitions.find(
+      (prop) => prop.id === viewData.config?.group_by,
+    );
 
     if (
       groupByProperty &&
@@ -174,14 +185,14 @@ export const deleteKanbanColumn = async (
       // Remove the option from the options array if it exists
       if (groupByProperty.data.options.includes(optionToDelete)) {
         groupByProperty.data.options = groupByProperty.data.options.filter(
-          (option: string) => option !== optionToDelete
+          (option: string) => option !== optionToDelete,
         );
 
         // Update the property definitions in the database
         const { error: updateError } = await supabase
-          .from('database_property_definition')
+          .from("database_property_definition")
           .update(groupByProperty)
-          .eq('id', groupByProperty.id);
+          .eq("id", groupByProperty.id);
 
         if (updateError) throw updateError;
 
