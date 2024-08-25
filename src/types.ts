@@ -4,7 +4,7 @@ export type UserRole = "client" | "agent";
 
 // Types for Users Collection
 export interface User {
-  id?: string; // auto-generated
+  id: string;
   email: string;
   role: UserRole;
   fullname: string;
@@ -63,7 +63,7 @@ export interface ViewConfig {
 }
 
 export interface DatabaseView {
-  id?: string;
+  id: string;
   database_id: string;
   name: string;
   type: string;
@@ -127,9 +127,10 @@ export interface Database {
 }
 
 export interface TaskComment {
-  id?: string;
+  id: string;
   text: string;
-  author: string;
+  task_id: string;
+  author_id: string;
   created_at?: string;
 }
 

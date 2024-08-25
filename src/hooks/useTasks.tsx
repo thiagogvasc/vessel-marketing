@@ -1,7 +1,5 @@
 import { useQuery, useMutation, useQueryClient } from "react-query";
 import {
-  fetchTasks,
-  addTask,
   updateTask,
   fetchBoard,
   updateTaskOrder,

@@ -6,7 +6,7 @@ export const useKanbanColumns = (
   databaseView: DatabaseView | null,
 ) => {
   const [columns, setColumns] = useState<AggregateColumn[]>([]);
-
+  console.warn({ databaseView, databaseTasks });
   useEffect(() => {
     if (databaseTasks && databaseView) {
       const initialColumns: AggregateColumn[] = [];

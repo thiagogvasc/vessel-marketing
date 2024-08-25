@@ -1,16 +1,16 @@
 import React, { useEffect, useState } from "react";
 import {
   DatabasePropertyDefinition,
-  Task,
   TaskComment,
   Task as TaskType,
 } from "../types";
-import {
-  useDeleteTask,
-  useGetDatabaseWithTasks,
-  useUpdateTask,
-} from "../hooks/useTasks";
 import TaskDialog from "../components/TaskDialog/TaskDialog";
+import { useAddTaskComment, useDeleteKanbanTask } from "../hooks/react-query/database_view";
+import { useGetDatabasePropertyDefinitions } from "../hooks/react-query/database";
+import { useUpdateTask } from "../hooks/react-query/database_view";
+import { useGetCommentsByTaskId } from "../hooks/react-query/task_comment";
+import { v4 as uuidv4 } from 'uuid'
+import { useAuth } from "../contexts/AuthContext";
 
 export interface TaskWithId extends TaskType {
   id: string;
@@ -23,7 +23,7 @@ export interface PropertyWithDefinition {
 
 interface TaskDialogContainerProps {
   databaseId: string;
-  viewName: string;
+  viewId: string;
   task: TaskWithId;
   open: boolean;
   dialogClosed?: () => void;
@@ -33,46 +33,24 @@ export const TaskDialogContainer = ({
   task,
   open,
   databaseId,
-  viewName,
+  viewId,
   dialogClosed,
 }: TaskDialogContainerProps) => {
-  const { data: databaseWithTasks } = useGetDatabaseWithTasks(databaseId);
-  const updateTaskMutation = useUpdateTask(task.database_id, viewName);
-  const deleteTaskMutation = useDeleteTask(task.database_id, viewName);
-
-  const comments: TaskComment[] = [
-    {
-      author: "thiago",
-      text: "my commetn",
-      created_at: "today",
-      id: "1",
-    },
-    {
-      author: "thiago2",
-      text: "my commetn2",
-      created_at: "today2",
-      id: "2",
-    },
-    {
-      author: "thiago3",
-      text: "my commetn33333333",
-      created_at: "today3333",
-      id: "3",
-    },
-  ];
-  task.comments = comments; //
+  const { data: propertyDefinitions } = useGetDatabasePropertyDefinitions(databaseId);
+  const { data: taskComments } = useGetCommentsByTaskId(databaseId, task.id);
+  const { user } = useAuth();
+  const updateTaskMutation = useUpdateTask(task.database_id, viewId);
+  const deleteTaskMutation = useDeleteKanbanTask(task.database_id, viewId);
+  const addCommentMutation = useAddTaskComment(task.database_id, task.id);
 
   const [properties, setProperties] = useState<PropertyWithDefinition[]>([]);
   useEffect(() => {
-    const propDefinitions = databaseWithTasks?.propertyDefinitions;
-    const props = task?.properties;
-    if (!props) return;
-
+    if (!task?.properties) return;
     const properties: PropertyWithDefinition[] = [];
 
-    Object.entries(props).forEach(([key, value]) => {
+    Object.entries(task?.properties).forEach(([key, value]) => {
       const [propertyName, propertyValue] = [key, value];
-      const propertyDefinition = propDefinitions?.find(
+      const propertyDefinition = propertyDefinitions?.find(
         (propDef) => propDef.name === propertyName,
       );
       propertyDefinition &&
@@ -82,7 +60,7 @@ export const TaskDialogContainer = ({
         });
     });
     setProperties(properties);
-  }, [databaseWithTasks, task]);
+  }, [propertyDefinitions, task]);
 
   const handleTaskUpdated = async (
     title: string,
@@ -108,12 +86,22 @@ export const TaskDialogContainer = ({
 
   const handleTaskDialogClose = () => dialogClosed?.();
 
-  const handleCommentAdded = () => {};
+  const handleCommentAdded = (commentText: string) => {
+    if (!user) return;
+    const newComment: TaskComment = {
+      id: uuidv4(),
+      author_id: user.id,
+      task_id: task.id,
+      text: commentText,
+    }
+    addCommentMutation.mutateAsync(newComment);
+  };
 
   return (
     <TaskDialog
       readOnly={false}
       task={task}
+      taskComments={taskComments ?? []}
       propertiesWithDefinitions={properties}
       open={open}
       onClose={handleTaskDialogClose}

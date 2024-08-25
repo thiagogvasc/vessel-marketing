@@ -15,7 +15,7 @@ import {
   MenuItem as MenuOption,
 } from "@mui/material";
 import MoreVertIcon from "@mui/icons-material/MoreVert";
-import { PropertyType, Task as TaskType } from "../../types";
+import { PropertyType, TaskComment, Task as TaskType } from "../../types";
 import { TaskComments } from "./TaskComments";
 import { PropertyWithDefinition } from "@/src/containers/TaskDialogContainer";
 
@@ -25,6 +25,7 @@ export interface TaskWithId extends TaskType {
 
 interface TaskDialogProps {
   task: TaskWithId;
+  taskComments: TaskComment[];
   propertiesWithDefinitions: PropertyWithDefinition[];
   open: boolean;
   onClose: () => void;
@@ -40,6 +41,7 @@ interface TaskDialogProps {
 
 const TaskDialog: React.FC<TaskDialogProps> = ({
   task,
+  taskComments,
   propertiesWithDefinitions,
   open,
   onClose,
@@ -74,20 +76,20 @@ const TaskDialog: React.FC<TaskDialogProps> = ({
   };
 
   const handleAddProperty = () => {
-    setNewPropertiesWithDefinitions([
-      ...newPropertiesWithDefinitions,
-      {
-        definition: {
-          name: newPropertyName,
-          type: newPropertyType as PropertyType,
-        },
-        value: newPropertyValue,
-      },
-    ]);
-    setNewPropertyType("");
-    setNewPropertyName("");
-    setNewPropertyValue("");
-    setShowNewPropertyForm(false);
+    // setNewPropertiesWithDefinitions([
+    //   ...newPropertiesWithDefinitions,
+    //   {
+    //     definition: {
+    //       name: newPropertyName,
+    //       type: newPropertyType as PropertyType,
+    //     },
+    //     value: newPropertyValue,
+    //   },
+    // ]);
+    // setNewPropertyType("");
+    // setNewPropertyName("");
+    // setNewPropertyValue("");
+    // setShowNewPropertyForm(false);
   };
 
   const handleMenuOpen = (event: React.MouseEvent<HTMLElement>) => {
@@ -254,7 +256,7 @@ const TaskDialog: React.FC<TaskDialogProps> = ({
             <Box>
               {/* use component composition instead, pass this from the container compoennts */}
               <TaskComments
-                comments={task.comments}
+                comments={taskComments}
                 commentAdded={handleCommentAdded}
               />
             </Box>

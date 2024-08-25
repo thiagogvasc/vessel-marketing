@@ -1,14 +1,18 @@
-export const useDeleteKanbanTask = (databaseId: string, viewName: string) => {
+import { addKanbanTask, deleteKanbanTask, updateTask } from "@/src/supabase/task";
+import { addTaskComment } from "@/src/supabase/task_comment";
+import { Task, TaskComment } from "@/src/types";
+import { useMutation, useQueryClient } from "react-query";
+
+export const useDeleteKanbanTask = (databaseId: string, viewId: string) => {
   const queryClient = useQueryClient();
 
   return useMutation(
     async (taskToDelete: Task) => {
       try {
         console.warn("calling delete task");
-        const deletedTask = await deleteTask(
+        const deletedTask = await deleteKanbanTask(
           taskToDelete,
-          databaseId,
-          viewName,
+          viewId,
         );
         return deletedTask;
       } catch (err) {
@@ -19,58 +23,58 @@ export const useDeleteKanbanTask = (databaseId: string, viewName: string) => {
 
     {
       onSuccess: (task) => {
-        const previousDatabaseTasks = queryClient.getQueryData([
-          "database-tasks",
-          databaseId,
-        ]) as Database & { tasks: Task[] };
-        queryClient.setQueryData<Database & { tasks: Task[] }>(
-          ["database-tasks", databaseId],
-          (old) => ({
-            ...previousDatabaseTasks,
-            views: previousDatabaseTasks.views.map((view) => {
-              if (view.name === viewName) {
-                return {
-                  ...view,
-                  config: {
-                    ...view.config,
-                    groups: view.config?.groups?.map((group) => {
-                      if (
-                        group.group_by_value ===
-                        task.properties[view.config?.group_by as string]
-                      ) {
-                        return {
-                          ...group,
-                          task_order: group.task_order.filter(
-                            (taskId) => taskId !== task.id,
-                          ),
-                        };
-                      } else {
-                        return group;
-                      }
-                    }),
-                  },
-                };
-              } else {
-                return view;
-              }
-            }),
-            tasks: previousDatabaseTasks.tasks.filter((t) => t.id !== task.id),
-          }),
-        );
+        // const previousDatabaseTasks = queryClient.getQueryData([
+        //   "database-tasks",
+        //   databaseId,
+        // ]) as Database & { tasks: Task[] };
+        // queryClient.setQueryData<Database & { tasks: Task[] }>(
+        //   ["database-tasks", databaseId],
+        //   (old) => ({
+        //     ...previousDatabaseTasks,
+        //     views: previousDatabaseTasks.views.map((view) => {
+        //       if (view.name === viewName) {
+        //         return {
+        //           ...view,
+        //           config: {
+        //             ...view.config,
+        //             groups: view.config?.groups?.map((group) => {
+        //               if (
+        //                 group.group_by_value ===
+        //                 task.properties[view.config?.group_by as string]
+        //               ) {
+        //                 return {
+        //                   ...group,
+        //                   task_order: group.task_order.filter(
+        //                     (taskId) => taskId !== task.id,
+        //                   ),
+        //                 };
+        //               } else {
+        //                 return group;
+        //               }
+        //             }),
+        //           },
+        //         };
+        //       } else {
+        //         return view;
+        //       }
+        //     }),
+        //     tasks: previousDatabaseTasks.tasks.filter((t) => t.id !== task.id),
+        //   }),
+        // );
       },
     },
   );
 };
 
 // Add a new task
-export const useAddKanbanTask = (databaseId: string, viewName: string) => {
+export const useAddKanbanTask = (databaseId: string, viewId: string) => {
   const queryClient = useQueryClient();
 
   return useMutation(
-    async (task: Omit<Task, "id" | "created_at" | "updated_at">) => {
+    async (task: Task) => {
       try {
         console.warn("calling add task");
-        const addedTask = await addTask(task, databaseId, viewName);
+        const addedTask = await addKanbanTask(task, viewId);
         console.warn("here");
         return addedTask;
       } catch (err) {
@@ -85,45 +89,172 @@ export const useAddKanbanTask = (databaseId: string, viewName: string) => {
       },
       onSettled: () => {
         console.warn("settled");
+        queryClient.invalidateQueries({ queryKey: ["databases", databaseId] });
       },
       onSuccess: (task) => {
-        const previousDatabaseTasks = queryClient.getQueryData([
-          "database-tasks",
-          databaseId,
-        ]) as Database & { tasks: Task[] };
-        console.warn("setting query data");
-        queryClient.setQueryData<Database & { tasks: Task[] }>(
-          ["database-tasks", databaseId],
-          (old) => ({
-            ...previousDatabaseTasks,
-            views: previousDatabaseTasks.views.map((view) => {
-              if (view.name === viewName) {
-                return {
-                  ...view,
-                  config: {
-                    ...view.config,
-                    groups: view.config?.groups?.map((group) => {
-                      if (
-                        group.group_by_value ===
-                        task.properties[view.config?.group_by as string]
-                      ) {
-                        return {
-                          ...group,
-                          task_order: [...group.task_order, task.id as string],
-                        };
-                      } else {
-                        return group;
-                      }
-                    }),
-                  },
-                };
-              } else {
-                return view;
-              }
-            }),
-            tasks: [...previousDatabaseTasks?.tasks, task],
-          }),
-        );
+        // const previousDatabaseTasks = queryClient.getQueryData([
+        //   "database-tasks",
+        //   databaseId,
+        // ]) as Database & { tasks: Task[] };
+        // console.warn("setting query data");
+        // queryClient.setQueryData<Database & { tasks: Task[] }>(
+        //   ["database-tasks", databaseId],
+        //   (old) => ({
+        //     ...previousDatabaseTasks,
+        //     views: previousDatabaseTasks.views.map((view) => {
+        //       if (view.name === viewName) {
+        //         return {
+        //           ...view,
+        //           config: {
+        //             ...view.config,
+        //             groups: view.config?.groups?.map((group) => {
+        //               if (
+        //                 group.group_by_value ===
+        //                 task.properties[view.config?.group_by as string]
+        //               ) {
+        //                 return {
+        //                   ...group,
+        //                   task_order: [...group.task_order, task.id as string],
+        //                 };
+        //               } else {
+        //                 return group;
+        //               }
+        //             }),
+        //           },
+        //         };
+        //       } else {
+        //         return view;
+        //       }
+        //     }),
+        //     tasks: [...previousDatabaseTasks?.tasks, task],
+        //   }),
+        // );
+      },
+    },
+  );
+};
+
+
+// Update an existing task
+export const useUpdateTask = (databaseId: string, viewId: string) => {
+  const queryClient = useQueryClient();
+
+  return useMutation(
+    ({
+      id,
+      updatedTask,
+    }: {
+      id: string;
+      updatedTask: Partial<Omit<Task, "id" | "created_at">>;
+    }) => updateTask(id, updatedTask, viewId),
+    // {
+    //   onSuccess: (updatedTaskData, variables) => {
+    //     // const previousDatabaseTasks = queryClient.getQueryData([
+    //     //   "database-tasks",
+    //     //   databaseId,
+    //     // ]) as Database & { tasks: Task[] };
+    //     // const newViews = previousDatabaseTasks.views.map((view) => {
+    //     //   const changedProperties = updatedTaskData.updatedTask.properties;
+    //     //   if (!changedProperties) return view;
+
+    //     //   Object.keys(changedProperties).forEach((propertyName) => {
+    //     //     if (view.config?.group_by === propertyName) {
+    //     //       // Remove task from the old group
+    //     //       let indexToRemove = -1;
+    //     //       let groupToRemoveTaskFrom: GroupByGroup | null = null;
+    //     //       view.config.groups?.forEach((group) => {
+    //     //         const taskIndex = group.task_order.indexOf(updatedTaskData.id);
+    //     //         if (taskIndex !== -1) {
+    //     //           indexToRemove = taskIndex;
+    //     //           groupToRemoveTaskFrom = group;
+    //     //         }
+    //     //       });
+
+    //     //       if (indexToRemove !== -1 && groupToRemoveTaskFrom) {
+    //     //         (groupToRemoveTaskFrom as GroupByGroup).task_order.splice(
+    //     //           indexToRemove,
+    //     //           1,
+    //     //         );
+    //     //       }
+
+    //     //       // Add task to the new group
+    //     //       const newGroupByValue = changedProperties[view.config.group_by];
+    //     //       const newGroup = view.config.groups?.find(
+    //     //         (group) => group.group_by_value === newGroupByValue,
+    //     //       );
+
+    //     //       if (newGroup) {
+    //     //         newGroup.task_order.push(updatedTaskData.id);
+    //     //       } else {
+    //     //         // If the group does not exist, create it
+    //     //         view.config.groups = [
+    //     //           ...(view.config.groups || []),
+    //     //           {
+    //     //             group_by_value: newGroupByValue,
+    //     //             task_order: [updatedTaskData.id],
+    //     //           },
+    //     //         ];
+    //     //       }
+    //     //     }
+    //     //   });
+
+    //     //   return view;
+    //     // });
+
+    //     // queryClient.setQueryData<Database & { tasks: Task[] }>(
+    //     //   ["database-tasks", databaseId],
+    //     //   (old) => ({
+    //     //     ...previousDatabaseTasks,
+    //     //     views: newViews,
+    //     //     tasks:
+    //     //       old?.tasks.map((task) => {
+    //     //         if (task?.id === updatedTaskData.id) {
+    //     //           return {
+    //     //             id: updatedTaskData.id,
+    //     //             database_id: updatedTaskData.updatedTask.database_id ?? "",
+    //     //             description: updatedTaskData.updatedTask.description ?? "",
+    //     //             properties: updatedTaskData.updatedTask.properties,
+    //     //             title: updatedTaskData.updatedTask.title,
+    //     //             created_at: updatedTaskData.updatedTask.created_at,
+    //     //             updated_at: updatedTaskData.updatedTask.updated_at,
+    //     //           } as Task;
+    //     //         }
+    //     //         return task;
+    //     //       }) ?? [],
+    //     //   }),
+    //     // );
+    //   },
+    // },
+  );
+};
+
+
+export const useAddTaskComment = (databaseId: string, taskId: string) => {
+  const queryClient = useQueryClient();
+
+  return useMutation(
+    (comment: TaskComment) =>
+      addTaskComment(comment),
+    {
+      onMutate: (comment) => {
+        // const previousDatabaseWithTasks = queryClient.getQueryData<
+        //   Database & { tasks: Task[] }
+        // >(["database-tasks", databaseId]);
+        // previousDatabaseWithTasks &&
+        //   queryClient.setQueryData<Database & { tasks: Task[] }>(
+        //     ["database-tasks", databaseId],
+        //     () => ({
+        //       ...previousDatabaseWithTasks,
+        //       tasks: previousDatabaseWithTasks?.tasks.map((task) => ({
+        //         ...task,
+        //         comments: [...task.comments, comment],
+        //       })),
+        //     }),
+        //   );
+      },
+
+      onSettled: () => {
+        queryClient.invalidateQueries({ queryKey: ['databases', databaseId, 'tasks', taskId, 'comments']});
       },
     },
   );

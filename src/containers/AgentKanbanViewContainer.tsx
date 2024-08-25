@@ -3,7 +3,6 @@
 import React, { useState } from "react";
 import {
   useAddKanbanColumn,
-  useAddTask,
   useDeleteKanbanColumn,
   useUpdateKanbanViewManualSort,
 } from "../hooks/useTasks";
@@ -13,6 +12,7 @@ import { KanbanView } from "../components/KanbanView";
 import { useKanbanColumns } from "../hooks/useKanbanColumns";
 import { TaskDialogContainer } from "./TaskDialogContainer";
 import { useGetDatabaseTasks } from "../hooks/react-query/database";
+import { useAddKanbanTask } from "../hooks/react-query/database_view";
 
 interface KanbanViewProps {
   databaseId: string;
@@ -27,6 +27,7 @@ export const AgentKanbanViewContainer: React.FC<KanbanViewProps> = ({
 }) => {
   const { data: databaseTasks, isLoading: isTasksLoading } =
     useGetDatabaseTasks(databaseId as string);
+  console.warn("here", databaseTasks);
   const updateKanbanViewManualSort = useUpdateKanbanViewManualSort(
     databaseId,
     databaseView.id as string,
@@ -35,13 +36,14 @@ export const AgentKanbanViewContainer: React.FC<KanbanViewProps> = ({
     databaseId,
     databaseView.name,
   );
-  const addTaskMutation = useAddTask(databaseId, databaseView.name);
+  const addTaskMutation = useAddKanbanTask(databaseId, databaseView.id);
   const deleteColumnMutation = useDeleteKanbanColumn(
     databaseId,
     databaseView.name,
   );
 
   const { columns, setColumns } = useKanbanColumns(databaseTasks, databaseView);
+  console.warn({ columns });
   const [isTaskDialogOpen, setIsTaskDialogOpen] = useState(false);
   const [selectedTask, setSelectedTask] = useState<TaskWithId | null>(null);
 
@@ -138,7 +140,7 @@ export const AgentKanbanViewContainer: React.FC<KanbanViewProps> = ({
       {selectedTask && (
         <TaskDialogContainer
           databaseId={databaseId}
-          viewName={databaseView.name}
+          viewId={databaseView.id}
           task={selectedTask}
           open={isTaskDialogOpen}
           dialogClosed={handleTaskDialogClose}
