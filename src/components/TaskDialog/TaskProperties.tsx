@@ -8,6 +8,7 @@ import {
   FormControl,
   InputLabel,
   Select,
+  Typography,
 } from "@mui/material";
 import { PropertyWithDefinition } from "@/src/containers/TaskPropertiesContainer";
 import { DatabasePropertyDefinition } from "@/src/types";
@@ -25,78 +26,90 @@ export const TaskProperties: React.FC<TaskPropertiesProps> = ({
   onPropertyChange,
   onAddProperty,
   onEditProperty,
-  onPropertyDelete
+  onPropertyDelete,
 }) => {
   const [anchorEl, setAnchorEl] = useState<null | HTMLElement>(null);
+  const [editMenuAnchorEl, setEditMenuAnchorEl] = useState<null | HTMLElement>(null);
+  const [selectedProperty, setSelectedProperty] = useState<null | PropertyWithDefinition>(null);
+  const [isEditing, setIsEditing] = useState(false);
 
-  const handleClick = (event: React.MouseEvent<HTMLButtonElement>) => {
+  const handleAddClick = (event: React.MouseEvent<HTMLButtonElement>) => {
     setAnchorEl(event.currentTarget);
   };
 
-  const handleClose = () => {
+  const handleMenuClose = () => {
     setAnchorEl(null);
+    setEditMenuAnchorEl(null);
+    setIsEditing(false);
   };
 
   const handleAddProperty = (type: string) => {
     const defaultName = `New ${type} Property`;
     const defaultValue = type === "Text" ? "" : type === "Select" ? "Option 1" : "";
-    
+
     onAddProperty?.(defaultName, type, defaultValue);
-    handleClose();
+    handleMenuClose();
+  };
+
+  const handlePropertyNameClick = (event: React.MouseEvent<HTMLElement>, prop: PropertyWithDefinition) => {
+    setSelectedProperty(prop);
+    setEditMenuAnchorEl(event.currentTarget);
+  };
+
+  const handleEditProperty = () => {
+    setIsEditing(true);
+  };
+
+  const handlePropertyChange = (newValue: any) => {
+    if (selectedProperty) {
+      onPropertyChange?.(selectedProperty.definition.name, newValue);
+    }
+    handleMenuClose();
+  };
+
+  const handleDeleteProperty = () => {
+    if (selectedProperty) {
+      onPropertyDelete?.(selectedProperty.definition.id);
+    }
+    handleMenuClose();
   };
 
   return (
     <>
       {propertiesWithDefinitions.map((prop, index) => (
-        <Box
-          key={index}
-          sx={{ display: "flex", flexDirection: "column", gap: 2 }}
-        >
-          {prop.definition.type === "Text" && (
-            <TextField
-              label={prop.definition.name}
-              value={prop.value}
-              onChange={(e) =>
-                onPropertyChange?.(prop.definition.name, e.target.value)
-              }
-              fullWidth
-            />
-          )}
-          {prop.definition.type === "Select" && (
-            <FormControl fullWidth>
-              <InputLabel id={`${prop.definition.name}-label`}>
-                {prop.definition.name}
-              </InputLabel>
-              <Select
-                labelId={`${prop.definition.name}-label`}
-                value={prop.value}
-                onChange={(e) =>
-                  onPropertyChange?.(prop.definition.name, e.target.value)
-                }
-                fullWidth
-              >
-                {prop.definition.data?.options?.map((option) => (
-                  <MenuItem key={option} value={option}>
-                    {option}
-                  </MenuItem>
-                ))}
-              </Select>
-            </FormControl>
-          )}
+        <Box key={index} sx={{ display: "flex", flexDirection: "row", alignItems: "center", gap: 2 }}>
+          <Box sx={{ flex: 1 }}>
+            <Typography
+              variant="body1"
+              onClick={(e) => handlePropertyNameClick(e, prop)}
+              sx={{ cursor: "pointer", textDecoration: "underline" }}
+            >
+              {prop.definition.name}
+            </Typography>
+          </Box>
+          <Box sx={{ flex: 1 }}>
+            <Typography variant="body2">{prop.value}</Typography>
+          </Box>
         </Box>
       ))}
-      <Button
-        variant="outlined"
-        onClick={handleClick}
-        sx={{ alignSelf: "flex-start" }}
-      >
+      <Button variant="outlined" onClick={handleAddClick} sx={{ alignSelf: "flex-start", mt: 2 }}>
         Add Property
       </Button>
-      <Menu
-        anchorEl={anchorEl}
-        open={Boolean(anchorEl)}
-        onClose={handleClose}
-      >
+      <Menu anchorEl={editMenuAnchorEl} open={Boolean(editMenuAnchorEl) && !isEditing} onClose={handleMenuClose}>
+        <MenuItem onClick={handleEditProperty}>Edit</MenuItem>
+        <MenuItem onClick={handleDeleteProperty}>Delete</MenuItem>
+      </Menu>
+      {isEditing && selectedProperty && (
+        <Menu anchorEl={editMenuAnchorEl} open={Boolean(editMenuAnchorEl) && isEditing} onClose={handleMenuClose}>
+          {selectedProperty.definition.type === "Text" && (
+           <>Text edit menu</>
+          )}
+          {selectedProperty.definition.type === "Select" && (
+            <>select edit menu</>
+          )}
+        </Menu>
+      )}
+      <Menu anchorEl={anchorEl} open={Boolean(anchorEl)} onClose={handleMenuClose}>
         <MenuItem onClick={() => handleAddProperty("Text")}>Text</MenuItem>
         <MenuItem onClick={() => handleAddProperty("Select")}>Select</MenuItem>
         {/* Add more property types here if needed */}

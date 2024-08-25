@@ -1,9 +1,8 @@
-import React, { useEffect, useState } from "react";
+import React from "react";
 import { TaskProperties } from "../components/TaskDialog/TaskProperties";
-import { useAddPropertyDefinition, useGetDatabasePropertyDefinitions, useUpdatePropertyDefinition } from "../hooks/react-query/database_property_definition";
+import { useAddPropertyDefinition, useDeletePropertyDefinition, useGetDatabasePropertyDefinitions, useUpdatePropertyDefinition } from "../hooks/react-query/database_property_definition";
 import { DatabasePropertyDefinition, PropertyType } from "../types";
 import { usePropertiesWithDefinitions } from "../hooks/usePropertiesWithDefinitions";
-import { deletePropertyDefinition } from "../supabase/database_property_definitions";
 import { useUpdateTask } from "../hooks/react-query/database_view";
 import { v4 as uuidv4 } from 'uuid';
 
@@ -30,7 +29,7 @@ export const TaskPropertiesContainer: React.FC<
   );
 
 	const addPropertyDefinitionMutation = useAddPropertyDefinition(database_id);
-	const deletePropertyDefinitionMutation = deletePropertyDefinition(database_id);
+	const deletePropertyDefinitionMutation = useDeletePropertyDefinition(database_id);
 	const updatePropertyDefinitionMutation = useUpdatePropertyDefinition(database_id);
 	const updateTaskMutation = useUpdateTask(database_id, view_id);
 
@@ -50,15 +49,14 @@ export const TaskPropertiesContainer: React.FC<
 		updateTaskMutation.mutateAsync({ id: task_id, changes: { properties: { ...taskProperties, [name]: value }}});
 	};
 
-  const handleDeleteProperty = () => {
-
+  const handleDeleteProperty = (id: string) => {
+		deletePropertyDefinitionMutation.mutateAsync(id);
 	};
 
   const handleEditProperty = () => {
 
 	};
 
-  console.warn({ propertiesWithDefinitions });
   return (
     <TaskProperties 
 			propertiesWithDefinitions={propertiesWithDefinitions} 
