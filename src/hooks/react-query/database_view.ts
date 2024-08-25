@@ -1,4 +1,8 @@
-import { addKanbanTask, deleteKanbanTask, updateTask } from "@/src/supabase/task";
+import {
+  addKanbanTask,
+  deleteKanbanTask,
+  updateTask,
+} from "@/src/supabase/task";
 import { addTaskComment } from "@/src/supabase/task_comment";
 import { Task, TaskComment } from "@/src/types";
 import { useMutation, useQueryClient } from "react-query";
@@ -10,10 +14,7 @@ export const useDeleteKanbanTask = (databaseId: string, viewId: string) => {
     async (taskToDelete: Task) => {
       try {
         console.warn("calling delete task");
-        const deletedTask = await deleteKanbanTask(
-          taskToDelete,
-          viewId,
-        );
+        const deletedTask = await deleteKanbanTask(taskToDelete, viewId);
         return deletedTask;
       } catch (err) {
         console.warn(err);
@@ -134,7 +135,6 @@ export const useAddKanbanTask = (databaseId: string, viewId: string) => {
   );
 };
 
-
 // Update an existing task
 export const useUpdateTask = (databaseId: string, viewId: string) => {
   const queryClient = useQueryClient();
@@ -228,34 +228,31 @@ export const useUpdateTask = (databaseId: string, viewId: string) => {
   );
 };
 
-
 export const useAddTaskComment = (databaseId: string, taskId: string) => {
   const queryClient = useQueryClient();
 
-  return useMutation(
-    (comment: TaskComment) =>
-      addTaskComment(comment),
-    {
-      onMutate: (comment) => {
-        // const previousDatabaseWithTasks = queryClient.getQueryData<
-        //   Database & { tasks: Task[] }
-        // >(["database-tasks", databaseId]);
-        // previousDatabaseWithTasks &&
-        //   queryClient.setQueryData<Database & { tasks: Task[] }>(
-        //     ["database-tasks", databaseId],
-        //     () => ({
-        //       ...previousDatabaseWithTasks,
-        //       tasks: previousDatabaseWithTasks?.tasks.map((task) => ({
-        //         ...task,
-        //         comments: [...task.comments, comment],
-        //       })),
-        //     }),
-        //   );
-      },
-
-      onSettled: () => {
-        queryClient.invalidateQueries({ queryKey: ['databases', databaseId, 'tasks', taskId, 'comments']});
-      },
+  return useMutation((comment: TaskComment) => addTaskComment(comment), {
+    onMutate: (comment) => {
+      // const previousDatabaseWithTasks = queryClient.getQueryData<
+      //   Database & { tasks: Task[] }
+      // >(["database-tasks", databaseId]);
+      // previousDatabaseWithTasks &&
+      //   queryClient.setQueryData<Database & { tasks: Task[] }>(
+      //     ["database-tasks", databaseId],
+      //     () => ({
+      //       ...previousDatabaseWithTasks,
+      //       tasks: previousDatabaseWithTasks?.tasks.map((task) => ({
+      //         ...task,
+      //         comments: [...task.comments, comment],
+      //       })),
+      //     }),
+      //   );
     },
-  );
+
+    onSettled: () => {
+      queryClient.invalidateQueries({
+        queryKey: ["databases", databaseId, "tasks", taskId, "comments"],
+      });
+    },
+  });
 };

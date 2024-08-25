@@ -22,7 +22,10 @@ export async function getTasksByDatabaseId(databaseId: string) {
   }
 }
 
-export const addKanbanTask = async (newTask: Task, viewId: string): Promise<Task> => {
+export const addKanbanTask = async (
+  newTask: Task,
+  viewId: string,
+): Promise<Task> => {
   const { data: taskData, error: taskError } = await supabase
     .from("task")
     .insert({
@@ -128,30 +131,29 @@ export const deleteKanbanTask = async (
   return deletedTask;
 };
 
-
 export const updateTask = async (
   id: string,
   updatedTask: Partial<Omit<Task, "id">>,
   viewId: string,
 ): Promise<{ id: string; updatedTask: Partial<Omit<Task, "id">> }> => {
   const { error: updateTaskError } = await supabase
-    .from('task')
+    .from("task")
     .update(updatedTask)
-    .eq('id', id);
+    .eq("id", id);
 
   if (updateTaskError) {
     throw new Error(`Failed to update task: ${updateTaskError.message}`);
   }
 
-	const { data: viewData, error: viewError } = await supabase
-	.from("database_view")
-	.select("*")
-	.eq("id", viewId)
-	.single();
+  const { data: viewData, error: viewError } = await supabase
+    .from("database_view")
+    .select("*")
+    .eq("id", viewId)
+    .single();
 
-if (viewError) {
-	throw new Error(`Failed to retrieve view: ${viewError.message}`);
-}
+  if (viewError) {
+    throw new Error(`Failed to retrieve view: ${viewError.message}`);
+  }
 
   // Update the views based on the changed task properties
   const getNewView = (view: any) => {
@@ -202,13 +204,13 @@ if (viewError) {
     return view;
   };
 
-	const newView = getNewView({ ...viewData });
+  const newView = getNewView({ ...viewData });
 
   // Update the views in the 'databases' table
   const { error: updateViewError } = await supabase
-    .from('database_view')
+    .from("database_view")
     .update({ config: newView.config })
-    .eq('id', viewId);
+    .eq("id", viewId);
 
   if (updateViewError) {
     throw new Error(`Failed to update view: ${updateViewError.message}`);

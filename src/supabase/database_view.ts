@@ -22,21 +22,21 @@ export async function getViewsByDatabaseId(databaseId: string) {
 }
 
 export async function getDatabaseViewById(viewId: string) {
-    try {
-      const { data: databaseView, error: databaseViewError } = await supabase
-        .from("database_view")
-        .select("*")
-        .eq("id", viewId)
-        .single();
-  
-      if (databaseViewError) {
-        throw new Error("Error fetching views");
-      }
-  
-      console.warn(databaseView);
-      return databaseView;
-    } catch (error) {
-      console.error("Error fetching  views:", error);
-      throw error;
+  try {
+    const { data: databaseView, error: databaseViewError } = await supabase
+      .from("database_view")
+      .select("*")
+      .eq("id", viewId)
+      .single();
+
+    if (databaseViewError) {
+      throw new Error("Error fetching views");
     }
+
+    console.warn(databaseView);
+    return databaseView;
+  } catch (error) {
+    console.error("Error fetching  views:", error);
+    throw error;
   }
+}

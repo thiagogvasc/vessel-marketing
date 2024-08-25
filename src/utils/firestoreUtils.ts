@@ -7,12 +7,7 @@ import {
   serverTimestamp,
 } from "firebase/firestore";
 import { db } from "../../firebaseConfig";
-import {
-  Task,
-  Column,
-  AggregateColumn,
-  Database,
-} from "../types";
+import { Task, Column, AggregateColumn, Database } from "../types";
 
 export const convertDocs = <T>(
   querySnapshot: QuerySnapshot<DocumentData>,

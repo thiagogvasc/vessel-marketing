@@ -5,11 +5,14 @@ import {
   Task as TaskType,
 } from "../types";
 import TaskDialog from "../components/TaskDialog/TaskDialog";
-import { useAddTaskComment, useDeleteKanbanTask } from "../hooks/react-query/database_view";
+import {
+  useAddTaskComment,
+  useDeleteKanbanTask,
+} from "../hooks/react-query/database_view";
 import { useGetDatabasePropertyDefinitions } from "../hooks/react-query/database";
 import { useUpdateTask } from "../hooks/react-query/database_view";
 import { useGetCommentsByTaskId } from "../hooks/react-query/task_comment";
-import { v4 as uuidv4 } from 'uuid'
+import { v4 as uuidv4 } from "uuid";
 import { useAuth } from "../contexts/AuthContext";
 
 export interface TaskWithId extends TaskType {
@@ -36,7 +39,8 @@ export const TaskDialogContainer = ({
   viewId,
   dialogClosed,
 }: TaskDialogContainerProps) => {
-  const { data: propertyDefinitions } = useGetDatabasePropertyDefinitions(databaseId);
+  const { data: propertyDefinitions } =
+    useGetDatabasePropertyDefinitions(databaseId);
   const { data: taskComments } = useGetCommentsByTaskId(databaseId, task.id);
   const { user } = useAuth();
   const updateTaskMutation = useUpdateTask(task.database_id, viewId);
@@ -93,7 +97,7 @@ export const TaskDialogContainer = ({
       author_id: user.id,
       task_id: task.id,
       text: commentText,
-    }
+    };
     addCommentMutation.mutateAsync(newComment);
   };
 

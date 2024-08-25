@@ -1,7 +1,9 @@
-import { supabase } from '@/supabaseClient';
-import { TaskComment } from '../types';
+import { supabase } from "@/supabaseClient";
+import { TaskComment } from "../types";
 
-export const addTaskComment = async (comment: TaskComment): Promise<TaskComment> => {
+export const addTaskComment = async (
+  comment: TaskComment,
+): Promise<TaskComment> => {
   const { data: commentData, error: commentError } = await supabase
     .from("task_comment")
     .insert(comment)
