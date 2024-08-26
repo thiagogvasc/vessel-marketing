@@ -2,7 +2,7 @@
 
 import {
   useGetDatabaseById,
-  useGetDatabasePropertyDefinitions,
+  useGetDatabaseTasks,
   useGetDatabaseViews,
 } from "@/src/hooks/react-query/database";
 import {
@@ -21,6 +21,10 @@ import { Add, Search, FilterList, SwapVert } from "@mui/icons-material";
 import { useParams } from "next/navigation";
 import { useState } from "react";
 import { AgentKanbanViewContainer } from "@/src/containers/AgentKanbanViewContainer";
+import { useAddDatabaseView } from "@/src/hooks/react-query/database_view";
+import { DatabaseView } from "@/src/types";
+import { v4 as uuidv4 } from 'uuid';
+import { useGetDatabasePropertyDefinitions } from "@/src/hooks/react-query/database_property_definition";
 
 export default function Database() {
   const { id: databaseId } = useParams();
@@ -31,13 +35,20 @@ export default function Database() {
   const [filterAnchorEl, setFilterAnchorEl] = useState<null | HTMLElement>(
     null,
   );
-
+  const [addAnchorEl, setAddAnchorEl] = useState<null | HTMLElement>(null); // State for Add button menu
+  
   const { data: database, isLoading: isLoadingDatabase } = useGetDatabaseById(
     databaseId as string,
   );
   const { data: views, isLoading: isLoadingViews } = useGetDatabaseViews(
     databaseId as string,
   );
+  const selectedView = views?.find((view, i) => i === selectedTab);
+
+  const { data: propertyDefinitions } = useGetDatabasePropertyDefinitions(databaseId as string);
+  const addDatabaseViewMutation = useAddDatabaseView(databaseId as string);
+  const { data: tasks } = useGetDatabaseTasks(databaseId as string)
+
 
   const handleTabChange = (event: React.ChangeEvent<{}>, newValue: number) => {
     setSelectedTab(newValue);
@@ -49,11 +60,6 @@ export default function Database() {
 
   const handleSearchChange = (event: React.ChangeEvent<HTMLInputElement>) => {
     setSearchText(event.target.value);
-  };
-
-  const addNewTab = () => {
-    // Implement the logic to add a new tab
-    console.log("Add new tab");
   };
 
   const handleSortClick = (event: React.MouseEvent<HTMLElement>) => {
@@ -70,6 +76,37 @@ export default function Database() {
 
   const handleFilterClose = () => {
     setFilterAnchorEl(null);
+  };
+
+  const handleAddClick = (event: React.MouseEvent<HTMLElement>) => {
+    setAddAnchorEl(event.currentTarget);
+  };
+
+  const handleAddClose = () => {
+    setAddAnchorEl(null);
+  };
+
+  const handleAddOptionClick = (option: string) => {
+    setAddAnchorEl(null);
+    const firstSelectProperty = propertyDefinitions?.find(prop => prop.type === 'Select');
+    console.warn(firstSelectProperty)
+    if (firstSelectProperty) {
+      const databaseView: DatabaseView = {  
+        id: uuidv4(),
+        database_id: databaseId as string,
+        name: option,
+        type: option,
+        config: {
+          filters: [],
+          sorts: [],
+          group_by: firstSelectProperty.id,
+          groups: firstSelectProperty.data?.options?.map(option => ({
+            group_by_value: option, task_order: tasks?.filter(task => task.properties[firstSelectProperty.id] === option).map(t => t.id) ?? []
+          }))
+        },
+      }
+      addDatabaseViewMutation.mutateAsync(databaseView);
+    }
   };
 
   return (
@@ -104,12 +141,25 @@ export default function Database() {
             scrollButtons="auto"
           >
             {views?.map((databaseView) => (
-              <Tab key={databaseView.name} label={databaseView.name} />
+              <Tab key={databaseView.id} label={databaseView.name} />
             ))}
           </Tabs>
-          <IconButton onClick={addNewTab}>
+          <IconButton onClick={handleAddClick}>
             <Add />
           </IconButton>
+          <Menu
+            anchorEl={addAnchorEl}
+            open={Boolean(addAnchorEl)}
+            onClose={handleAddClose}
+          >
+            <MenuItem onClick={() => handleAddOptionClick("Kanban")}>
+              Kanban
+            </MenuItem>
+            <MenuItem disabled>Table</MenuItem>
+            <MenuItem disabled>List</MenuItem>
+            <MenuItem disabled>Timeline</MenuItem>
+            <MenuItem disabled>Calendar</MenuItem>
+          </Menu>
         </Box>
         <Box sx={{ display: "flex", alignItems: "center", ml: 2 }}>
           {searchOpen && (
@@ -150,18 +200,18 @@ export default function Database() {
         </Box>
       </Box>
       <Box sx={{ p: 3, width: "100%", overflowX: "scroll" }}>
-        {views?.map((databaseView) => {
-          if (databaseView.type === "kanban")
-            return (
+        {selectedView && (
+          <>
+            {selectedView.type.toUpperCase() === "KANBAN" && (
               <AgentKanbanViewContainer
                 readOnly={false}
-                key={databaseView.name}
-                databaseId={databaseView.database_id}
-                databaseView={databaseView}
+                key={selectedView.id}
+                databaseId={selectedView.database_id}
+                databaseView={selectedView}
               />
-            );
-          return <>View type not supported</>;
-        })}
+            )}
+          </>
+        )}
       </Box>
     </Container>
   );

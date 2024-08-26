@@ -8,6 +8,22 @@ import {
 import { updateTask } from "./task";
 import { getPropertyDefinitionsByDatabaseId } from "./database_property_definitions";
 
+export const addDatabaseView = async (
+  databaseView: DatabaseView,
+) => {
+  const { data: viewData, error: viewError } = await supabase
+    .from("database_view")
+    .insert(databaseView)
+    .select("*")
+    .single();
+
+  if (viewError) {
+    throw new Error(`Failed to add database view: ${viewError.message}`);
+  }
+
+  return viewData;
+};
+
 export async function getViewsByDatabaseId(databaseId: string) {
   try {
     // Fetch all tasks related to the database

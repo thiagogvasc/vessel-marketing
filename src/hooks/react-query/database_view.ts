@@ -1,4 +1,5 @@
 import {
+  addDatabaseView,
   addKanbanColumn,
   deleteKanbanColumn,
   updateKanbanViewManualSort,
@@ -8,8 +9,29 @@ import {
   deleteKanbanTask,
   updateTask,
 } from "@/src/supabase/task";
-import { AggregateColumn, Task } from "@/src/types";
+import { AggregateColumn, DatabaseView, Task } from "@/src/types";
 import { useMutation, useQueryClient } from "react-query";
+
+
+export const useAddDatabaseView = (database_id: string) => {
+  const queryClient = useQueryClient();
+  return useMutation(
+    async (databaseView: DatabaseView) => {
+      try {
+        const addedView = await addDatabaseView(databaseView);
+        return addedView;
+      } catch (err) {
+        console.warn(err);
+        throw err;
+      }
+    },
+    {
+      onSettled: (_, variables) => {
+        queryClient.refetchQueries(["databases", database_id, 'views']);
+      },
+    },
+  );
+};
 
 export const useDeleteKanbanTask = (databaseId: string, viewId: string) => {
   const queryClient = useQueryClient();
