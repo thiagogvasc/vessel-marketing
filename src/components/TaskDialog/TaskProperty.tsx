@@ -12,6 +12,7 @@ import {
 } from "@mui/material";
 import { PropertyWithDefinition } from "@/src/containers/TaskPropertiesContainer";
 import { DatabasePropertyDefinition } from "@/src/types";
+import { PropertyEditPopover } from "./PropertyEditMenu/PropertyEditPopover";
 
 interface TaskPropertiyProps {
   propertyWithDefinition: PropertyWithDefinition;
@@ -73,6 +74,18 @@ export const TaskProperty: React.FC<TaskPropertiyProps> = ({
     onPropertyChange?.(definition.id, newPropertyValue);
     setIsEditingValue(false);
   };
+
+  const handleNameChange = () => {
+
+  }
+
+  const handleTypeChange = () => {
+
+  }
+
+  const handleMetadataChange = () => {
+
+  }
 
   return (
     <>
@@ -144,16 +157,16 @@ export const TaskProperty: React.FC<TaskPropertiyProps> = ({
         <MenuItem onClick={handleEditProperty}>Edit</MenuItem>
         <MenuItem onClick={handleDeleteProperty}>Delete</MenuItem>
       </Menu>
-      {isEditingProperty && (
-        <Menu
-          anchorEl={editMenuAnchorEl}
-          open={Boolean(editMenuAnchorEl) && isEditingProperty}
-          onClose={handleMenuClose}
-        >
-          {definition.type === "Text" && <>Text edit menu</>}
-          {definition.type === "Select" && <>select edit menu</>}
-        </Menu>
-      )}
+
+      <PropertyEditPopover
+        anchorEl={editMenuAnchorEl}
+        isOpen={isEditingProperty}
+        onClose={handleMenuClose}
+        definition={definition}
+        onNameChange={handleNameChange}
+        onTypeChange={handleTypeChange}
+        onMetadataChange={handleMetadataChange}
+      />
     </>
   );
 };
