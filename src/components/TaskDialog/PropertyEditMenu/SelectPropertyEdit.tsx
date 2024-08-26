@@ -1,7 +1,7 @@
-import React, { useState } from 'react';
-import { MenuItem, TextField, Select, Button, IconButton } from '@mui/material';
-import AddIcon from '@mui/icons-material/Add';
-import DeleteIcon from '@mui/icons-material/Delete';
+import React, { useState } from "react";
+import { MenuItem, TextField, Select, Button, IconButton } from "@mui/material";
+import AddIcon from "@mui/icons-material/Add";
+import DeleteIcon from "@mui/icons-material/Delete";
 
 interface SelectPropertyEditProps {
   name: string;
@@ -12,7 +12,14 @@ interface SelectPropertyEditProps {
   onMetadataChange: (data: any) => void;
 }
 
-export const SelectPropertyEdit: React.FC<SelectPropertyEditProps> = ({ name, type, options, onNameChange, onTypeChange, onMetadataChange }) => {
+export const SelectPropertyEdit: React.FC<SelectPropertyEditProps> = ({
+  name,
+  type,
+  options,
+  onNameChange,
+  onTypeChange,
+  onMetadataChange,
+}) => {
   const handleAddOption = () => {
     //onOptionsChange([...options, '']);
   };
@@ -30,25 +37,25 @@ export const SelectPropertyEdit: React.FC<SelectPropertyEditProps> = ({ name, ty
 
   return (
     <>
-        <TextField
-          label="Property Name"
-          value={name}
-          onChange={(e) => onNameChange(e.target.value)}
-          fullWidth
-        />
-        <Select
-          native
-          value={type}
-          onChange={(e) => onTypeChange(e.target.value)}
-          fullWidth
-        >
-          <option value="Text">Text</option>
-          <option value="Select">Select</option>
-          {/* Add other options as needed */}
-        </Select>
-        <Button onClick={handleAddOption} startIcon={<AddIcon />}>
-          Add Option
-        </Button>
+      <TextField
+        label="Property Name"
+        value={name}
+        onChange={(e) => onNameChange(e.target.value)}
+        fullWidth
+      />
+      <Select
+        native
+        value={type}
+        onChange={(e) => onTypeChange(e.target.value)}
+        fullWidth
+      >
+        <option value="Text">Text</option>
+        <option value="Select">Select</option>
+        {/* Add other options as needed */}
+      </Select>
+      <Button onClick={handleAddOption} startIcon={<AddIcon />}>
+        Add Option
+      </Button>
       {options.map((option, index) => (
         <MenuItem key={index}>
           <TextField

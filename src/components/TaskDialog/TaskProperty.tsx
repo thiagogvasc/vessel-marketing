@@ -75,17 +75,11 @@ export const TaskProperty: React.FC<TaskPropertiyProps> = ({
     setIsEditingValue(false);
   };
 
-  const handleNameChange = () => {
+  const handleNameChange = () => {};
 
-  }
+  const handleTypeChange = () => {};
 
-  const handleTypeChange = () => {
-
-  }
-
-  const handleMetadataChange = () => {
-
-  }
+  const handleMetadataChange = () => {};
 
   return (
     <>

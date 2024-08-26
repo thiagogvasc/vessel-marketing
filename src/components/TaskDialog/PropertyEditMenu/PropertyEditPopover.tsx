@@ -1,7 +1,7 @@
-import React from 'react';
-import { Menu, Popover } from '@mui/material';
-import { TextPropertyEdit } from './TextPropertyEdit';
-import { SelectPropertyEdit } from './SelectPropertyEdit';
+import React from "react";
+import { Menu, Popover } from "@mui/material";
+import { TextPropertyEdit } from "./TextPropertyEdit";
+import { SelectPropertyEdit } from "./SelectPropertyEdit";
 
 interface PropertyEditPopoverProps {
   anchorEl: HTMLElement | null;
@@ -24,7 +24,7 @@ export const PropertyEditPopover: React.FC<PropertyEditPopoverProps> = ({
 }) => {
   return (
     <Popover anchorEl={anchorEl} open={isOpen} onClose={onClose}>
-      {definition.type === 'Text' && (
+      {definition.type === "Text" && (
         <TextPropertyEdit
           name={definition.name}
           type={definition.type}
@@ -33,7 +33,7 @@ export const PropertyEditPopover: React.FC<PropertyEditPopoverProps> = ({
           onMetadataChange={onMetadataChange}
         />
       )}
-      {definition.type === 'Select' && (
+      {definition.type === "Select" && (
         <SelectPropertyEdit
           name={definition.name}
           type={definition.type}
