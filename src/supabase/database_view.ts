@@ -5,7 +5,6 @@ import {
   DatabaseView,
   Task,
 } from "../types";
-import { updateTask } from "./task";
 import { getPropertyDefinitionsByDatabaseId } from "./database_property_definitions";
 
 export const addDatabaseView = async (databaseView: DatabaseView) => {
@@ -44,7 +43,6 @@ export async function getViewsByDatabaseId(databaseId: string) {
 
 export async function getDatabaseViewById(viewId: string) {
   try {
-    console.warn("getDatabse view");
     const { data: databaseView, error: databaseViewError } = await supabase
       .from("database_view")
       .select("*")
