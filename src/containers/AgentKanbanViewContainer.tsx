@@ -11,10 +11,12 @@ import {
   useAddKanbanColumn,
   useAddKanbanTask,
   useDeleteKanbanColumn,
+  useGetViewTaskOrdersByViewId,
   useUpdateKanbanViewManualSort,
 } from "../hooks/react-query/database_view";
 import { v4 as uuidv4 } from "uuid";
 import { useGetDatabasePropertyDefinitions } from "../hooks/react-query/database_property_definition";
+import { useOrderedTasks } from "../hooks/useOrderedTasks";
 
 interface KanbanViewProps {
   databaseId: string;
@@ -29,6 +31,10 @@ export const AgentKanbanViewContainer: React.FC<KanbanViewProps> = ({
 }) => {
   const { data: databaseTasks, isLoading: isTasksLoading } =
     useGetDatabaseTasks(databaseId as string);
+
+    const { data: propertyDefinitions } = useGetDatabasePropertyDefinitions(databaseId);
+
+  const { data: viewTaskOrders } = useGetViewTaskOrdersByViewId(databaseView.id);
   const updateKanbanViewManualSort = useUpdateKanbanViewManualSort(
     databaseId,
     databaseView.id as string,
@@ -43,7 +49,8 @@ export const AgentKanbanViewContainer: React.FC<KanbanViewProps> = ({
     databaseView.id,
   );
 
-  const { columns, setColumns } = useKanbanColumns(databaseTasks, databaseView);
+  const { orderedTasks } = useOrderedTasks(databaseTasks, viewTaskOrders);
+  const { columns, setColumns } = useKanbanColumns(orderedTasks, propertyDefinitions, databaseView);
   const [isTaskDialogOpen, setIsTaskDialogOpen] = useState(false);
   const [selectedTask, setSelectedTask] = useState<Task | null>(null);
   useEffect(() => {
@@ -113,6 +120,7 @@ export const AgentKanbanViewContainer: React.FC<KanbanViewProps> = ({
 
   const handleTaskAdded = async (columnTitle: string, newTaskTitle: string) => {
     if (!databaseView.config?.group_by) return;
+  
     const newTask: Task = {
       id: uuidv4(),
       database_id: databaseId,
@@ -120,8 +128,27 @@ export const AgentKanbanViewContainer: React.FC<KanbanViewProps> = ({
       description: "",
       properties: { [databaseView.config.group_by]: columnTitle },
     };
-    await addTaskMutation.mutateAsync(newTask);
+  
+    let afterTaskId: string | null = null;
+  
+    columns.forEach((col, index) => {
+      if (col.title === columnTitle) {
+        if (col.tasks.length > 0) {
+          // Get the ID of the last task in the current column
+          afterTaskId = col.tasks[col.tasks.length - 1]?.id ?? null;
+        } else if (index > 0) {
+          // If the column is empty, get the last task from the previous column
+          const previousColumn = columns[index - 1];
+          if (previousColumn.tasks.length > 0) {
+            afterTaskId = previousColumn.tasks[previousColumn.tasks.length - 1].id;
+          }
+        }
+      }
+    });
+  
+    addTaskMutation.mutate({ task: newTask, afterTaskId });
   };
+  
 
   const handleColumnDeleted = async (columnTitle: string) => {
     await deleteColumnMutation.mutateAsync({
@@ -137,7 +164,6 @@ export const AgentKanbanViewContainer: React.FC<KanbanViewProps> = ({
   };
 
   if (isTasksLoading) return <div>Loading...</div>;
-
   return (
     <>
       <KanbanView

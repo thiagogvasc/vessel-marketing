@@ -3,6 +3,7 @@ import {
   addKanbanColumn,
   deleteDatabaseView,
   deleteKanbanColumn,
+  getViewTaskOrdersByViewId,
   updateDatabaseView,
   updateKanbanViewManualSort,
 } from "@/src/supabase/database_view";
@@ -12,7 +13,7 @@ import {
   updateTask,
 } from "@/src/supabase/task";
 import { AggregateColumn, DatabaseView, Task } from "@/src/types";
-import { useMutation, useQueryClient } from "react-query";
+import { useMutation, useQuery, useQueryClient } from "react-query";
 
 export const useUpdateDatabaseView = (databaseId: string | undefined) => {
   const queryClient = useQueryClient();
@@ -82,14 +83,25 @@ export const useDeleteKanbanTask = (databaseId: string, viewId: string) => {
   );
 };
 
+export const useGetViewTaskOrdersByViewId = (viewId: string | undefined) => {
+  return useQuery(
+    ["view-task-order"],
+    () => (viewId ? getViewTaskOrdersByViewId(viewId) : Promise.resolve(null)),
+    {
+      enabled: !!viewId, // only run the query if id is truthy
+      staleTime: 60000,
+    },
+  );
+};
+
 // Add a new task
 export const useAddKanbanTask = (databaseId: string, viewId: string) => {
   const queryClient = useQueryClient();
 
   return useMutation(
-    async (task: Task) => {
+    async ({ task, afterTaskId }: { task: Task, afterTaskId: string | null }) => {
       try {
-        const addedTask = await addKanbanTask(task, viewId);
+        const addedTask = await addKanbanTask(task, viewId, afterTaskId);
         return addedTask;
       } catch (err) {
         console.warn(err);

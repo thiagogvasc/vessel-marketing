@@ -50,16 +50,18 @@ export interface ViewSort {
   order: "Asc" | "Desc";
 }
 
-export interface GroupByGroup {
-  group_by_value: string;
-  task_order: string[];
-}
-
 export interface ViewConfig {
   group_by?: string; // property ID for grouping
-  groups?: GroupByGroup[]; // optional manual sorting configuration
+  groups?: string[]; // optional manual sorting configuration
   filters?: ViewFilter[];
   sorts?: ViewSort[];
+}
+
+export interface ViewTaskOrder {
+  view_id: string;
+  task_id: string;
+  prev_task_id: string | null;
+  next_task_id: string | null;
 }
 
 export interface DatabaseView {

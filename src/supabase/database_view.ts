@@ -4,6 +4,7 @@ import {
   DatabasePropertyDefinition,
   DatabaseView,
   Task,
+  ViewTaskOrder,
 } from "../types";
 import { getPropertyDefinitionsByDatabaseId } from "./database_property_definitions";
 
@@ -61,6 +62,20 @@ export async function getDatabaseViewById(viewId: string) {
   }
 }
 
+export const getViewTaskOrdersByViewId = async (viewId: string): Promise<ViewTaskOrder[]> => {
+  const { data, error } = await supabase
+    .from("view_task_order")
+    .select("*")
+    .eq("view_id", viewId)    // Replace `viewId` with your actual view_id value
+
+  if (error) {
+    console.error('Error fetching data:', error);
+  } else {
+    console.log('Fetched data:', data);
+  } 
+  return data as ViewTaskOrder[] ?? []
+};
+
 export const deleteDatabaseView = async (id: string): Promise<void> => {
   const { error: deleteError } = await supabase
     .from("database_view")
@@ -95,10 +110,7 @@ export const updateKanbanViewManualSort = async (
   const viewData = (await getDatabaseViewById(viewId)) as DatabaseView;
   const config = { ...viewData.config };
 
-  config.groups = columns.map((column) => ({
-    group_by_value: column.title,
-    task_order: column.tasks.map((task) => task.id as string),
-  }));
+  config.groups = columns.map(column => column.title);
   console.warn("updated config", config);
   const { error: updateError } = await supabase
     .from("database_view")
@@ -136,10 +148,7 @@ export const addKanbanColumn = async (
       ...viewData.config,
       groups: [
         ...(viewData.config?.groups ?? []),
-        {
-          group_by_value: newOption,
-          task_order: [],
-        },
+        newOption,
       ],
     };
 
@@ -191,7 +200,7 @@ export const deleteKanbanColumn = async (
       ...viewData.config,
       groups:
         viewData.config?.groups?.filter(
-          (group) => group.group_by_value !== optionToDelete,
+          group => group !== optionToDelete,
         ) ?? [],
     };
 

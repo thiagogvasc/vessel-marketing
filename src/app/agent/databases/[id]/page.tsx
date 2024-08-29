@@ -123,15 +123,7 @@ export default function Database() {
           filters: [],
           sorts: [],
           group_by: firstSelectProperty.id,
-          groups: firstSelectProperty.data?.options?.map((option) => ({
-            group_by_value: option,
-            task_order:
-              tasks
-                ?.filter(
-                  (task) => task.properties[firstSelectProperty.id] === option,
-                )
-                .map((t) => t.id) ?? [],
-          })),
+          groups: firstSelectProperty.data?.options ?? [],
         },
       };
       addDatabaseViewMutation.mutateAsync(databaseView);

@@ -1,6 +1,5 @@
 import { supabase } from "@/supabaseClient";
-import { GroupByGroup, Task } from "../types";
-import { getDatabaseViewById } from "./database_view";
+import { Task } from "../types";
 
 export async function getTasksByDatabaseId(databaseId: string) {
   try {
@@ -25,6 +24,7 @@ export async function getTasksByDatabaseId(databaseId: string) {
 export const addKanbanTask = async (
   newTask: Task,
   viewId: string,
+  afterTaskId: string | null,
 ): Promise<Task> => {
   const { data: taskData, error: taskError } = await supabase
     .from("task")
@@ -38,36 +38,18 @@ export const addKanbanTask = async (
     throw new Error(`Failed to add task: ${taskError.message}`);
   }
 
-  const viewData = await getDatabaseViewById(viewId);
+  const { data, error } = await supabase
+        .rpc('add_task_to_view', {
+            view_uuid: viewId,            // UUID of the view where the task should be added
+            new_task_uuid: newTask.id,      // UUID of the new task to be added
+            after_task_uuid: afterTaskId   // UUID of the task after which the new task should be inserted
+        })
 
-  const newView = {
-    ...viewData,
-    config: {
-      ...viewData.config,
-      groups: viewData.config.groups.map((group: any) => {
-        if (
-          group.group_by_value === newTask.properties[viewData.config.group_by]
-        ) {
-          return {
-            ...group,
-            task_order: [...group.task_order, taskData.id],
-          };
-        } else {
-          return group;
-        }
-      }),
-    },
-  };
-
-  const { error: updateError } = await supabase
-    .from("database_view")
-    .update(newView)
-    .eq("id", viewId);
-
-  if (updateError) {
-    throw new Error(`Failed to update database views: ${updateError.message}`);
-  }
-
+    if (error) {
+        console.error('Error adding task to view:', error)
+    } else {
+        console.log('Task added to view:', data)
+    }
   console.warn("addedTask", taskData);
 
   return {
@@ -80,43 +62,6 @@ export const deleteKanbanTask = async (
   taskToDelete: Task,
   viewId: string,
 ): Promise<Task | null> => {
-  // Fetch the database view by viewName and databaseId
-  const { data: viewData, error: viewError } = await supabase
-    .from("database_view")
-    .select("*")
-    .eq("id", viewId)
-    .single();
-
-  if (viewError) {
-    throw new Error(`Failed to retrieve view: ${viewError.message}`);
-  }
-
-  const newConfig = {
-    ...viewData.config,
-    groups: viewData.config.groups.map((group: any) => {
-      if (group.group_by_value === taskToDelete.properties["status"]) {
-        return {
-          ...group,
-          task_order: group.task_order.filter(
-            (taskId: string) => taskId !== taskToDelete.id,
-          ),
-        };
-      } else {
-        return group;
-      }
-    }),
-  };
-
-  // Update the views in the database
-  const { error: updateError } = await supabase
-    .from("database_view")
-    .update({ config: newConfig })
-    .eq("id", viewId);
-
-  if (updateError) {
-    throw new Error(`Failed to update database views: ${updateError.message}`);
-  }
-
   // Delete the task from the 'task' table
   const { data: deletedTask, error: deleteError } = await supabase
     .from("task")
@@ -145,77 +90,6 @@ export const updateTask = async (
 
   if (updateTaskError) {
     throw new Error(`Failed to update task: ${updateTaskError.message}`);
-  }
-
-  const { data: viewData, error: viewError } = await supabase
-    .from("database_view")
-    .select("*")
-    .eq("id", viewId)
-    .single();
-
-  if (viewError) {
-    throw new Error(`Failed to retrieve view: ${viewError.message}`);
-  }
-
-  // Update the views based on the changed task properties
-  const getNewView = (view: any) => {
-    const changedProperties = updatedTask.properties;
-    if (!changedProperties) return view;
-
-    Object.keys(changedProperties).forEach((propertyName) => {
-      if (view.config?.group_by === propertyName) {
-        // Remove task from the old group
-        let indexToRemove = -1;
-        let groupToRemoveTaskFrom: GroupByGroup | null = null;
-        view.config.groups?.forEach((group: any) => {
-          const taskIndex = group.task_order.indexOf(id);
-          if (taskIndex !== -1) {
-            indexToRemove = taskIndex;
-            groupToRemoveTaskFrom = group;
-          }
-        });
-
-        if (indexToRemove !== -1 && groupToRemoveTaskFrom) {
-          (groupToRemoveTaskFrom as GroupByGroup).task_order.splice(
-            indexToRemove,
-            1,
-          );
-        }
-
-        // Add task to the new group
-        const newGroupByValue = changedProperties[view.config.group_by];
-        const newGroup = view.config.groups?.find(
-          (group: any) => group.group_by_value === newGroupByValue,
-        );
-
-        if (newGroup) {
-          newGroup.task_order.push(id);
-        } else {
-          // If the group does not exist, create it
-          view.config.groups = [
-            ...(view.config.groups || []),
-            {
-              group_by_value: newGroupByValue,
-              task_order: [id],
-            },
-          ];
-        }
-      }
-    });
-
-    return view;
-  };
-
-  const newView = getNewView({ ...viewData });
-
-  // Update the views in the 'databases' table
-  const { error: updateViewError } = await supabase
-    .from("database_view")
-    .update({ config: newView.config })
-    .eq("id", viewId);
-
-  if (updateViewError) {
-    throw new Error(`Failed to update view: ${updateViewError.message}`);
   }
 
   return { id, updatedTask };
