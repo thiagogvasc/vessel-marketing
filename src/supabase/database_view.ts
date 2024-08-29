@@ -8,9 +8,7 @@ import {
 import { updateTask } from "./task";
 import { getPropertyDefinitionsByDatabaseId } from "./database_property_definitions";
 
-export const addDatabaseView = async (
-  databaseView: DatabaseView,
-) => {
+export const addDatabaseView = async (databaseView: DatabaseView) => {
   const { data: viewData, error: viewError } = await supabase
     .from("database_view")
     .insert(databaseView)
@@ -46,6 +44,7 @@ export async function getViewsByDatabaseId(databaseId: string) {
 
 export async function getDatabaseViewById(viewId: string) {
   try {
+    console.warn("getDatabse view");
     const { data: databaseView, error: databaseViewError } = await supabase
       .from("database_view")
       .select("*")
@@ -63,6 +62,17 @@ export async function getDatabaseViewById(viewId: string) {
     throw error;
   }
 }
+
+export const deleteDatabaseView = async (id: string): Promise<void> => {
+  const { error: deleteError } = await supabase
+    .from("database_view")
+    .delete()
+    .eq("id", id);
+
+  if (deleteError) {
+    throw new Error(`Failed to delete database view: ${deleteError.message}`);
+  }
+};
 
 export const updateDatabaseView = async (
   id: string,

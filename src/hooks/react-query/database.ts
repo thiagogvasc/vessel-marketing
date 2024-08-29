@@ -9,7 +9,6 @@ import {
 import { CreateDatabasePayload, Database } from "@/src/types";
 import { getTasksByDatabaseId } from "@/src/supabase/task";
 import { getViewsByDatabaseId } from "@/src/supabase/database_view";
-import { getPropertyDefinitionsByDatabaseId } from "@/src/supabase/database_property_definitions";
 
 export const useGetDatabases = () => {
   return useQuery(["databases", "list"], () => getDatabases(), {

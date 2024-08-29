@@ -19,12 +19,14 @@ import {
 } from "@mui/material";
 import { Add, Search, FilterList, SwapVert } from "@mui/icons-material";
 import { useParams } from "next/navigation";
-import { useState } from "react";
+import { useEffect, useState } from "react";
 import { AgentKanbanViewContainer } from "@/src/containers/AgentKanbanViewContainer";
 import { useAddDatabaseView } from "@/src/hooks/react-query/database_view";
 import { DatabaseView } from "@/src/types";
-import { v4 as uuidv4 } from 'uuid';
+import { v4 as uuidv4 } from "uuid";
 import { useGetDatabasePropertyDefinitions } from "@/src/hooks/react-query/database_property_definition";
+import { ViewSettingsPopoverContainer } from "@/src/containers/ViewSettingsPopoverContainer";
+import MoreVertIcon from "@mui/icons-material/MoreVert";
 
 export default function Database() {
   const { id: databaseId } = useParams();
@@ -36,19 +38,30 @@ export default function Database() {
     null,
   );
   const [addAnchorEl, setAddAnchorEl] = useState<null | HTMLElement>(null); // State for Add button menu
-  
+  const [viewSettingsAnchorEl, setViewSettingsAnchorEl] =
+    useState<null | HTMLElement>(null);
+
   const { data: database, isLoading: isLoadingDatabase } = useGetDatabaseById(
     databaseId as string,
   );
   const { data: views, isLoading: isLoadingViews } = useGetDatabaseViews(
     databaseId as string,
   );
+  views?.sort((a, b) => a.id.localeCompare(b.id));
   const selectedView = views?.find((view, i) => i === selectedTab);
+  useEffect(() => {
+    if (!selectedView) {
+      setSelectedTab(0);
+    }
+  }, [views]);
 
-  const { data: propertyDefinitions } = useGetDatabasePropertyDefinitions(databaseId as string);
+  console.warn({ selectedView, selectedTab });
+
+  const { data: propertyDefinitions } = useGetDatabasePropertyDefinitions(
+    databaseId as string,
+  );
   const addDatabaseViewMutation = useAddDatabaseView(databaseId as string);
-  const { data: tasks } = useGetDatabaseTasks(databaseId as string)
-
+  const { data: tasks } = useGetDatabaseTasks(databaseId as string);
 
   const handleTabChange = (event: React.ChangeEvent<{}>, newValue: number) => {
     setSelectedTab(newValue);
@@ -86,12 +99,22 @@ export default function Database() {
     setAddAnchorEl(null);
   };
 
+  const handleViewSettingsClick = (event: React.MouseEvent<HTMLElement>) => {
+    setViewSettingsAnchorEl(event?.currentTarget);
+  };
+
+  const handleViewSettingsClose = () => {
+    setViewSettingsAnchorEl(null);
+  };
+
   const handleAddOptionClick = (option: string) => {
     setAddAnchorEl(null);
-    const firstSelectProperty = propertyDefinitions?.find(prop => prop.type === 'Select');
-    console.warn(firstSelectProperty)
+    const firstSelectProperty = propertyDefinitions?.find(
+      (prop) => prop.type === "Select",
+    );
+    console.warn(firstSelectProperty);
     if (firstSelectProperty) {
-      const databaseView: DatabaseView = {  
+      const databaseView: DatabaseView = {
         id: uuidv4(),
         database_id: databaseId as string,
         name: option,
@@ -100,11 +123,17 @@ export default function Database() {
           filters: [],
           sorts: [],
           group_by: firstSelectProperty.id,
-          groups: firstSelectProperty.data?.options?.map(option => ({
-            group_by_value: option, task_order: tasks?.filter(task => task.properties[firstSelectProperty.id] === option).map(t => t.id) ?? []
-          }))
+          groups: firstSelectProperty.data?.options?.map((option) => ({
+            group_by_value: option,
+            task_order:
+              tasks
+                ?.filter(
+                  (task) => task.properties[firstSelectProperty.id] === option,
+                )
+                .map((t) => t.id) ?? [],
+          })),
         },
-      }
+      };
       addDatabaseViewMutation.mutateAsync(databaseView);
     }
   };
@@ -197,6 +226,21 @@ export default function Database() {
             <MenuItem onClick={handleFilterClose}>Filter by Status</MenuItem>
             <MenuItem onClick={handleFilterClose}>Filter by Priority</MenuItem>
           </Menu>
+          <IconButton onClick={handleViewSettingsClick}>
+            <MoreVertIcon />
+          </IconButton>
+          {viewSettingsAnchorEl && selectedView && (
+            <ViewSettingsPopoverContainer
+              view={selectedView}
+              databaseId={
+                (databaseId as string).trim() !== ""
+                  ? (databaseId as string)
+                  : undefined
+              }
+              onClose={handleViewSettingsClose}
+              anchorEl={viewSettingsAnchorEl}
+            />
+          )}
         </Box>
       </Box>
       <Box sx={{ p: 3, width: "100%", overflowX: "scroll" }}>

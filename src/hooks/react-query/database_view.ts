@@ -1,7 +1,9 @@
 import {
   addDatabaseView,
   addKanbanColumn,
+  deleteDatabaseView,
   deleteKanbanColumn,
+  updateDatabaseView,
   updateKanbanViewManualSort,
 } from "@/src/supabase/database_view";
 import {
@@ -12,6 +14,21 @@ import {
 import { AggregateColumn, DatabaseView, Task } from "@/src/types";
 import { useMutation, useQueryClient } from "react-query";
 
+export const useUpdateDatabaseView = (databaseId: string | undefined) => {
+  const queryClient = useQueryClient();
+
+  return useMutation(
+    ({ id, changes }: { id: string; changes: Partial<DatabaseView> }) =>
+      updateDatabaseView(id, changes),
+    {
+      onSettled: () => {
+        queryClient.invalidateQueries({
+          queryKey: ["databases", databaseId, "views"],
+        });
+      },
+    },
+  );
+};
 
 export const useAddDatabaseView = (database_id: string) => {
   const queryClient = useQueryClient();
@@ -27,10 +44,19 @@ export const useAddDatabaseView = (database_id: string) => {
     },
     {
       onSettled: (_, variables) => {
-        queryClient.refetchQueries(["databases", database_id, 'views']);
+        queryClient.refetchQueries(["databases", database_id, "views"]);
       },
     },
   );
+};
+
+export const useDeleteDatabaseView = (databaseId: string | undefined) => {
+  const queryClient = useQueryClient();
+  return useMutation(async (id: string) => deleteDatabaseView(id), {
+    onSettled: (_, variables) => {
+      queryClient.invalidateQueries(["databases", databaseId, "views"]);
+    },
+  });
 };
 
 export const useDeleteKanbanTask = (databaseId: string, viewId: string) => {
