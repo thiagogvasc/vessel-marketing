@@ -1,8 +1,5 @@
 import { useEffect, useState } from "react";
-import {
-  Task,
-  ViewTaskOrder,
-} from "../types";
+import { Task, ViewTaskOrder } from "../types";
 
 export const useOrderedTasks = (
   databaseTasks: Task[] | null | undefined,
@@ -19,7 +16,7 @@ export const useOrderedTasks = (
       });
 
       // Find the first task (which has prev_task_id as NULL)
-      let firstTaskOrder = viewTaskOrders.find(vto => !vto.prev_task_id);
+      let firstTaskOrder = viewTaskOrders.find((vto) => !vto.prev_task_id);
 
       // If there is no first task, return an empty column
       if (!firstTaskOrder) {
@@ -36,7 +33,9 @@ export const useOrderedTasks = (
         if (task) {
           orderedTasks.push(task);
         }
-        currentTaskOrder = viewTaskOrders.find(vto => vto.task_id === currentTaskOrder.next_task_id) as ViewTaskOrder;
+        currentTaskOrder = viewTaskOrders.find(
+          (vto) => vto.task_id === currentTaskOrder.next_task_id,
+        ) as ViewTaskOrder;
       }
 
       setOrderedTasks(orderedTasks);

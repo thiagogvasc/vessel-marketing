@@ -32,9 +32,12 @@ export const useUpdateDatabaseView = (databaseId: string | undefined) => {
   );
 };
 
-export const useGetDatabaseViewById = (databaseId: string | undefined | null, viewId: string | undefined | null) => {
+export const useGetDatabaseViewById = (
+  databaseId: string | undefined | null,
+  viewId: string | undefined | null,
+) => {
   return useQuery(
-    ["databases", databaseId, 'views', viewId],
+    ["databases", databaseId, "views", viewId],
     () => (viewId ? getDatabaseViewById(viewId) : Promise.resolve(null)),
     {
       enabled: !!(viewId && databaseId), // only run the query if id is truthy
@@ -76,7 +79,13 @@ export const useDeleteKanbanTask = (databaseId: string | undefined) => {
   const queryClient = useQueryClient();
 
   return useMutation(
-    async ({ viewId, taskToDelete }: { viewId: string, taskToDelete: Task }) => {
+    async ({
+      viewId,
+      taskToDelete,
+    }: {
+      viewId: string;
+      taskToDelete: Task;
+    }) => {
       try {
         console.warn("calling delete task");
         const deletedTask = await deleteKanbanTask(taskToDelete, viewId);
@@ -111,7 +120,15 @@ export const useAddKanbanTask = (databaseId: string | undefined) => {
   const queryClient = useQueryClient();
 
   return useMutation(
-    async ({ task, afterTaskId, viewId }: { task: Task, afterTaskId: string | null, viewId: string }) => {
+    async ({
+      task,
+      afterTaskId,
+      viewId,
+    }: {
+      task: Task;
+      afterTaskId: string | null;
+      viewId: string;
+    }) => {
       try {
         const addedTask = await addKanbanTask(task, viewId, afterTaskId);
         return addedTask;
@@ -130,14 +147,19 @@ export const useAddKanbanTask = (databaseId: string | undefined) => {
 };
 
 // Update an existing task
-export const useUpdateTask = (
-  databaseId: string | undefined,
-) => {
+export const useUpdateTask = (databaseId: string | undefined) => {
   const queryClient = useQueryClient();
 
   return useMutation(
-    ({ id, viewId, changes }: { id: string; viewId: string, changes: Partial<Task> }) =>
-      updateTask(id, changes, viewId),
+    ({
+      id,
+      viewId,
+      changes,
+    }: {
+      id: string;
+      viewId: string;
+      changes: Partial<Task>;
+    }) => updateTask(id, changes, viewId),
     {
       onSettled: () => {
         queryClient.invalidateQueries(["databases", databaseId, "tasks"]);
@@ -185,7 +207,7 @@ export const useAddKanbanColumn = (databaseId: string | undefined) => {
     async ({
       newOption,
       viewName,
-      databaseId
+      databaseId,
     }: {
       databaseId: string;
       viewName: string;
@@ -215,7 +237,7 @@ export const useDeleteKanbanColumn = (databaseId: string | undefined) => {
     async ({
       optionToDelete,
       viewName,
-      databaseId
+      databaseId,
     }: {
       databaseId: string;
       viewName: string;

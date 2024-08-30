@@ -38,18 +38,17 @@ export const addKanbanTask = async (
     throw new Error(`Failed to add task: ${taskError.message}`);
   }
 
-  const { data, error } = await supabase
-        .rpc('add_task_to_view', {
-            view_uuid: viewId,            // UUID of the view where the task should be added
-            new_task_uuid: newTask.id,      // UUID of the new task to be added
-            after_task_uuid: afterTaskId   // UUID of the task after which the new task should be inserted
-        })
+  const { data, error } = await supabase.rpc("add_task_to_view", {
+    view_uuid: viewId, // UUID of the view where the task should be added
+    new_task_uuid: newTask.id, // UUID of the new task to be added
+    after_task_uuid: afterTaskId, // UUID of the task after which the new task should be inserted
+  });
 
-    if (error) {
-        console.error('Error adding task to view:', error)
-    } else {
-        console.log('Task added to view:', data)
-    }
+  if (error) {
+    console.error("Error adding task to view:", error);
+  } else {
+    console.log("Task added to view:", data);
+  }
   console.warn("addedTask", taskData);
 
   return {

@@ -33,8 +33,9 @@ export const AgentKanbanViewContainer: React.FC<KanbanViewProps> = ({
   const { data: databaseTasks, isLoading: isTasksLoading } =
     useGetDatabaseTasks(databaseId as string);
 
-    const { data: view } = useGetDatabaseViewById(databaseId, viewId);
-  const { data: propertyDefinitions } = useGetDatabasePropertyDefinitions(databaseId);
+  const { data: view } = useGetDatabaseViewById(databaseId, viewId);
+  const { data: propertyDefinitions } =
+    useGetDatabasePropertyDefinitions(databaseId);
 
   const { data: viewTaskOrders } = useGetViewTaskOrdersByViewId(viewId);
   const updateKanbanViewManualSort = useUpdateKanbanViewManualSort(databaseId);
@@ -43,7 +44,11 @@ export const AgentKanbanViewContainer: React.FC<KanbanViewProps> = ({
   const deleteColumnMutation = useDeleteKanbanColumn(databaseId);
 
   const { orderedTasks } = useOrderedTasks(databaseTasks, viewTaskOrders);
-  const { columns, setColumns } = useKanbanColumns(orderedTasks, propertyDefinitions, view);
+  const { columns, setColumns } = useKanbanColumns(
+    orderedTasks,
+    propertyDefinitions,
+    view,
+  );
   const [isTaskDialogOpen, setIsTaskDialogOpen] = useState(false);
   const [selectedTask, setSelectedTask] = useState<Task | null>(null);
   useEffect(() => {
@@ -115,7 +120,7 @@ export const AgentKanbanViewContainer: React.FC<KanbanViewProps> = ({
 
   const handleTaskAdded = async (columnTitle: string, newTaskTitle: string) => {
     if (!view?.config?.group_by || !databaseId) return;
-  
+
     const newTask: Task = {
       id: uuidv4(),
       database_id: databaseId,
@@ -123,9 +128,9 @@ export const AgentKanbanViewContainer: React.FC<KanbanViewProps> = ({
       description: "",
       properties: { [view.config.group_by]: columnTitle },
     };
-  
+
     let afterTaskId: string | null = null;
-  
+
     columns.forEach((col, index) => {
       if (col.title === columnTitle) {
         if (col.tasks.length > 0) {
@@ -135,15 +140,15 @@ export const AgentKanbanViewContainer: React.FC<KanbanViewProps> = ({
           // If the column is empty, get the last task from the previous column
           const previousColumn = columns[index - 1];
           if (previousColumn.tasks.length > 0) {
-            afterTaskId = previousColumn.tasks[previousColumn.tasks.length - 1].id;
+            afterTaskId =
+              previousColumn.tasks[previousColumn.tasks.length - 1].id;
           }
         }
       }
     });
-  
+
     viewId && addTaskMutation.mutate({ task: newTask, afterTaskId, viewId });
   };
-  
 
   const handleColumnDeleted = async (columnTitle: string) => {
     if (!databaseId || !view) return;

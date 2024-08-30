@@ -55,11 +55,7 @@ const NewDatabase = () => {
               filters: [],
               sorts: [],
               group_by: statusPropertyId,
-              groups: [
-                "To Do",
-                "In Progress",
-                "Done",
-              ],
+              groups: ["To Do", "In Progress", "Done"],
             },
           },
         ],

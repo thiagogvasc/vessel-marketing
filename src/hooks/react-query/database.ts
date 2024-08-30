@@ -60,11 +60,14 @@ export const useGetDatabaseViews = (databaseId: string | null | undefined) => {
         if (data) {
           data.forEach((view) => {
             // Assuming each view has an id, set the individual view data in the cache
-            queryClient.setQueryData(["databases", databaseId, "views", view.id], view);
+            queryClient.setQueryData(
+              ["databases", databaseId, "views", view.id],
+              view,
+            );
           });
         }
       },
-    }
+    },
   );
 };
 

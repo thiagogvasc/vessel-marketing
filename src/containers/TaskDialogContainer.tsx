@@ -35,7 +35,7 @@ export const TaskDialogContainer = ({
 
   const handleTaskDeleted = async () => {
     if (!viewId) return;
-    await deleteTaskMutation.mutateAsync({taskToDelete: task, viewId});
+    await deleteTaskMutation.mutateAsync({ taskToDelete: task, viewId });
   };
 
   const handleTaskDialogClose = () => dialogClosed?.();

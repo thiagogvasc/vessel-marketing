@@ -62,18 +62,20 @@ export async function getDatabaseViewById(viewId: string) {
   }
 }
 
-export const getViewTaskOrdersByViewId = async (viewId: string): Promise<ViewTaskOrder[]> => {
+export const getViewTaskOrdersByViewId = async (
+  viewId: string,
+): Promise<ViewTaskOrder[]> => {
   const { data, error } = await supabase
     .from("view_task_order")
     .select("*")
-    .eq("view_id", viewId)    // Replace `viewId` with your actual view_id value
+    .eq("view_id", viewId); // Replace `viewId` with your actual view_id value
 
   if (error) {
-    console.error('Error fetching data:', error);
+    console.error("Error fetching data:", error);
   } else {
-    console.log('Fetched data:', data);
-  } 
-  return data as ViewTaskOrder[] ?? []
+    console.log("Fetched data:", data);
+  }
+  return (data as ViewTaskOrder[]) ?? [];
 };
 
 export const deleteDatabaseView = async (id: string): Promise<void> => {
@@ -110,7 +112,7 @@ export const updateKanbanViewManualSort = async (
   const viewData = (await getDatabaseViewById(viewId)) as DatabaseView;
   const config = { ...viewData.config };
 
-  config.groups = columns.map(column => column.title);
+  config.groups = columns.map((column) => column.title);
   console.warn("updated config", config);
   const { error: updateError } = await supabase
     .from("database_view")
@@ -146,10 +148,7 @@ export const addKanbanColumn = async (
 
     const newConfig = {
       ...viewData.config,
-      groups: [
-        ...(viewData.config?.groups ?? []),
-        newOption,
-      ],
+      groups: [...(viewData.config?.groups ?? []), newOption],
     };
 
     await updateDatabaseView(viewId, { config: newConfig });
@@ -199,9 +198,8 @@ export const deleteKanbanColumn = async (
     const newConfig = {
       ...viewData.config,
       groups:
-        viewData.config?.groups?.filter(
-          group => group !== optionToDelete,
-        ) ?? [],
+        viewData.config?.groups?.filter((group) => group !== optionToDelete) ??
+        [],
     };
 
     await updateDatabaseView(viewId, { config: newConfig });
