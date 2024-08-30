@@ -25,7 +25,7 @@ interface KanbanViewProps {
   readOnly: boolean;
 }
 
-export const AgentKanbanViewContainer: React.FC<KanbanViewProps> = ({
+export const KanbanViewContainer: React.FC<KanbanViewProps> = ({
   databaseId,
   viewId,
   readOnly,

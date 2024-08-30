@@ -1,5 +1,6 @@
 import React from "react";
-import { AgentKanbanViewContainer } from "../containers/AgentKanbanViewContainer";
+import { KanbanViewContainer } from "../containers/KanbanViewContainer";
+import { ListViewContainer } from "../containers/ListViewContainer";
 
 interface DatabaseViewRendererProps {
   viewId: string | undefined;
@@ -16,13 +17,21 @@ export const DatabaseViewRenderer: React.FC<DatabaseViewRendererProps> = ({
 
   if (viewTypeUppercase === "KANBAN") {
     return (
-      <AgentKanbanViewContainer
+      <KanbanViewContainer
         readOnly={false}
         databaseId={databaseId}
         viewId={viewId}
       />
     );
-  }
+  } else if (viewTypeUppercase === 'LIST') {
+		return (
+			<ListViewContainer
+				databaseId={databaseId}
+				viewId={viewId}
+				readOnly={false}
+			/>
+		)
+	}
 
   return <>No matched view</>;
 };

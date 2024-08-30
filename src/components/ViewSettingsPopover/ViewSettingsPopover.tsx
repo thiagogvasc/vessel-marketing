@@ -76,20 +76,20 @@ export const ViewSettingsPopover: React.FC<ViewSettingsPopoverProps> = ({
           <InputLabel>View Type</InputLabel>
           <Select
             label="View Type"
-            value={view?.type || ""}
+            value={view?.type.toUpperCase() || ""}
             onChange={(e) => onViewTypeChange?.(e.target.value as string)}
           >
-            <MenuItem value="Kanban">Kanban</MenuItem>
-            <MenuItem value="Table" disabled>
+            <MenuItem value="KANBAN">Kanban</MenuItem>
+            <MenuItem value="TABLE" disabled>
               Table
             </MenuItem>
-            <MenuItem value="List" disabled>
+            <MenuItem value="LIST">
               List
             </MenuItem>
-            <MenuItem value="Timeline" disabled>
+            <MenuItem value="TIMELINE" disabled>
               Timeline
             </MenuItem>
-            <MenuItem value="Calendar" disabled>
+            <MenuItem value="CALENDAR" disabled>
               Calendar
             </MenuItem>
           </Select>
