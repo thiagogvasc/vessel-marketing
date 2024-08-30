@@ -3,6 +3,7 @@ import {
   addKanbanColumn,
   deleteDatabaseView,
   deleteKanbanColumn,
+  getDatabaseViewById,
   getViewTaskOrdersByViewId,
   updateDatabaseView,
   updateKanbanViewManualSort,
@@ -27,6 +28,17 @@ export const useUpdateDatabaseView = (databaseId: string | undefined) => {
           queryKey: ["databases", databaseId, "views"],
         });
       },
+    },
+  );
+};
+
+export const useGetDatabaseViewById = (databaseId: string | undefined | null, viewId: string | undefined | null) => {
+  return useQuery(
+    ["databases", databaseId, 'views', viewId],
+    () => (viewId ? getDatabaseViewById(viewId) : Promise.resolve(null)),
+    {
+      enabled: !!(viewId && databaseId), // only run the query if id is truthy
+      staleTime: 60000,
     },
   );
 };
@@ -60,11 +72,11 @@ export const useDeleteDatabaseView = (databaseId: string | undefined) => {
   });
 };
 
-export const useDeleteKanbanTask = (databaseId: string, viewId: string) => {
+export const useDeleteKanbanTask = (databaseId: string | undefined) => {
   const queryClient = useQueryClient();
 
   return useMutation(
-    async (taskToDelete: Task) => {
+    async ({ viewId, taskToDelete }: { viewId: string, taskToDelete: Task }) => {
       try {
         console.warn("calling delete task");
         const deletedTask = await deleteKanbanTask(taskToDelete, viewId);
@@ -95,11 +107,11 @@ export const useGetViewTaskOrdersByViewId = (viewId: string | undefined) => {
 };
 
 // Add a new task
-export const useAddKanbanTask = (databaseId: string, viewId: string) => {
+export const useAddKanbanTask = (databaseId: string | undefined) => {
   const queryClient = useQueryClient();
 
   return useMutation(
-    async ({ task, afterTaskId }: { task: Task, afterTaskId: string | null }) => {
+    async ({ task, afterTaskId, viewId }: { task: Task, afterTaskId: string | null, viewId: string }) => {
       try {
         const addedTask = await addKanbanTask(task, viewId, afterTaskId);
         return addedTask;
@@ -119,14 +131,12 @@ export const useAddKanbanTask = (databaseId: string, viewId: string) => {
 
 // Update an existing task
 export const useUpdateTask = (
-  databaseId: string,
-  taskId: string,
-  viewId: string,
+  databaseId: string | undefined,
 ) => {
   const queryClient = useQueryClient();
 
   return useMutation(
-    ({ id, changes }: { id: string; changes: Partial<Task> }) =>
+    ({ id, viewId, changes }: { id: string; viewId: string, changes: Partial<Task> }) =>
       updateTask(id, changes, viewId),
     {
       onSettled: () => {
@@ -138,16 +148,17 @@ export const useUpdateTask = (
 };
 
 export const useUpdateKanbanViewManualSort = (
-  databaseId: string,
-  viewId: string,
+  databaseId: string | undefined,
 ) => {
   const queryClient = useQueryClient();
   return useMutation(
     async ({
+      viewId,
       columns,
       taskId,
       taskChanges,
     }: {
+      viewId: string;
       columns: AggregateColumn[];
       taskId: string;
       taskChanges: Partial<Task>;
@@ -168,11 +179,13 @@ export const useUpdateKanbanViewManualSort = (
   );
 };
 
-export const useAddKanbanColumn = (databaseId: string, viewName: string) => {
+export const useAddKanbanColumn = (databaseId: string | undefined) => {
   const queryClient = useQueryClient();
   return useMutation(
     async ({
       newOption,
+      viewName,
+      databaseId
     }: {
       databaseId: string;
       viewName: string;
@@ -196,11 +209,13 @@ export const useAddKanbanColumn = (databaseId: string, viewName: string) => {
   );
 };
 
-export const useDeleteKanbanColumn = (databaseId: string, viewName: string) => {
+export const useDeleteKanbanColumn = (databaseId: string | undefined) => {
   const queryClient = useQueryClient();
   return useMutation(
     async ({
       optionToDelete,
+      viewName,
+      databaseId
     }: {
       databaseId: string;
       viewName: string;

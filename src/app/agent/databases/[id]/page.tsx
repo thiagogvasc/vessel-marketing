@@ -20,13 +20,13 @@ import {
 import { Add, Search, FilterList, SwapVert } from "@mui/icons-material";
 import { useParams } from "next/navigation";
 import { useEffect, useState } from "react";
-import { AgentKanbanViewContainer } from "@/src/containers/AgentKanbanViewContainer";
 import { useAddDatabaseView } from "@/src/hooks/react-query/database_view";
 import { DatabaseView } from "@/src/types";
 import { v4 as uuidv4 } from "uuid";
 import { useGetDatabasePropertyDefinitions } from "@/src/hooks/react-query/database_property_definition";
 import { ViewSettingsPopoverContainer } from "@/src/containers/ViewSettingsPopoverContainer";
 import MoreVertIcon from "@mui/icons-material/MoreVert";
+import { DatabaseViewRenderer } from "@/src/components/DatabaseViewRenderer";
 
 export default function Database() {
   const { id: databaseId } = useParams();
@@ -236,18 +236,11 @@ export default function Database() {
         </Box>
       </Box>
       <Box sx={{ p: 3, width: "100%", overflowX: "scroll" }}>
-        {selectedView && (
-          <>
-            {selectedView.type.toUpperCase() === "KANBAN" && (
-              <AgentKanbanViewContainer
-                readOnly={false}
-                key={selectedView.id}
-                databaseId={selectedView.database_id}
-                databaseView={selectedView}
-              />
-            )}
-          </>
-        )}
+        <DatabaseViewRenderer
+          databaseId={databaseId as string | undefined}
+          viewId={selectedView?.id}
+          viewType={selectedView?.type}
+        />
       </Box>
     </Container>
   );

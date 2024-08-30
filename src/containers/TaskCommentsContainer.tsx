@@ -11,8 +11,8 @@ import { TaskComment } from "../types";
 import { TaskComments } from "../components/TaskDialog/TaskComments";
 
 interface TaskCommentsContainerProps {
-  database_id: string;
-  task_id: string;
+  database_id: string | undefined;
+  task_id: string | undefined;
 }
 
 export const TaskCommentsContainer = ({
@@ -26,7 +26,7 @@ export const TaskCommentsContainer = ({
   const deleteCommentMutation = useDeleteTaskComment(database_id, task_id);
 
   const handleCommentAdded = (commentText: string) => {
-    if (!user) return;
+    if (!user || !task_id) return;
     const newComment: TaskComment = {
       id: uuidv4(),
       author_id: user.id,

@@ -21,7 +21,7 @@ export const useGetCommentsByTaskId = (
   );
 };
 
-export const useAddTaskComment = (databaseId: string, taskId: string) => {
+export const useAddTaskComment = (databaseId: string | undefined, taskId: string | undefined) => {
   const queryClient = useQueryClient();
   return useMutation((comment: TaskComment) => addTaskComment(comment), {
     onSettled: () => {
@@ -32,7 +32,7 @@ export const useAddTaskComment = (databaseId: string, taskId: string) => {
   });
 };
 
-export const useDeleteTaskComment = (databaseId: string, taskId: string) => {
+export const useDeleteTaskComment = (databaseId: string | undefined, taskId: string | undefined) => {
   const queryClient = useQueryClient();
   return useMutation((commentId: string) => deleteTaskComment(commentId), {
     onSettled: () => {
@@ -43,7 +43,7 @@ export const useDeleteTaskComment = (databaseId: string, taskId: string) => {
   });
 };
 
-export const useUpdateTaskComment = (databaseId: string, taskId: string) => {
+export const useUpdateTaskComment = (databaseId: string | undefined, taskId: string | undefined) => {
   const queryClient = useQueryClient();
 
   return useMutation(

@@ -43,15 +43,28 @@ export const useGetDatabaseTasks = (databaseId: string | null | undefined) => {
 };
 
 export const useGetDatabaseViews = (databaseId: string | null | undefined) => {
+  const queryClient = useQueryClient();
+
   return useQuery(
     ["databases", databaseId, "views"],
     () => {
-      console.warn("start fetching  ivews for database", databaseId);
+      console.warn("Start fetching views for database", databaseId);
       return databaseId
         ? getViewsByDatabaseId(databaseId)
         : Promise.resolve(null);
     },
-    { enabled: !!databaseId, staleTime: 60000 },
+    {
+      enabled: !!databaseId,
+      staleTime: 60000,
+      onSuccess: (data) => {
+        if (data) {
+          data.forEach((view) => {
+            // Assuming each view has an id, set the individual view data in the cache
+            queryClient.setQueryData(["databases", databaseId, "views", view.id], view);
+          });
+        }
+      },
+    }
   );
 };
 

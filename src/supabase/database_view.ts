@@ -55,7 +55,7 @@ export async function getDatabaseViewById(viewId: string) {
     }
 
     console.warn(databaseView);
-    return databaseView;
+    return databaseView as DatabaseView;
   } catch (error) {
     console.error("Error fetching  views:", error);
     throw error;

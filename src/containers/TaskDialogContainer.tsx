@@ -7,8 +7,8 @@ import { TaskCommentsContainer } from "./TaskCommentsContainer";
 import { TaskPropertiesContainer } from "./TaskPropertiesContainer";
 
 interface TaskDialogContainerProps {
-  databaseId: string;
-  viewId: string;
+  databaseId: string | undefined;
+  viewId: string | undefined;
   task: Task;
   open: boolean;
   dialogClosed?: () => void;
@@ -21,18 +21,21 @@ export const TaskDialogContainer = ({
   viewId,
   dialogClosed,
 }: TaskDialogContainerProps) => {
-  const updateTaskMutation = useUpdateTask(task.database_id, task.id, viewId);
-  const deleteTaskMutation = useDeleteKanbanTask(task.database_id, viewId);
+  const updateTaskMutation = useUpdateTask(task.database_id);
+  const deleteTaskMutation = useDeleteKanbanTask(task.database_id);
 
   const handleTaskUpdated = async (changes: Partial<Task>) => {
+    if (!viewId) return;
     await updateTaskMutation.mutateAsync({
       id: task.id,
+      viewId,
       changes,
     });
   };
 
   const handleTaskDeleted = async () => {
-    await deleteTaskMutation.mutateAsync(task);
+    if (!viewId) return;
+    await deleteTaskMutation.mutateAsync({taskToDelete: task, viewId});
   };
 
   const handleTaskDialogClose = () => dialogClosed?.();
@@ -45,9 +48,9 @@ export const TaskDialogContainer = ({
       }
       TaskPropertiesComponent={
         <TaskPropertiesContainer
-          task_id={task.id}
-          database_id={databaseId}
-          view_id={viewId}
+          taskId={task.id}
+          databaseId={databaseId}
+          viewId={viewId}
           taskProperties={task.properties}
         />
       }

@@ -25,7 +25,7 @@ export const useGetDatabasePropertyDefinitions = (
   );
 };
 
-export const useAddPropertyDefinition = (databaseId: string) => {
+export const useAddPropertyDefinition = (databaseId: string | undefined) => {
   const queryClient = useQueryClient();
   return useMutation(
     (propertyDefinition: DatabasePropertyDefinition) =>
@@ -40,7 +40,7 @@ export const useAddPropertyDefinition = (databaseId: string) => {
   );
 };
 
-export const useDeletePropertyDefinition = (databaseId: string) => {
+export const useDeletePropertyDefinition = (databaseId: string | undefined) => {
   const queryClient = useQueryClient();
   return useMutation((id: string) => deletePropertyDefinition(id), {
     onSettled: () => {
@@ -51,7 +51,7 @@ export const useDeletePropertyDefinition = (databaseId: string) => {
   });
 };
 
-export const useUpdatePropertyDefinition = (databaseId: string) => {
+export const useUpdatePropertyDefinition = (databaseId: string | undefined) => {
   const queryClient = useQueryClient();
   return useMutation(
     ({

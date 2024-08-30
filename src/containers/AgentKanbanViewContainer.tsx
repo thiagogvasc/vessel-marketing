@@ -1,7 +1,7 @@
 "use client";
 
 import React, { useEffect, useState } from "react";
-import { DatabaseView, Task } from "../types";
+import { Task } from "../types";
 import { TaskWithId } from "../components/KanbanView/Task";
 import { KanbanView } from "../components/KanbanView";
 import { useKanbanColumns } from "../hooks/useKanbanColumns";
@@ -11,6 +11,7 @@ import {
   useAddKanbanColumn,
   useAddKanbanTask,
   useDeleteKanbanColumn,
+  useGetDatabaseViewById,
   useGetViewTaskOrdersByViewId,
   useUpdateKanbanViewManualSort,
 } from "../hooks/react-query/database_view";
@@ -19,38 +20,30 @@ import { useGetDatabasePropertyDefinitions } from "../hooks/react-query/database
 import { useOrderedTasks } from "../hooks/useOrderedTasks";
 
 interface KanbanViewProps {
-  databaseId: string;
-  databaseView: DatabaseView;
+  databaseId: string | undefined;
+  viewId: string | undefined;
   readOnly: boolean;
 }
 
 export const AgentKanbanViewContainer: React.FC<KanbanViewProps> = ({
   databaseId,
-  databaseView,
+  viewId,
   readOnly,
 }) => {
   const { data: databaseTasks, isLoading: isTasksLoading } =
     useGetDatabaseTasks(databaseId as string);
 
-    const { data: propertyDefinitions } = useGetDatabasePropertyDefinitions(databaseId);
+    const { data: view } = useGetDatabaseViewById(databaseId, viewId);
+  const { data: propertyDefinitions } = useGetDatabasePropertyDefinitions(databaseId);
 
-  const { data: viewTaskOrders } = useGetViewTaskOrdersByViewId(databaseView.id);
-  const updateKanbanViewManualSort = useUpdateKanbanViewManualSort(
-    databaseId,
-    databaseView.id as string,
-  );
-  const addKanbanColumnMutation = useAddKanbanColumn(
-    databaseId,
-    databaseView.id,
-  );
-  const addTaskMutation = useAddKanbanTask(databaseId, databaseView.id);
-  const deleteColumnMutation = useDeleteKanbanColumn(
-    databaseId,
-    databaseView.id,
-  );
+  const { data: viewTaskOrders } = useGetViewTaskOrdersByViewId(viewId);
+  const updateKanbanViewManualSort = useUpdateKanbanViewManualSort(databaseId);
+  const addKanbanColumnMutation = useAddKanbanColumn(databaseId);
+  const addTaskMutation = useAddKanbanTask(databaseId);
+  const deleteColumnMutation = useDeleteKanbanColumn(databaseId);
 
   const { orderedTasks } = useOrderedTasks(databaseTasks, viewTaskOrders);
-  const { columns, setColumns } = useKanbanColumns(orderedTasks, propertyDefinitions, databaseView);
+  const { columns, setColumns } = useKanbanColumns(orderedTasks, propertyDefinitions, view);
   const [isTaskDialogOpen, setIsTaskDialogOpen] = useState(false);
   const [selectedTask, setSelectedTask] = useState<Task | null>(null);
   useEffect(() => {
@@ -88,9 +81,10 @@ export const AgentKanbanViewContainer: React.FC<KanbanViewProps> = ({
       );
 
       console.warn("sending columns to db", columns);
-      const groupByField = databaseView.config?.group_by;
-      if (groupByField) {
+      const groupByField = view?.config?.group_by;
+      if (groupByField && viewId) {
         updateKanbanViewManualSort.mutateAsync({
+          viewId,
           columns,
           taskId: movedTask.id!,
           taskChanges: {
@@ -106,9 +100,10 @@ export const AgentKanbanViewContainer: React.FC<KanbanViewProps> = ({
 
   const handleColumnAdded = (newColumnTitle: string) => {
     if (newColumnTitle.trim() === "") return;
+    if (!databaseId || !view) return;
     addKanbanColumnMutation.mutateAsync({
       databaseId,
-      viewName: databaseView.name,
+      viewName: view.name,
       newOption: newColumnTitle,
     });
   };
@@ -119,14 +114,14 @@ export const AgentKanbanViewContainer: React.FC<KanbanViewProps> = ({
   };
 
   const handleTaskAdded = async (columnTitle: string, newTaskTitle: string) => {
-    if (!databaseView.config?.group_by) return;
+    if (!view?.config?.group_by || !databaseId) return;
   
     const newTask: Task = {
       id: uuidv4(),
       database_id: databaseId,
       title: newTaskTitle,
       description: "",
-      properties: { [databaseView.config.group_by]: columnTitle },
+      properties: { [view.config.group_by]: columnTitle },
     };
   
     let afterTaskId: string | null = null;
@@ -146,14 +141,15 @@ export const AgentKanbanViewContainer: React.FC<KanbanViewProps> = ({
       }
     });
   
-    addTaskMutation.mutate({ task: newTask, afterTaskId });
+    viewId && addTaskMutation.mutate({ task: newTask, afterTaskId, viewId });
   };
   
 
   const handleColumnDeleted = async (columnTitle: string) => {
+    if (!databaseId || !view) return;
     await deleteColumnMutation.mutateAsync({
       databaseId,
-      viewName: databaseView.name,
+      viewName: view.name,
       optionToDelete: columnTitle,
     });
   };
@@ -178,7 +174,7 @@ export const AgentKanbanViewContainer: React.FC<KanbanViewProps> = ({
       {selectedTask && (
         <TaskDialogContainer
           databaseId={databaseId}
-          viewId={databaseView.id}
+          viewId={view?.id}
           task={selectedTask}
           open={isTaskDialogOpen}
           dialogClosed={handleTaskDialogClose}

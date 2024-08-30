@@ -17,47 +17,51 @@ export interface PropertyWithDefinition {
 }
 
 interface TaskPropertiesContainerProps {
-  database_id: string;
-  view_id: string;
-  task_id: string;
+  databaseId: string | undefined;
+  viewId: string | undefined;
+  taskId: string | undefined;
   taskProperties: { [key: string]: any };
 }
 
 export const TaskPropertiesContainer: React.FC<
   TaskPropertiesContainerProps
-> = ({ database_id, view_id, task_id, taskProperties }) => {
+> = ({ databaseId, viewId, taskId, taskProperties }) => {
   const { data: propertyDefinitions } =
-    useGetDatabasePropertyDefinitions(database_id);
+    useGetDatabasePropertyDefinitions(databaseId);
   const { propertiesWithDefinitions } = usePropertiesWithDefinitions(
     taskProperties,
     propertyDefinitions,
   );
 
-  const addPropertyDefinitionMutation = useAddPropertyDefinition(database_id);
+  const addPropertyDefinitionMutation = useAddPropertyDefinition(databaseId);
   const deletePropertyDefinitionMutation =
-    useDeletePropertyDefinition(database_id);
+    useDeletePropertyDefinition(databaseId);
   const updatePropertyDefinitionMutation =
-    useUpdatePropertyDefinition(database_id);
-  const updateTaskMutation = useUpdateTask(database_id, task_id, view_id);
+    useUpdatePropertyDefinition(databaseId);
+  const updateTaskMutation = useUpdateTask(databaseId);
 
   const handlePropertyChange = (propertyId: string, newValue: any) => {
+    if (!taskId || !viewId) return;
     updateTaskMutation.mutateAsync({
-      id: task_id,
+      id: taskId,
+      viewId,
       changes: { properties: { ...taskProperties, [propertyId]: newValue } },
     });
   };
 
   const handleAddProperty = (name: string, type: string, value: unknown) => {
+    if (!databaseId || !viewId || !taskId) return;
     const propertyDefinition: DatabasePropertyDefinition = {
       id: uuidv4(),
-      database_id,
+      database_id: databaseId,
       name,
       type: type as PropertyType,
       data: {},
     };
     addPropertyDefinitionMutation.mutateAsync(propertyDefinition);
     updateTaskMutation.mutateAsync({
-      id: task_id,
+      id: taskId,
+      viewId,
       changes: {
         properties: { ...taskProperties, [propertyDefinition.id]: value },
       },
