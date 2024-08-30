@@ -25,10 +25,10 @@ import SettingsIcon from "@mui/icons-material/Settings";
 import ChevronLeftIcon from "@mui/icons-material/ChevronLeft";
 import ChevronRightIcon from "@mui/icons-material/ChevronRight";
 import {
-  DashboardOutlined,
-  GroupOutlined,
-  ListAltOutlined,
-  ViewKanbanOutlined,
+  Dashboard,
+  Group,
+  ViewKanban,
+  ViewList
 } from "@mui/icons-material";
 import MyDrawer from "./MyDrawer";
 import { useGetCurrentUser } from "../hooks/react-query/user";
@@ -48,25 +48,25 @@ const AgentSidebar = () => {
   const links = [
     {
       text: "Dashboard",
-      iconComponent: DashboardOutlined,
+      iconComponent: Dashboard,
       disabled: false,
       href: "/agent/dashboard",
     },
     {
       text: "Users",
-      iconComponent: GroupOutlined,
+      iconComponent: Group,
       disabled: false,
       href: "/agent/users",
     },
     {
       text: "Requests",
-      iconComponent: ListAltOutlined,
+      iconComponent: ViewList,
       disabled: false,
       href: "/agent/requests",
     },
     {
       text: "Projects",
-      iconComponent: ViewKanbanOutlined,
+      iconComponent: ViewKanban,
       disabled: false,
       href: "/agent/databases",
     },
