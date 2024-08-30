@@ -27,6 +27,7 @@ import {
   IconButton,
   Menu,
   MenuItem,
+  Chip,
 } from "@mui/material";
 import AddCircleOutlineIcon from "@mui/icons-material/AddCircleOutline";
 import SearchIcon from "@mui/icons-material/Search";
@@ -36,6 +37,7 @@ import { useRouter } from "next/navigation";
 import { Request } from "@/src/types";
 import { BorderColor, MoreVert } from "@mui/icons-material";
 import theme from "@/src/theme";
+import { useTheme } from "@emotion/react";
 
 const Requests = () => {
   const router = useRouter();
@@ -47,7 +49,7 @@ const Requests = () => {
   const [order, setOrder] = useState<"asc" | "desc">("asc");
   const [orderBy, setOrderBy] = useState<keyof Request>("title");
   console.warn(requests);
-
+  const t = useTheme();
   useEffect(() => {
     if (!isLoading && requests) {
       setShowRequests(true);
@@ -118,6 +120,18 @@ const Requests = () => {
     setMenuRequestId(requestId);
     setAnchorEl(event.currentTarget);
   };
+
+  const priorityColor = (priority: string) => {
+    if (priority === 'Low') return '#95A5A6'
+    else if (priority === 'Medium') return '#F39C12'
+    else if (priority === 'High') return '#E74C3C'
+  }
+
+  const statusToColor = (status: string) => {
+    if (status === 'Pending') return '#F1C40F'
+    else if (status === 'In Progress') return '#3498DB'
+    else if (status === 'Completed') return '#2ECC71'
+  }
 
   return (
     <Container component="main" maxWidth="xl">
@@ -256,10 +270,14 @@ const Requests = () => {
                           {request.description.substring(0, 50)}...
                         </TableCell>
                         <TableCell sx={{ color: theme.palette.text.secondary }}>
-                          {request.status}
+                          <Chip label={request.status} sx={{backgroundColor: statusToColor(request.status), color: theme.palette.getContrastText(statusToColor(request.status) ?? '')}}/>
                         </TableCell>
                         <TableCell sx={{ color: theme.palette.text.secondary }}>
-                          {request.priority}
+                          {request.priority ? (
+                            <Chip label={request.priority} sx={{backgroundColor: priorityColor(request.priority), color: theme.palette.getContrastText(priorityColor(request.priority)??'')}}/>
+                          ) : (
+                            <>None</>
+                          )}
                         </TableCell>
                         <TableCell sx={{ color: theme.palette.text.secondary }}>
                           {request.created_at}

@@ -82,12 +82,9 @@ export default function RequestDetails() {
   const handleDialogClose = async (confirm: boolean) => {
     setOpenDialog(false);
     if (confirm) {
-      await addRequestUpdateMutation.mutate({
+      await updateRequestMutation.mutate({
         id: request?.id as string,
-        update: {
-          update_description: comment,
-          updated_by: user?.id as string,
-        },
+        updates: { status: status  },
       });
     } else {
       setStatus(request?.status || "Pending");
