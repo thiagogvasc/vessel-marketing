@@ -98,6 +98,22 @@ const MyDrawer = ({
       open={open}
     >
       <Toolbar>
+        {!open && (
+          <Box sx={{
+            width: '100%',
+            height: '100%',
+            display: 'flex',
+            justifyContent: 'center',
+            alignItems: 'center'
+          }}>
+            <Image
+            alt="vessel marketing"
+            src="/logovessel.png"
+            width={50}
+            height={50}
+          />
+          </Box>
+        )}
         {open && (
           <>
             <Image
@@ -107,13 +123,13 @@ const MyDrawer = ({
               height={50}
             />
             <Typography variant="h6" noWrap component="div">
-              Vessel Marketing
+              Vessel
             </Typography>
           </>
         )}
       </Toolbar>
       <Box sx={{ overflow: "auto" }}>
-        <List sx={{ p: 2 }}>
+        <List sx={{ p: 1 }}>
           {links.map((link) => (
             <StyledListItemButton
               sx={{

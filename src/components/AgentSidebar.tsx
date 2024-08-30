@@ -35,7 +35,7 @@ import { useGetCurrentUser } from "../hooks/react-query/user";
 import theme from "../theme";
 import Image from "next/image";
 
-const drawerWidth = 240;
+const drawerWidth = 220;
 
 const AgentSidebar = () => {
   const { user, logout } = useAuth();
@@ -139,7 +139,7 @@ const AgentSidebar = () => {
         sx={{
           width: `calc(100% - ${open ? drawerWidth + "px" : theme.spacing(9)})`,
           ml: `${open ? drawerWidth + "px" : theme.spacing(9)}`,
-          background: "#fcfbfe",
+          background: "white",
           color: "black",
           transition: theme.transitions.create("width", {
             easing: theme.transitions.easing.sharp,
@@ -171,25 +171,6 @@ const AgentSidebar = () => {
               {open ? <ChevronLeftIcon /> : <ChevronRightIcon />}
             </IconButton>
           </Box>
-
-          {!open && (
-            <>
-              <Image
-                alt="vessel marketing"
-                src="/logovessel.png"
-                width={50}
-                height={50}
-              />
-              <Typography
-                variant="h6"
-                noWrap
-                component="div"
-                sx={{ flexGrow: 1 }}
-              >
-                Vessel Marketing
-              </Typography>
-            </>
-          )}
 
           <Box sx={{ flexGrow: 1 }} />
           <IconButton
