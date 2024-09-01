@@ -66,14 +66,23 @@ export const RequestsContainer = () => {
   };
 
   const columns: GridColDef[] = [
-    { field: "id", headerName: "ID" },
-    { field: "title", headerName: "Title", headerClassName: 'secondary-header' },
+    { 
+      field: "id", 
+      headerName: "ID",
+      flex: 1,
+    },
+    { 
+      field: "title", 
+      headerName: "Title", 
+      headerClassName: 'secondary-header',
+      flex: 1,
+     },
     { 
       field: "client_id", 
       headerName: "Client", 
-      minWidth: 350,
+      minWidth: 300,
       align: 'center',
-      flex: 1,
+      flex: 2,
       headerClassName: 'secondary-header',
       renderCell: (params: GridRenderCellParams) => (
         <CustomerCellContainer client_id={params.value}/>
@@ -82,7 +91,7 @@ export const RequestsContainer = () => {
     {
       field: "status",
       headerName: "Status",
-      width: 130,
+      minWidth: 130,
       headerClassName: 'secondary-header',
       renderCell: (params: GridRenderCellParams) => (
         <Chip
@@ -97,7 +106,8 @@ export const RequestsContainer = () => {
     {
       field: "priority",
       headerName: "Priority",
-      width: 130,
+      minWidth: 130,
+      flex: 1,
       headerClassName: 'secondary-header',
       renderCell: (params: GridRenderCellParams) => (
         <Chip
@@ -112,17 +122,18 @@ export const RequestsContainer = () => {
     { 
       field: "assigned_to", 
       headerName: "Assignee", 
-      width: 150, 
-      flex: 1,
+      minWidth: 150, 
+      flex: 2,
       headerClassName: 'secondary-header',
       renderCell: (params: GridRenderCellParams) => (
-        <CustomerCellContainer client_id={params.value}/>
+        <CustomerCellContainer client_id={params.value}/> 
       )
      },
     {
       field: "created_at",
       headerName: "Created At",
-      width: 130,
+      minWidth: 130,
+      flex: 1,
       headerClassName: 'secondary-header',
       valueGetter: (params: any) => {
         return new Date(params).toLocaleDateString()
