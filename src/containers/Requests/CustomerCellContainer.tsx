@@ -1,5 +1,5 @@
 import React from "react";
-import { useGetUserById } from "../hooks/react-query/user";
+import { useGetUserById } from "../../hooks/react-query/user";
 import { Avatar, Box, Typography } from "@mui/material";
 
 interface CustomerCellContainerProps {

@@ -1,5 +1,5 @@
 import { supabase } from "../../supabaseClient"; // Adjust the path to your supabaseClient
-import { Request, RequestUpdate } from "@/src/types";
+import { Request, RequestStatusUpdate } from "@/src/types";
 
 export const createRequest = async (
   request: Omit<Request, "id">,
@@ -52,6 +52,20 @@ export const getRequests = async (): Promise<Request[]> => {
   return data as Request[];
 };
 
+export const getRequestStatusUpdates = async (requestId: string): Promise<RequestStatusUpdate[]> => {
+  const { data, error } = await supabase
+    .from("request_status_update")
+    .select("*")
+    .eq("request_id", requestId)
+
+  if (error) {
+    console.error("Error fetching request updates:", error.message);
+    return [];
+  }
+
+  return data as RequestStatusUpdate[];
+};
+
 export const updateRequest = async (
   id: string,
   data: Partial<Request>,
@@ -71,31 +85,18 @@ export const updateRequest = async (
 };
 
 export const addRequestUpdate = async (
-  id: string,
-  update: Omit<RequestUpdate, "id" | "updated_at">,
+  update: RequestStatusUpdate,
 ): Promise<void> => {
-  const { data: currentRequest, error: fetchError } = await supabase
-    .from("request")
-    .select("updates")
-    .eq("id", id)
+  const { data, error } = await supabase
+    .from("request_status_update")
+    .insert(update)
+    .select("*")
     .single();
 
-  if (fetchError) {
-    console.error("Error fetching request for update:", fetchError.message);
-    throw new Error(fetchError.message);
-  }
-
-  const updates = currentRequest?.updates ?? [];
-
-  updates.push({ ...update, updated_at: new Date().toISOString() });
-
-  const { error } = await supabase
-    .from("request")
-    .update({ updates, updated_at: new Date().toISOString() })
-    .eq("id", id);
-
   if (error) {
-    console.error("Error adding request update:", error.message);
+    console.error("Error creating request status update:", error.message);
     throw new Error(error.message);
   }
+
+  return data.id;
 };

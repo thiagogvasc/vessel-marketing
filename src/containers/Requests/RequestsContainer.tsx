@@ -22,8 +22,10 @@ import MoreVert from "@mui/icons-material/MoreVert";
 import IconButton from "@mui/material/IconButton";
 import Menu from "@mui/material/Menu";
 import MenuItem from "@mui/material/MenuItem";
-import { useGetAllUsers } from "../hooks/react-query/user";
+import { useGetAllUsers } from "../../hooks/react-query/user";
 import { CustomerCellContainer } from "./CustomerCellContainer";
+import { CustomChip } from "../../components/CustomChip";
+import { StyledPaper } from "../../components/StyledPaper";
 
 export const RequestsContainer = () => {
   const router = useRouter();
@@ -51,18 +53,6 @@ export const RequestsContainer = () => {
   ) => {
     setMenuRequestId(requestId);
     setAnchorEl(event.currentTarget);
-  };
-
-  const priorityColor = (priority: string) => {
-    if (priority === "Low") return {color: '#637381', backgroundColor: 'rgba(145, 158, 171, 0.16)'};
-    else if (priority === "Medium") return { color: '#B76E00', backgroundColor: '#FFF5CC'};
-    else if (priority === "High") return { color: 'rgb(183, 29, 24)', backgroundColor: 'rgba(255, 86, 48, 0.16)'};
-  };
-
-  const statusToColor = (status: string) => {
-    if (status === "Pending") return {color: '#B76E00', backgroundColor: '#FFF5CC'};
-    else if (status === "In Progress") return {backgroundColor: '#CAFDF5', color: '#006C9C'};
-    else if (status === "Completed") return { backgroundColor: 'rgba(34, 197, 94, 0.16)', color: 'rgb(17, 141, 87)'};
   };
 
   const columns: GridColDef[] = [
@@ -94,13 +84,7 @@ export const RequestsContainer = () => {
       minWidth: 130,
       headerClassName: 'secondary-header',
       renderCell: (params: GridRenderCellParams) => (
-        <Chip
-          label={params.value}
-          sx={{
-            backgroundColor: statusToColor(params.value)?.backgroundColor,
-            color: statusToColor(params.value)?.color,
-          }}
-        />
+        <CustomChip type="status" value={params.value} />
       ),
     },
     {
@@ -110,13 +94,7 @@ export const RequestsContainer = () => {
       flex: 1,
       headerClassName: 'secondary-header',
       renderCell: (params: GridRenderCellParams) => (
-        <Chip
-          label={params.value ?? "None"}
-          sx={{
-            backgroundColor: priorityColor(params.value)?.backgroundColor,
-            color: priorityColor(params.value)?.color,
-          }}
-        />
+        <CustomChip type="priority" value={params.value}/>
       ),
     },
     { 
@@ -190,12 +168,7 @@ export const RequestsContainer = () => {
       <Typography component="h1" variant="h5">
         Requests
       </Typography>
-      <Paper
-        sx={{
-          boxShadow:
-            "rgba(145, 158, 171, 0.2) 0px 0px 2px 0px, rgba(145, 158, 171, 0.12) 0px 12px 24px -4px",
-          borderRadius: "16px",
-        }}
+      <StyledPaper
       >
         <TextField
           variant="outlined"
@@ -267,7 +240,7 @@ export const RequestsContainer = () => {
             />
           </Box>
         )}
-      </Paper>
+      </StyledPaper>
     </>
   );
 };

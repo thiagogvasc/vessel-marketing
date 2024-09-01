@@ -5,8 +5,9 @@ import {
   getRequests,
   updateRequest,
   addRequestUpdate,
+  getRequestStatusUpdates,
 } from "../../supabase/request";
-import { Request, RequestUpdate } from "../../types";
+import { Request, RequestStatusUpdate } from "../../types";
 
 // Hook to get all requests
 export const useGetRequests = () => {
@@ -16,10 +17,21 @@ export const useGetRequests = () => {
 // Hook to get a single request by ID
 export const useGetRequestById = (id: string | undefined | null) => {
   return useQuery(
-    ["request", id],
+    ["requests", id],
     () => (id ? getRequestById(id) : Promise.resolve(null)),
     {
       enabled: !!id,
+      staleTime: 60000, // only run the query if id is truthy
+    },
+  );
+};
+
+export const useGetRequestStatusUpdatesByRequestId = (requestId: string | undefined | null) => {
+  return useQuery(
+    ["requests", requestId, 'status-updates'],
+    () => (requestId ? getRequestStatusUpdates(requestId) : Promise.resolve(null)),
+    {
+      enabled: !!requestId,
       staleTime: 60000, // only run the query if id is truthy
     },
   );
@@ -46,7 +58,7 @@ export const useUpdateRequest = () => {
     {
       onSuccess: (_, { id }) => {
         queryClient.invalidateQueries("requests");
-        queryClient.invalidateQueries(["request", id]);
+        queryClient.invalidateQueries(["requests", id]);
       },
     },
   );
@@ -58,16 +70,15 @@ export const useAddRequestUpdate = () => {
 
   return useMutation(
     ({
-      id,
-      update,
+      statusUpdate,
     }: {
-      id: string;
-      update: Omit<RequestUpdate, "id" | "updated_at">;
-    }) => addRequestUpdate(id, update),
+      requestId: string;
+      statusUpdate: RequestStatusUpdate;
+    }) => addRequestUpdate(statusUpdate),
     {
-      onSuccess: (_, { id }) => {
-        queryClient.invalidateQueries("requests");
-        queryClient.invalidateQueries(["request", id]);
+      onSuccess: (_, { requestId }) => {
+        queryClient.invalidateQueries(["request", requestId]);
+        queryClient.invalidateQueries(["request", requestId, 'status-updates']);
       },
     },
   );
