@@ -1,5 +1,5 @@
 "use client";
-
+import "./RequestsContainer.css"
 import { useEffect, useState } from "react";
 import { useGetRequests } from "@/src/hooks/react-query/request";
 import {
@@ -10,21 +10,25 @@ import {
   InputAdornment,
   Paper,
   Chip,
+  Avatar,
 } from "@mui/material";
 import SearchIcon from "@mui/icons-material/Search";
 import { useRouter } from "next/navigation";
 import { Request } from "@/src/types";
 import { useTheme } from "@mui/material/styles";
 import React from "react";
-import { DataGrid, GridColDef, GridRenderCellParams } from "@mui/x-data-grid";
+import { DataGrid, GridColDef, GridColumnHeaderParams, GridRenderCellParams } from "@mui/x-data-grid";
 import MoreVert from "@mui/icons-material/MoreVert";
 import IconButton from "@mui/material/IconButton";
 import Menu from "@mui/material/Menu";
 import MenuItem from "@mui/material/MenuItem";
+import { useGetAllUsers } from "../hooks/react-query/user";
+import { CustomerCellContainer } from "./CustomerCellContainer";
 
 export const RequestsContainer = () => {
   const router = useRouter();
   const { data: requests, isLoading } = useGetRequests();
+  const { data: users } = useGetAllUsers();
   const [searchTerm, setSearchTerm] = useState("");
 
   const [anchorEl, setAnchorEl] = useState<null | HTMLElement>(null);
@@ -63,12 +67,23 @@ export const RequestsContainer = () => {
 
   const columns: GridColDef[] = [
     { field: "id", headerName: "ID" },
-    { field: "title", headerName: "Title" },
-    { field: "client_id", headerName: "Customer", flex: 1 },
+    { field: "title", headerName: "Title", headerClassName: 'secondary-header' },
+    { 
+      field: "client_id", 
+      headerName: "Client", 
+      minWidth: 350,
+      align: 'center',
+      flex: 1,
+      headerClassName: 'secondary-header',
+      renderCell: (params: GridRenderCellParams) => (
+        <CustomerCellContainer client_id={params.value}/>
+      )
+    },
     {
       field: "status",
       headerName: "Status",
       width: 130,
+      headerClassName: 'secondary-header',
       renderCell: (params: GridRenderCellParams) => (
         <Chip
           label={params.value}
@@ -83,6 +98,7 @@ export const RequestsContainer = () => {
       field: "priority",
       headerName: "Priority",
       width: 130,
+      headerClassName: 'secondary-header',
       renderCell: (params: GridRenderCellParams) => (
         <Chip
           label={params.value ?? "None"}
@@ -93,18 +109,28 @@ export const RequestsContainer = () => {
         />
       ),
     },
-    { field: "assigned_to", headerName: "Assignee", width: 150 },
+    { 
+      field: "assigned_to", 
+      headerName: "Assignee", 
+      width: 150, 
+      flex: 1,
+      headerClassName: 'secondary-header',
+      renderCell: (params: GridRenderCellParams) => (
+        <CustomerCellContainer client_id={params.value}/>
+      )
+     },
     {
       field: "created_at",
       headerName: "Created At",
       width: 130,
+      headerClassName: 'secondary-header',
       valueGetter: (params: any) => {
         return new Date(params).toLocaleDateString()
       }
     },
     {
       field: "actions",
-      headerName: "Actions",
+      renderHeader: (params: GridColumnHeaderParams<any>) => (<></>),
       width: 100,
       renderCell: (params: GridRenderCellParams<any>) => (
         <>
@@ -211,8 +237,11 @@ export const RequestsContainer = () => {
                   backgroundColor: '#F4F6F8',
                 },
                 '& .MuiDataGrid-cell': {
-                   border: 'none',
-                  padding: '16px'
+                    border: 'none',
+                    padding: '16px',
+                    display: 'flex',
+                    justifyContent: 'start',
+                    alignItems: 'center'
                 },
                 '& .MuiDataGrid-row': {
                   borderBottomColor: 'rgb(145 158 171 / 20%)',
