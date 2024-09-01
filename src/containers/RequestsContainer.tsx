@@ -201,20 +201,6 @@ export const RequestsContainer = () => {
               columns={columns}
               getRowHeight={() => 'auto'}
               
-              // pageSize={rowsPerPage}
-              // rowsPerPageOptions={[5, 10, 25]}
-              // pagination
-              // paginationMode="client"
-              // onPageChange={(params: any) => handlePageChange(params.page)}
-              // onPageSizeChange={(params: any) => handlePageSizeChange(params.pageSize)}
-              // sortingOrder={["asc", "desc"]}
-              // sortModel={[{ field: orderBy, sort: order }]}
-              // onSortModelChange={(model) => {
-              //   if (model.length > 0) {
-              //     setOrder(model[0].sort as "asc" | "desc");
-              //     setOrderBy(model[0].field as keyof Request);
-              //   }
-              // }}
               rowSpacingType="border"
               sx={{
                 border: 'none', // Removes the outer border
