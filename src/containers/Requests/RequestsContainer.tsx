@@ -31,6 +31,7 @@ import { useGetAllUsers } from "../../hooks/react-query/user";
 import { CustomerCellContainer } from "./CustomerCellContainer";
 import { CustomChip } from "../../components/CustomChip";
 import { StyledPaper } from "../../components/StyledPaper";
+import { ActionsCell } from "./ActionsCell";
 
 export const RequestsContainer = () => {
   const router = useRouter();
@@ -127,27 +128,7 @@ export const RequestsContainer = () => {
       renderHeader: (params: GridColumnHeaderParams<any>) => <></>,
       width: 100,
       renderCell: (params: GridRenderCellParams<any>) => (
-        <>
-          <IconButton
-            onClick={(e) => handleMenuOpen(params.row.id as string, e)}
-          >
-            <MoreVert />
-          </IconButton>
-          <Menu
-            anchorEl={anchorEl}
-            open={isMenuOpen && menuRequestId === params.row.id}
-            onClose={handleMenuClose}
-          >
-            <MenuItem
-              onClick={() => {
-                handleMenuClose();
-                router.push(`/agent/requests/${params.row.id}`);
-              }}
-            >
-              View
-            </MenuItem>
-          </Menu>
-        </>
+        <ActionsCell requestId={params.row.id} />
       ),
     },
   ];
