@@ -13,11 +13,10 @@ import {
   Select,
   MenuItem,
   SelectChangeEvent,
-  Grid2,
   Avatar,
   List,
-  Button,
   TextField,
+  IconButton,
 } from "@mui/material";
 import {
   RequestStatus,
@@ -35,7 +34,9 @@ import { StyledPaper } from "../../../components/StyledPaper";
 import { v4 as uuidv4 } from "uuid";
 import {
   useAddRequestComment,
+  useDeleteRequestComment,
   useGetCommentsByRequestId,
+  useUpdateRequestComment,
 } from "@/src/hooks/react-query/request_comment";
 import { RequestComment } from "@/src/components/RequestComment";
 
@@ -45,6 +46,7 @@ import TimelineSeparator from "@mui/lab/TimelineSeparator";
 import TimelineConnector from "@mui/lab/TimelineConnector";
 import TimelineContent from "@mui/lab/TimelineContent";
 import TimelineDot from "@mui/lab/TimelineDot";
+import { Send } from "@mui/icons-material";
 
 interface RequestDetailsContainerProps {
   requestId: string;
@@ -62,6 +64,8 @@ export const RequestDetailsContainer: React.FC<
   const addRequestUpdateMutation = useAddRequestUpdate();
   const updateRequestMutation = useUpdateRequest();
   const addCommentMutation = useAddRequestComment(requestId);
+  const deleteCommentMutation = useDeleteRequestComment(requestId);
+  const updateCommentMutation = useUpdateRequestComment(requestId);
   const [newCommentText, setNewCommentText] = useState("");
 
   const [status, setStatus] = useState<RequestStatus>(
@@ -88,6 +92,14 @@ export const RequestDetailsContainer: React.FC<
       text: newCommentText,
     });
   };
+
+  const handleCommentUpdate = (id: string, newText: string) => {
+    updateCommentMutation.mutate({ id, changes: { text: newText }});
+  }
+
+  const handleCommentDelete = (id: string) => {
+    deleteCommentMutation.mutate(id);
+  }
 
   const handlePriorityChange = async (
     event: SelectChangeEvent<RequestPriority>,
@@ -277,27 +289,31 @@ export const RequestDetailsContainer: React.FC<
             </StyledPaper>
 
             <StyledPaper sx={{ mt: 3, p: 3 }}>
-              <TextField
-                label="Comment"
-                value={newCommentText}
-                onChange={(e) => setNewCommentText(e.target.value)}
-                fullWidth
-              />
-              <Button
-                variant="contained"
-                color="primary"
-                onClick={handleAddComment}
-                style={{ marginTop: "10px" }}
-              >
-                Add Comment
-              </Button>
+            <Typography fontSize={18} fontWeight={600} gutterBottom mb={2}>
+                Comments
+              </Typography>
+              <Box sx={{ display: 'flex', justifyContent: 'center', alignItems: 'center', gap: 1}}>
+                <TextField
+                  label="Comment"
+                  value={newCommentText}
+                  onChange={(e) => setNewCommentText(e.target.value)}
+                  fullWidth
+                />
+                <IconButton
+                  color="primary"
+                  size="large"
+                  onClick={handleAddComment}
+                >
+                  <Send />
+                </IconButton>
+              </Box>
               <List>
                 {comments?.map((comment, index) => (
                   <RequestComment
                     key={index}
                     comment={comment}
-                    // onUpdate={handleCommentUpdate}
-                    // onDelete={handleCommentDelete}
+                    onUpdate={handleCommentUpdate}
+                    onDelete={handleCommentDelete}
                   />
                 ))}
               </List>
