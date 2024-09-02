@@ -1,6 +1,6 @@
 "use client";
 import "./RequestsContainer.css";
-import { useEffect, useState } from "react";
+import { useState } from "react";
 import { useGetRequests } from "@/src/hooks/react-query/request";
 import {
   Box,
@@ -8,13 +8,8 @@ import {
   CircularProgress,
   TextField,
   InputAdornment,
-  Paper,
-  Chip,
-  Avatar,
 } from "@mui/material";
 import SearchIcon from "@mui/icons-material/Search";
-import { useRouter } from "next/navigation";
-import { Request } from "@/src/types";
 import { useTheme } from "@mui/material/styles";
 import React from "react";
 import {
@@ -23,43 +18,14 @@ import {
   GridColumnHeaderParams,
   GridRenderCellParams,
 } from "@mui/x-data-grid";
-import MoreVert from "@mui/icons-material/MoreVert";
-import IconButton from "@mui/material/IconButton";
-import Menu from "@mui/material/Menu";
-import MenuItem from "@mui/material/MenuItem";
-import { useGetAllUsers } from "../../hooks/react-query/user";
 import { CustomerCellContainer } from "./CustomerCellContainer";
 import { CustomChip } from "../../components/CustomChip";
 import { StyledPaper } from "../../components/StyledPaper";
 import { ActionsCell } from "./ActionsCell";
 
 export const RequestsContainer = () => {
-  const router = useRouter();
   const { data: requests, isLoading } = useGetRequests();
-  const { data: users } = useGetAllUsers();
-  const [searchTerm, setSearchTerm] = useState("");
-
-  const [anchorEl, setAnchorEl] = useState<null | HTMLElement>(null);
-  const [menuRequestId, setMenuRequestId] = useState<null | string>(null);
-  const isMenuOpen = Boolean(anchorEl);
-
   const theme = useTheme();
-
-  const handleSearchChange = (event: React.ChangeEvent<HTMLInputElement>) => {
-    setSearchTerm(event.target.value);
-  };
-
-  const handleMenuClose = () => {
-    setAnchorEl(null);
-  };
-
-  const handleMenuOpen = (
-    requestId: string,
-    event: React.MouseEvent<HTMLElement>,
-  ) => {
-    setMenuRequestId(requestId);
-    setAnchorEl(event.currentTarget);
-  };
 
   const columns: GridColDef[] = [
     {
@@ -133,13 +99,7 @@ export const RequestsContainer = () => {
     },
   ];
 
-  const filteredRequests = requests?.filter(
-    (request) =>
-      request.title.toLowerCase().includes(searchTerm.toLowerCase()) ||
-      request.description.toLowerCase().includes(searchTerm.toLowerCase()),
-  );
-
-  const rows = filteredRequests?.map((request) => ({
+  const rows = requests?.map((request) => ({
     id: request.id,
     title: request.title,
     client_id: request.client_id,
@@ -159,8 +119,6 @@ export const RequestsContainer = () => {
           variant="outlined"
           margin="normal"
           placeholder="Search requests"
-          value={searchTerm}
-          onChange={handleSearchChange}
           sx={{
             m: 2,
             "& .MuiOutlinedInput-root": {
