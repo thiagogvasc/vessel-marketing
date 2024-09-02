@@ -29,8 +29,15 @@ import ConfirmStatusChangeDialog from "@/src/components/ConfirmStatusChangeDialo
 import { CustomChip } from "../../../components/CustomChip";
 import { StyledPaper } from "../../../components/StyledPaper";
 import { v4 as uuidv4 } from 'uuid'
-import { useGetCommentsByRequestId } from "@/src/hooks/react-query/request_comment";
+import { useAddRequestComment, useGetCommentsByRequestId } from "@/src/hooks/react-query/request_comment";
 import { RequestComment } from "@/src/components/RequestComment";
+
+import Timeline from '@mui/lab/Timeline';
+import TimelineItem, { timelineItemClasses } from '@mui/lab/TimelineItem';
+import TimelineSeparator from '@mui/lab/TimelineSeparator';
+import TimelineConnector from '@mui/lab/TimelineConnector';
+import TimelineContent from '@mui/lab/TimelineContent';
+import TimelineDot from '@mui/lab/TimelineDot';
 
 interface RequestDetailsContainerProps {
     requestId: string;
@@ -44,6 +51,8 @@ export const RequestDetailsContainer: React.FC<RequestDetailsContainerProps> = (
   const { data: comments } = useGetCommentsByRequestId(requestId);
   const addRequestUpdateMutation = useAddRequestUpdate();
   const updateRequestMutation = useUpdateRequest();
+  const addCommentMutation = useAddRequestComment(requestId);
+  const [newCommentText, setNewCommentText] = useState('');
 
   const [status, setStatus] = useState<RequestStatus>(
     request?.status || "Pending",
@@ -60,6 +69,15 @@ export const RequestDetailsContainer: React.FC<RequestDetailsContainerProps> = (
     setStatus(newStatus);
     setOpenDialog(true);
   };
+
+  const handleAddComment = () => {
+    addCommentMutation.mutate({
+      id: uuidv4(),
+      author_id: user?.id ?? '',
+      request_id: request?.id ?? '',
+      text: newCommentText,
+    })
+  }
 
   const handlePriorityChange = async (
     event: SelectChangeEvent<RequestPriority>,
@@ -166,6 +184,13 @@ export const RequestDetailsContainer: React.FC<RequestDetailsContainerProps> = (
                 </Box>
 
             </Box>
+
+               <StyledPaper sx={{mt: 3, p: 3}}>
+                    <Typography fontSize={18} fontWeight={600} gutterBottom mb={2}>
+                        Description
+                    </Typography>
+                    <Typography variant="body1">{request.description}</Typography>
+                </StyledPaper>
                 
                 <StyledPaper sx={{ mt: 3, p: 3, display: 'inline-block' }}>
                   <Typography variant="h6" gutterBottom mb={2}>
@@ -187,35 +212,39 @@ export const RequestDetailsContainer: React.FC<RequestDetailsContainerProps> = (
                     </Box>
                 </StyledPaper>
 
-                <StyledPaper sx={{mt: 3, p: 3}}>
-                    <Typography fontSize={18} fontWeight={600} gutterBottom mb={2}>
-                        Description
-                    </Typography>
-                    <Typography variant="body1">{request.description}</Typography>
-                </StyledPaper>
-
-                <StyledPaper sx={{mt: 3, p: 3}}>
+                <StyledPaper sx={{mt: 3, p: 3, display: 'inline-block'}}>
                     <Typography fontSize={18} fontWeight={600} gutterBottom mb={2}>
                         Status updates
                     </Typography>
-                    {statusUpdates?.map(update => (
-                      <>
-                      {update.status}
-                      </>
-                    ))}
+                    <Timeline sx={{
+                        [`& .${timelineItemClasses.root}:before`]: {
+                          flex: 0,
+                          padding: 0,
+                        },
+                      }}>
+                      {statusUpdates?.map(update => (
+                        <TimelineItem key={update.id}>
+                          <TimelineSeparator>
+                            <TimelineDot />
+                            <TimelineConnector />
+                          </TimelineSeparator>
+                          <TimelineContent>Request status moved to {update.status}</TimelineContent>
+                        </TimelineItem>
+                      ))}
+                    </Timeline>
                 </StyledPaper>
 
                 <StyledPaper sx={{mt: 3, p: 3}}>
                   <TextField
                     label="Comment"
-                    //value={newCommentText}
-                    //onChange={(e) => setNewCommentText(e.target.value)}
+                    value={newCommentText}
+                    onChange={(e) => setNewCommentText(e.target.value)}
                     fullWidth
                   />
                   <Button
                     variant="contained"
                     color="primary"
-                    //onClick={handleAddComment}
+                    onClick={handleAddComment}
                     style={{ marginTop: "10px" }}
                   >
                     Add Comment
