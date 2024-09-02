@@ -1,5 +1,5 @@
 "use client";
-import "./RequestsContainer.css"
+import "./RequestsContainer.css";
 import { useEffect, useState } from "react";
 import { useGetRequests } from "@/src/hooks/react-query/request";
 import {
@@ -17,7 +17,12 @@ import { useRouter } from "next/navigation";
 import { Request } from "@/src/types";
 import { useTheme } from "@mui/material/styles";
 import React from "react";
-import { DataGrid, GridColDef, GridColumnHeaderParams, GridRenderCellParams } from "@mui/x-data-grid";
+import {
+  DataGrid,
+  GridColDef,
+  GridColumnHeaderParams,
+  GridRenderCellParams,
+} from "@mui/x-data-grid";
 import MoreVert from "@mui/icons-material/MoreVert";
 import IconButton from "@mui/material/IconButton";
 import Menu from "@mui/material/Menu";
@@ -49,40 +54,40 @@ export const RequestsContainer = () => {
 
   const handleMenuOpen = (
     requestId: string,
-    event: React.MouseEvent<HTMLElement>
+    event: React.MouseEvent<HTMLElement>,
   ) => {
     setMenuRequestId(requestId);
     setAnchorEl(event.currentTarget);
   };
 
   const columns: GridColDef[] = [
-    { 
-      field: "id", 
+    {
+      field: "id",
       headerName: "ID",
       flex: 1,
     },
-    { 
-      field: "title", 
-      headerName: "Title", 
-      headerClassName: 'secondary-header',
+    {
+      field: "title",
+      headerName: "Title",
+      headerClassName: "secondary-header",
       flex: 1,
-     },
-    { 
-      field: "client_id", 
-      headerName: "Client", 
+    },
+    {
+      field: "client_id",
+      headerName: "Client",
       minWidth: 300,
-      align: 'center',
+      align: "center",
       flex: 2,
-      headerClassName: 'secondary-header',
+      headerClassName: "secondary-header",
       renderCell: (params: GridRenderCellParams) => (
-        <CustomerCellContainer client_id={params.value}/>
-      )
+        <CustomerCellContainer client_id={params.value} />
+      ),
     },
     {
       field: "status",
       headerName: "Status",
       minWidth: 130,
-      headerClassName: 'secondary-header',
+      headerClassName: "secondary-header",
       renderCell: (params: GridRenderCellParams) => (
         <CustomChip type="status" value={params.value} />
       ),
@@ -92,34 +97,34 @@ export const RequestsContainer = () => {
       headerName: "Priority",
       minWidth: 130,
       flex: 1,
-      headerClassName: 'secondary-header',
+      headerClassName: "secondary-header",
       renderCell: (params: GridRenderCellParams) => (
-        <CustomChip type="priority" value={params.value}/>
+        <CustomChip type="priority" value={params.value} />
       ),
     },
-    { 
-      field: "assigned_to", 
-      headerName: "Assignee", 
-      minWidth: 150, 
+    {
+      field: "assigned_to",
+      headerName: "Assignee",
+      minWidth: 150,
       flex: 2,
-      headerClassName: 'secondary-header',
+      headerClassName: "secondary-header",
       renderCell: (params: GridRenderCellParams) => (
-        <CustomerCellContainer client_id={params.value}/> 
-      )
-     },
+        <CustomerCellContainer client_id={params.value} />
+      ),
+    },
     {
       field: "created_at",
       headerName: "Created At",
       minWidth: 130,
       flex: 1,
-      headerClassName: 'secondary-header',
+      headerClassName: "secondary-header",
       valueGetter: (params: any) => {
-        return new Date(params).toLocaleDateString()
-      }
+        return new Date(params).toLocaleDateString();
+      },
     },
     {
       field: "actions",
-      renderHeader: (params: GridColumnHeaderParams<any>) => (<></>),
+      renderHeader: (params: GridColumnHeaderParams<any>) => <></>,
       width: 100,
       renderCell: (params: GridRenderCellParams<any>) => (
         <>
@@ -150,7 +155,7 @@ export const RequestsContainer = () => {
   const filteredRequests = requests?.filter(
     (request) =>
       request.title.toLowerCase().includes(searchTerm.toLowerCase()) ||
-      request.description.toLowerCase().includes(searchTerm.toLowerCase())
+      request.description.toLowerCase().includes(searchTerm.toLowerCase()),
   );
 
   const rows = filteredRequests?.map((request) => ({
@@ -168,8 +173,7 @@ export const RequestsContainer = () => {
       <Typography component="h1" variant="h5">
         Requests
       </Typography>
-      <StyledPaper
-      >
+      <StyledPaper>
         <TextField
           variant="outlined"
           margin="normal"
@@ -209,33 +213,32 @@ export const RequestsContainer = () => {
             <DataGrid
               rows={rows ?? []}
               columns={columns}
-              getRowHeight={() => 'auto'}
-              
+              getRowHeight={() => "auto"}
               rowSpacingType="border"
               sx={{
-                border: 'none', // Removes the outer border
-                '& .MuiDataGrid-row--borderBottom .MuiDataGrid-columnHeader': {
-                  border: 'none'
+                border: "none", // Removes the outer border
+                "& .MuiDataGrid-row--borderBottom .MuiDataGrid-columnHeader": {
+                  border: "none",
                 },
-                '& .MuiDataGrid-columnHeader': {
-                  backgroundColor: '#F4F6F8',
+                "& .MuiDataGrid-columnHeader": {
+                  backgroundColor: "#F4F6F8",
                 },
-                '& .MuiDataGrid-cell': {
-                    border: 'none',
-                    padding: '16px',
-                    display: 'flex',
-                    justifyContent: 'start',
-                    alignItems: 'center'
+                "& .MuiDataGrid-cell": {
+                  border: "none",
+                  padding: "16px",
+                  display: "flex",
+                  justifyContent: "start",
+                  alignItems: "center",
                 },
-                '& .MuiDataGrid-row': {
-                  borderBottomColor: 'rgb(145 158 171 / 20%)',
-                  borderBottomStyle: 'dashed',
-                  borderBottomWidth: '1px',
-                  borderBottomSpacing: '2px',
+                "& .MuiDataGrid-row": {
+                  borderBottomColor: "rgb(145 158 171 / 20%)",
+                  borderBottomStyle: "dashed",
+                  borderBottomWidth: "1px",
+                  borderBottomSpacing: "2px",
                 },
-                '& .MuiDataGrid-filler > *': {
-                  border: 'none'
-                }
+                "& .MuiDataGrid-filler > *": {
+                  border: "none",
+                },
               }}
             />
           </Box>

@@ -52,11 +52,13 @@ export const getRequests = async (): Promise<Request[]> => {
   return data as Request[];
 };
 
-export const getRequestStatusUpdates = async (requestId: string): Promise<RequestStatusUpdate[]> => {
+export const getRequestStatusUpdates = async (
+  requestId: string,
+): Promise<RequestStatusUpdate[]> => {
   const { data, error } = await supabase
     .from("request_status_update")
     .select("*")
-    .eq("request_id", requestId)
+    .eq("request_id", requestId);
 
   if (error) {
     console.error("Error fetching request updates:", error.message);

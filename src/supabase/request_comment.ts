@@ -17,7 +17,9 @@ export const addRequestComment = async (
   return commentData;
 };
 
-export const deleteRequestComment = async (commentId: string): Promise<void> => {
+export const deleteRequestComment = async (
+  commentId: string,
+): Promise<void> => {
   const { error: deleteError } = await supabase
     .from("request_comment")
     .delete()

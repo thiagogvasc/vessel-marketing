@@ -5,7 +5,6 @@ import { RequestDetailsContainer } from "@/src/containers/Requests/RequestDetail
 import { useParams } from "next/navigation";
 import { Container } from "@mui/material";
 
-
 export default function RequestDetails() {
   const { id: requestId } = useParams();
 

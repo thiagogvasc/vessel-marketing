@@ -38,9 +38,9 @@ const theme = createTheme({
   },
   palette: {
     text: {
-      primary: '#1C252E',
-      secondary: '#637381',
-      disabled: '#919EAB',
+      primary: "#1C252E",
+      secondary: "#637381",
+      disabled: "#919EAB",
     },
     primary: {
       main: deepPurple[500],
@@ -53,18 +53,20 @@ const theme = createTheme({
     MuiPopover: {
       styleOverrides: {
         paper: {
-          boxShadow: "rgba(145, 158, 171, 0.2) 0px 0px 2px 0px, rgba(145, 158, 171, 0.12) 0px 12px 24px -4px",
-          borderRadius: '10px',
-        }
-      }
+          boxShadow:
+            "rgba(145, 158, 171, 0.2) 0px 0px 2px 0px, rgba(145, 158, 171, 0.12) 0px 12px 24px -4px",
+          borderRadius: "10px",
+        },
+      },
     },
     MuiMenu: {
       styleOverrides: {
         paper: {
-          boxShadow: "rgba(145, 158, 171, 0.2) 0px 0px 2px 0px, rgba(145, 158, 171, 0.12) 0px 12px 24px -4px",
-          borderRadius: '10px',
-        }
-      }
+          boxShadow:
+            "rgba(145, 158, 171, 0.2) 0px 0px 2px 0px, rgba(145, 158, 171, 0.12) 0px 12px 24px -4px",
+          borderRadius: "10px",
+        },
+      },
     },
     MuiTableHead: {
       styleOverrides: {

@@ -30,11 +30,12 @@ export const ListViewContainer: React.FC<ListViewProps> = ({
   databaseId,
   viewId,
 }) => {
-  const { data: databaseTasks, isLoading: isTasksLoading } = useGetDatabaseTasks(databaseId as string);
+  const { data: databaseTasks, isLoading: isTasksLoading } =
+    useGetDatabaseTasks(databaseId as string);
   const { data: viewTaskOrders } = useGetViewTaskOrdersByViewId(viewId);
   const { orderedTasks } = useOrderedTasks(databaseTasks, viewTaskOrders);
   const [selectedTask, setSelectedTask] = useState<Task | null>(null);
-  
+
   useEffect(() => {
     if (selectedTask && databaseTasks) {
       const newSelectedTask = databaseTasks.find(
@@ -44,14 +45,10 @@ export const ListViewContainer: React.FC<ListViewProps> = ({
     }
   }, [databaseTasks]);
 
-
   if (isTasksLoading) return <div>Loading...</div>;
   return (
     <>
-      <ListView 
-        readOnly={false}
-        tasks={orderedTasks}
-      />
+      <ListView readOnly={false} tasks={orderedTasks} />
     </>
   );
 };

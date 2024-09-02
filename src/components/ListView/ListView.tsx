@@ -2,7 +2,14 @@
 
 import React from "react";
 import { Task } from "../../types";
-import { Box, List, ListItem, ListItemText, IconButton, Typography } from "@mui/material";
+import {
+  Box,
+  List,
+  ListItem,
+  ListItemText,
+  IconButton,
+  Typography,
+} from "@mui/material";
 import DeleteIcon from "@mui/icons-material/Delete";
 import AddIcon from "@mui/icons-material/Add";
 import DragHandleIcon from "@mui/icons-material/DragHandle";
@@ -12,10 +19,7 @@ interface ListViewProps {
   tasks: Task[];
 }
 
-export const ListView: React.FC<ListViewProps> = ({
-  tasks,
-  readOnly,
-}) => {
+export const ListView: React.FC<ListViewProps> = ({ tasks, readOnly }) => {
   return (
     <Box sx={{ width: "100%", padding: 2 }}>
       <Typography variant="h6" gutterBottom>
@@ -47,10 +51,7 @@ export const ListView: React.FC<ListViewProps> = ({
               sx={{ flexGrow: 1 }}
             />
             {!readOnly && (
-              <IconButton
-                edge="end"
-                aria-label="delete"
-              >
+              <IconButton edge="end" aria-label="delete">
                 <DeleteIcon />
               </IconButton>
             )}

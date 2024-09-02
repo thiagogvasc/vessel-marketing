@@ -24,12 +24,7 @@ import NotificationsIcon from "@mui/icons-material/Notifications";
 import SettingsIcon from "@mui/icons-material/Settings";
 import ChevronLeftIcon from "@mui/icons-material/ChevronLeft";
 import ChevronRightIcon from "@mui/icons-material/ChevronRight";
-import {
-  Dashboard,
-  Group,
-  ViewKanban,
-  ViewList
-} from "@mui/icons-material";
+import { Dashboard, Group, ViewKanban, ViewList } from "@mui/icons-material";
 import MyDrawer from "./MyDrawer";
 import { useGetCurrentUser } from "../hooks/react-query/user";
 import theme from "../theme";

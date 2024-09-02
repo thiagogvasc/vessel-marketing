@@ -23,15 +23,15 @@ export const DatabaseViewRenderer: React.FC<DatabaseViewRendererProps> = ({
         viewId={viewId}
       />
     );
-  } else if (viewTypeUppercase === 'LIST') {
-		return (
-			<ListViewContainer
-				databaseId={databaseId}
-				viewId={viewId}
-				readOnly={false}
-			/>
-		)
-	}
+  } else if (viewTypeUppercase === "LIST") {
+    return (
+      <ListViewContainer
+        databaseId={databaseId}
+        viewId={viewId}
+        readOnly={false}
+      />
+    );
+  }
 
   return <>No matched view</>;
 };

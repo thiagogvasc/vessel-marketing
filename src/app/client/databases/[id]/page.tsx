@@ -1,7 +1,10 @@
 "use client";
 
 // import { KanbanViewContain} from "@/src/components/KanbanView";
-import { useGetDatabaseById, useGetDatabaseViews } from "@/src/hooks/react-query/database";
+import {
+  useGetDatabaseById,
+  useGetDatabaseViews,
+} from "@/src/hooks/react-query/database";
 import { Box, Container, Paper, Tab, Tabs, Typography } from "@mui/material";
 import { useParams } from "next/navigation";
 import { useState } from "react";
@@ -16,7 +19,6 @@ export default function Database() {
 
   const { data: database } = useGetDatabaseById(databaseId as string);
   const { data: databaseViews } = useGetDatabaseViews(databaseId as string);
-
 
   return (
     <Container component="main" maxWidth="xl">

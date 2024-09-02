@@ -83,9 +83,7 @@ export const ViewSettingsPopover: React.FC<ViewSettingsPopoverProps> = ({
             <MenuItem value="TABLE" disabled>
               Table
             </MenuItem>
-            <MenuItem value="LIST">
-              List
-            </MenuItem>
+            <MenuItem value="LIST">List</MenuItem>
             <MenuItem value="TIMELINE" disabled>
               Timeline
             </MenuItem>

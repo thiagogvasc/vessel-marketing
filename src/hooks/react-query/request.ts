@@ -26,10 +26,13 @@ export const useGetRequestById = (id: string | undefined | null) => {
   );
 };
 
-export const useGetRequestStatusUpdatesByRequestId = (requestId: string | undefined | null) => {
+export const useGetRequestStatusUpdatesByRequestId = (
+  requestId: string | undefined | null,
+) => {
   return useQuery(
-    ["requests", requestId, 'status-updates'],
-    () => (requestId ? getRequestStatusUpdates(requestId) : Promise.resolve(null)),
+    ["requests", requestId, "status-updates"],
+    () =>
+      requestId ? getRequestStatusUpdates(requestId) : Promise.resolve(null),
     {
       enabled: !!requestId,
       staleTime: 60000, // only run the query if id is truthy
@@ -78,7 +81,7 @@ export const useAddRequestUpdate = () => {
     {
       onSuccess: (_, { requestId }) => {
         queryClient.invalidateQueries(["request", requestId]);
-        queryClient.invalidateQueries(["request", requestId, 'status-updates']);
+        queryClient.invalidateQueries(["request", requestId, "status-updates"]);
       },
     },
   );
