@@ -31,7 +31,7 @@ export const CustomChip: React.FC<CustomChipProps> = ({ type, value }) => {
   };
 
   // Determine the color style based on type and value
-  const chipStyle = colorMap[typeColorMap[type][value]] || {};
+  const chipStyle = colorMap[typeColorMap[type as keyof {}][value] as keyof typeof colorMap] || {}; // fix this
 
   return (
     <Chip

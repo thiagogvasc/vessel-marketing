@@ -1,7 +1,7 @@
 "use client";
 
 // import { KanbanViewContain} from "@/src/components/KanbanView";
-import { useGetDatabaseWithTasks } from "@/src/hooks/useTasks";
+import { useGetDatabaseById, useGetDatabaseViews } from "@/src/hooks/react-query/database";
 import { Box, Container, Paper, Tab, Tabs, Typography } from "@mui/material";
 import { useParams } from "next/navigation";
 import { useState } from "react";
@@ -14,7 +14,9 @@ export default function Database() {
     setSelectedTab(newValue);
   };
 
-  const { data } = useGetDatabaseWithTasks(databaseId as string);
+  const { data: database } = useGetDatabaseById(databaseId as string);
+  const { data: databaseViews } = useGetDatabaseViews(databaseId as string);
+
 
   return (
     <Container component="main" maxWidth="xl">
@@ -28,7 +30,7 @@ export default function Database() {
         }}
       >
         <Typography component="h1" variant="h5">
-          {data?.name}
+          {database?.name}
         </Typography>
       </Paper>
       <Tabs
@@ -38,13 +40,13 @@ export default function Database() {
         variant="scrollable"
         scrollButtons="auto"
       >
-        {data?.views.map((databaseView) => (
+        {databaseViews?.map((databaseView) => (
           <Tab key={databaseView.name} label={databaseView.name} />
         ))}
       </Tabs>
 
       <Box sx={{ p: 3 }}>
-        {data?.views.map((databaseView) => {
+        {databaseViews?.map((databaseView) => {
           // if (databaseView.type === 'kanban') return <KanbanView readOnly={true} key={databaseView.name} databaseId={data?.id} databaseView={databaseView} />
           return <>View type not supported</>;
         })}
