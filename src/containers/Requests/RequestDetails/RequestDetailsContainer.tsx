@@ -9,6 +9,7 @@ import { RequestClientContainer } from "./RequestClientContainer";
 import { RequestCommentsContainer } from "./RequestCommentsContainer";
 import { RequestStatusUpdatesContainer } from "./RequestStatusUpdatesContainer";
 import { RequestControlsContainer } from "./RequestControlsContainer";
+import { RequestDatabasesContainer } from "./RequestDatabasesContainer";
 
 interface RequestDetailsContainerProps {
   requestId: string;
@@ -40,7 +41,7 @@ export const RequestDetailsContainer: React.FC<
             sx={{
               display: "flex",
               alignItems: "start",
-              justifyContent: "center",
+              justifyContent: "center", 
               gap: "8px",
             }}
           >
@@ -64,6 +65,7 @@ export const RequestDetailsContainer: React.FC<
         <Typography variant="body1">{request?.description}</Typography>
       </StyledPaper>
 
+      <RequestDatabasesContainer requestId={requestId} />
       <RequestClientContainer requestId={requestId} />
       <RequestStatusUpdatesContainer requestId={requestId} />
       <RequestCommentsContainer requestId={requestId} />

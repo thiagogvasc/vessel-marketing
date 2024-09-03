@@ -1,5 +1,5 @@
 "use client";
-
+import 'react-quill/dist/quill.snow.css';
 import { useState } from "react";
 import { useRouter } from "next/navigation";
 import {
@@ -18,10 +18,12 @@ import {
 import { useGetCurrentUser } from "@/src/hooks/react-query/user";
 import Link from "next/link";
 import { useCreateRequest } from "@/src/hooks/react-query/request";
+import ReactQuill from 'react-quill';
 
 const NewRequest = () => {
   const [title, setTitle] = useState("");
   const [description, setDescription] = useState("");
+  const [content, setContent] = useState("");
   const { data: user } = useGetCurrentUser();
   const mutation = useCreateRequest();
   const router = useRouter();
@@ -46,6 +48,32 @@ const NewRequest = () => {
       alert("Failed to add request");
     }
   };
+
+  const handleQuillChange = (content: string) => {
+    setContent(content);
+  }
+
+  const modules = {
+    toolbar: [
+      [{ 'header': '1'}, {'header': '2'}, { 'font': [] }],
+      [{size: []}],
+      ['bold', 'italic', 'underline', 'strike', 'blockquote'],
+      [{'list': 'ordered'}, {'list': 'bullet'}, 
+       {'indent': '-1'}, {'indent': '+1'}],
+      ['link', 'image', 'video'],
+      ['clean']                                         
+    ],
+    clipboard: {
+      matchVisual: false,
+    }
+  };
+  
+  const formats = [
+    'header', 'font', 'size',
+    'bold', 'italic', 'underline', 'strike', 'blockquote',
+    'list', 'bullet', 'indent',
+    'link', 'image', 'video'
+  ];
 
   return (
     <Fade in timeout={500}>
@@ -113,6 +141,19 @@ const NewRequest = () => {
                 value={description}
                 onChange={(e) => setDescription(e.target.value)}
               />
+
+              <div>
+                <h3>Content</h3>
+                <ReactQuill 
+                theme="snow"
+                  value={content}
+                  // modules={modules}
+                 // formats={formats}
+                  onChange={handleQuillChange}
+                  placeholder="Enter the description here..."
+                />
+              </div>
+
               <Grid container justifyContent="flex-end">
                 <Grid item>
                   <Button
