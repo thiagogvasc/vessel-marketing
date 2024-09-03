@@ -1,12 +1,7 @@
 "use client";
 
-import {
-  useGetRequestById,
-} from "@/src/hooks/react-query/request";
-import {
-  Box,
-  Typography,
-} from "@mui/material";
+import { useGetRequestById } from "@/src/hooks/react-query/request";
+import { Box, Typography } from "@mui/material";
 import React from "react";
 import { CustomChip } from "../../../components/CustomChip";
 import { StyledPaper } from "../../../components/StyledPaper";
@@ -49,15 +44,10 @@ export const RequestDetailsContainer: React.FC<
               gap: "8px",
             }}
           >
-            <Typography
-              component="h1"
-              variant="h5"
-              fontWeight="bold"
-              noWrap
-            >
+            <Typography component="h1" variant="h5" fontWeight="bold" noWrap>
               {request?.title}
             </Typography>
-            <CustomChip type="status" value={request?.status ?? ''} />
+            <CustomChip type="status" value={request?.status ?? ""} />
             <CustomChip type="priority" value={request?.priority ?? ""} />
           </Box>
           <Typography variant="body2" color="textDisabled" noWrap>
@@ -74,8 +64,8 @@ export const RequestDetailsContainer: React.FC<
         <Typography variant="body1">{request?.description}</Typography>
       </StyledPaper>
 
-      <RequestClientContainer requestId={requestId}/>
-      <RequestStatusUpdatesContainer requestId={requestId}/>
+      <RequestClientContainer requestId={requestId} />
+      <RequestStatusUpdatesContainer requestId={requestId} />
       <RequestCommentsContainer requestId={requestId} />
     </>
   );

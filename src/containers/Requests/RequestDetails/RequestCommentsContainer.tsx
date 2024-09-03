@@ -1,19 +1,9 @@
 "use client";
 
-import {
-  useGetRequestById,
-} from "@/src/hooks/react-query/request";
-import {
-  Box,
-  Typography,
-  List,
-  TextField,
-  IconButton,
-} from "@mui/material";
+import { useGetRequestById } from "@/src/hooks/react-query/request";
+import { Box, Typography, List, TextField, IconButton } from "@mui/material";
 import React, { useState } from "react";
-import {
-  useGetCurrentUser,
-} from "@/src/hooks/react-query/user";
+import { useGetCurrentUser } from "@/src/hooks/react-query/user";
 import { StyledPaper } from "../../../components/StyledPaper";
 import { v4 as uuidv4 } from "uuid";
 import {
@@ -30,7 +20,7 @@ interface RequestCommentsContainerProps {
 }
 
 export const RequestCommentsContainer: React.FC<
-RequestCommentsContainerProps
+  RequestCommentsContainerProps
 > = ({ requestId }) => {
   const { data: request } = useGetRequestById(requestId);
   const { data: user } = useGetCurrentUser();
@@ -50,43 +40,46 @@ RequestCommentsContainerProps
   };
 
   const handleCommentUpdate = (id: string, newText: string) => {
-    updateCommentMutation.mutate({ id, changes: { text: newText }});
-  }
+    updateCommentMutation.mutate({ id, changes: { text: newText } });
+  };
 
   const handleCommentDelete = (id: string) => {
     deleteCommentMutation.mutate(id);
-  }
+  };
 
   return (
     <StyledPaper sx={{ mt: 3, p: 3 }}>
-        <Typography fontSize={18} fontWeight={600} gutterBottom mb={2}>
-            Comments
-        </Typography>
-        <Box sx={{ display: 'flex', justifyContent: 'center', alignItems: 'center', gap: 1}}>
+      <Typography fontSize={18} fontWeight={600} gutterBottom mb={2}>
+        Comments
+      </Typography>
+      <Box
+        sx={{
+          display: "flex",
+          justifyContent: "center",
+          alignItems: "center",
+          gap: 1,
+        }}
+      >
         <TextField
-            label="Comment"
-            value={newCommentText}
-            onChange={(e) => setNewCommentText(e.target.value)}
-            fullWidth
+          label="Comment"
+          value={newCommentText}
+          onChange={(e) => setNewCommentText(e.target.value)}
+          fullWidth
         />
-        <IconButton
-            color="primary"
-            size="large"
-            onClick={handleAddComment}
-        >
-            <Send />
+        <IconButton color="primary" size="large" onClick={handleAddComment}>
+          <Send />
         </IconButton>
-        </Box>
-        <List>
+      </Box>
+      <List>
         {comments?.map((comment, index) => (
-            <RequestComment
+          <RequestComment
             key={index}
             comment={comment}
             onUpdate={handleCommentUpdate}
             onDelete={handleCommentDelete}
-            />
+          />
         ))}
-        </List>
+      </List>
     </StyledPaper>
   );
 };

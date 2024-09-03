@@ -59,29 +59,29 @@ export const RequestStatusUpdatesContainer: React.FC<
     useGetRequestStatusUpdatesByRequestId(requestId);
   return (
     <StyledPaper sx={{ mt: 3, p: 3, display: "inline-block" }}>
-        <Typography fontSize={18} fontWeight={600} gutterBottom mb={2}>
+      <Typography fontSize={18} fontWeight={600} gutterBottom mb={2}>
         Status updates
-        </Typography>
-        <Timeline
+      </Typography>
+      <Timeline
         sx={{
-            [`& .${timelineItemClasses.root}:before`]: {
+          [`& .${timelineItemClasses.root}:before`]: {
             flex: 0,
             padding: 0,
-            },
+          },
         }}
-        >
+      >
         {statusUpdates?.map((update) => (
-            <TimelineItem key={update.id}>
+          <TimelineItem key={update.id}>
             <TimelineSeparator>
-                <TimelineDot />
-                <TimelineConnector />
+              <TimelineDot />
+              <TimelineConnector />
             </TimelineSeparator>
             <TimelineContent>
-                Request status moved to {update.status}
+              Request status moved to {update.status}
             </TimelineContent>
-            </TimelineItem>
+          </TimelineItem>
         ))}
-        </Timeline>
+      </Timeline>
     </StyledPaper>
   );
 };

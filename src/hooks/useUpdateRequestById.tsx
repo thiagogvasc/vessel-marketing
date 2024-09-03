@@ -6,7 +6,8 @@ const useUpdateRequest = (id: string | undefined) => {
   const queryClient = useQueryClient();
 
   return useMutation(
-    ({id, changes }: {id: string, changes: Partial<Request>}) => updateRequest(id, changes),
+    ({ id, changes }: { id: string; changes: Partial<Request> }) =>
+      updateRequest(id, changes),
     {
       onSuccess: () => {
         queryClient.invalidateQueries(["request", id]);
