@@ -2,11 +2,11 @@ import { useMutation, useQueryClient } from "react-query";
 import { updateRequest } from "../supabase/request";
 import { Request } from "../types";
 
-const useUpdateRequest = (id: string) => {
+const useUpdateRequest = (id: string | undefined) => {
   const queryClient = useQueryClient();
 
   return useMutation(
-    (updatedRequest: Request) => updateRequest(id, updatedRequest),
+    ({id, changes }: {id: string, changes: Partial<Request>}) => updateRequest(id, changes),
     {
       onSuccess: () => {
         queryClient.invalidateQueries(["request", id]);
