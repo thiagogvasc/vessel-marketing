@@ -11,7 +11,7 @@ import {
   RequestStatusUpdate,
 } from "@/src/types";
 import { Box, MenuItem, Select, SelectChangeEvent } from "@mui/material";
-import React, { useState } from "react";
+import React, { useEffect, useState } from "react";
 import { v4 as uuidv4 } from "uuid";
 
 interface RequestControlsContainerProps {
@@ -37,6 +37,11 @@ export const RequestControlsContainer: React.FC<
   const [priority, setPriority] = useState<RequestPriority>(
     request?.priority || "Low",
   );
+
+  useEffect(() => {
+    setStatus(request?.status || "Pending");
+    setPriority(request?.priority || "Low");
+  }, [request])
 
   const handleStatusChange = (event: SelectChangeEvent<RequestStatus>) => {
     const newStatus = event.target.value as RequestStatus;
