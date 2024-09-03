@@ -1,5 +1,4 @@
-"use client";
-import { Container, Paper } from "@mui/material";
+import { Container } from "@mui/material";
 import { RequestsContainer } from "@/src/containers/Requests/RequestsContainer";
 
 const Requests = () => {

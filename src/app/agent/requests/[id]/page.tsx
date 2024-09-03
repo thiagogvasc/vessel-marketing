@@ -1,16 +1,17 @@
-"use client";
-
 import React from "react";
 import { RequestDetailsContainer } from "@/src/containers/Requests/RequestDetails/RequestDetailsContainer";
-import { useParams } from "next/navigation";
 import { Container } from "@mui/material";
 
-export default function RequestDetails() {
-  const { id: requestId } = useParams();
+interface RequestDetailsProps {
+  params: {
+    id: string;
+  }
+}
 
+export default function RequestDetails({ params }: RequestDetailsProps) {
   return (
     <Container component="main" maxWidth="xl">
-      <RequestDetailsContainer requestId={requestId as string} />
+      <RequestDetailsContainer requestId={params.id} />
     </Container>
   );
 }
