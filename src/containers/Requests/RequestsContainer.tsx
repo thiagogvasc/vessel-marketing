@@ -1,6 +1,4 @@
 "use client";
-import "./RequestsContainer.css";
-import { useState } from "react";
 import { useGetRequests } from "@/src/hooks/react-query/request";
 import {
   Box,
@@ -13,7 +11,6 @@ import SearchIcon from "@mui/icons-material/Search";
 import { useTheme } from "@mui/material/styles";
 import React from "react";
 import {
-  DataGrid,
   GridColDef,
   GridColumnHeaderParams,
   GridRenderCellParams,
@@ -22,6 +19,7 @@ import { CustomerCellContainer } from "./CustomerCellContainer";
 import { CustomChip } from "../../components/CustomChip";
 import { StyledPaper } from "../../components/StyledPaper";
 import { ActionsCell } from "./ActionsCell";
+import { CustomDataGrid } from "@/src/components/CustomDataGrid/CustomDataGrid";
 
 export const RequestsContainer = () => {
   const { data: requests, isLoading } = useGetRequests();
@@ -149,37 +147,7 @@ export const RequestsContainer = () => {
           </Box>
         ) : (
           <Box sx={{ height: 600, width: "100%" }}>
-            <DataGrid
-              rows={rows ?? []}
-              columns={columns}
-              getRowHeight={() => "auto"}
-              rowSpacingType="border"
-              sx={{
-                border: "none", // Removes the outer border
-                "& .MuiDataGrid-row--borderBottom .MuiDataGrid-columnHeader": {
-                  border: "none",
-                },
-                "& .MuiDataGrid-columnHeader": {
-                  backgroundColor: "#F4F6F8",
-                },
-                "& .MuiDataGrid-cell": {
-                  border: "none",
-                  padding: "16px",
-                  display: "flex",
-                  justifyContent: "start",
-                  alignItems: "center",
-                },
-                "& .MuiDataGrid-row": {
-                  borderBottomColor: "rgb(145 158 171 / 20%)",
-                  borderBottomStyle: "dashed",
-                  borderBottomWidth: "1px",
-                  borderBottomSpacing: "2px",
-                },
-                "& .MuiDataGrid-filler > *": {
-                  border: "none",
-                },
-              }}
-            />
+            <CustomDataGrid rows={rows} columns={columns} />
           </Box>
         )}
       </StyledPaper>

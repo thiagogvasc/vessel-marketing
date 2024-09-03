@@ -132,10 +132,10 @@ export interface DatabaseUI extends Database {
 }
 
 export interface Database {
-  id?: string;
+  id: string;
   name: string;
   description: string;
-  client_id?: string;
+  request_id?: string;
 }
 
 export interface TaskComment {
