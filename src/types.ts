@@ -24,6 +24,7 @@ export interface Request {
   title: string;
   description: string;
   status: RequestStatus;
+  content: string;
   priority?: RequestPriority;
   due_date?: Timestamp;
   assigned_to?: string; // reference to Users

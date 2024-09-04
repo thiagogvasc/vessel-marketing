@@ -14,11 +14,14 @@ import {
   Link as MuiLink,
   Fade,
   Grow,
+  Divider,
+  Grid2,
 } from "@mui/material";
 import { useGetCurrentUser } from "@/src/hooks/react-query/user";
 import Link from "next/link";
 import { useCreateRequest } from "@/src/hooks/react-query/request";
 import ReactQuill from 'react-quill';
+import { StyledPaper } from '@/src/components/StyledPaper';
 
 const NewRequest = () => {
   const [title, setTitle] = useState("");
@@ -37,6 +40,7 @@ const NewRequest = () => {
           client_id: user.id,
           title,
           description,
+          content,
           status: "Pending",
           created_at: Date.now().toString(),
           updated_at: Date.now().toString(),
@@ -53,124 +57,71 @@ const NewRequest = () => {
     setContent(content);
   }
 
-  const modules = {
-    toolbar: [
-      [{ 'header': '1'}, {'header': '2'}, { 'font': [] }],
-      [{size: []}],
-      ['bold', 'italic', 'underline', 'strike', 'blockquote'],
-      [{'list': 'ordered'}, {'list': 'bullet'}, 
-       {'indent': '-1'}, {'indent': '+1'}],
-      ['link', 'image', 'video'],
-      ['clean']                                         
-    ],
-    clipboard: {
-      matchVisual: false,
-    }
-  };
-  
-  const formats = [
-    'header', 'font', 'size',
-    'bold', 'italic', 'underline', 'strike', 'blockquote',
-    'list', 'bullet', 'indent',
-    'link', 'image', 'video'
-  ];
 
   return (
-    <Fade in timeout={500}>
-      <Container component="main" maxWidth="xl" sx={{ mt: 4 }}>
-        <Grid
-          container
-          justifyContent="space-between"
-          alignItems="center"
-          sx={{ mb: 2 }}
-        >
-          <Grid item>
-            <Typography component="h1" variant="h5">
-              Add Request
-            </Typography>
-          </Grid>
-          <Grid item>
-            <Breadcrumbs aria-label="breadcrumb">
-              <MuiLink
-                component={Link}
-                color="inherit"
-                href="/client/dashboard"
-              >
-                Dashboard
-              </MuiLink>
-              <MuiLink component={Link} color="inherit" href="/client/requests">
-                Requests
-              </MuiLink>
-              <Typography color="textPrimary">Add Request</Typography>
-            </Breadcrumbs>
-          </Grid>
-        </Grid>
-        <Grow in timeout={1000}>
-          <Paper elevation={0} sx={{ px: 4, py: 2, borderRadius: 3 }}>
-            <Box
-              component="form"
-              onSubmit={handleSubmit}
-              noValidate
-              sx={{ mt: 2 }}
-            >
-              <TextField
-                variant="outlined"
-                margin="normal"
-                required
-                fullWidth
-                id="title"
-                label="Title"
-                name="title"
-                autoComplete="title"
-                autoFocus
-                value={title}
-                onChange={(e) => setTitle(e.target.value)}
-                sx={{ mb: 3 }}
-              />
-              <TextField
-                variant="outlined"
-                margin="normal"
-                required
-                fullWidth
-                id="description"
-                label="Description"
-                name="description"
-                autoComplete="description"
-                multiline
-                rows={6}
-                value={description}
-                onChange={(e) => setDescription(e.target.value)}
-              />
-
-              <div>
-                <h3>Content</h3>
-                <ReactQuill 
+    <Container component="main" maxWidth="xl">
+        <Typography component="h1" variant="h5">
+          Add Request
+        </Typography>
+        <StyledPaper sx={{ p: 3 }}>
+          <Box
+            component="form"
+            onSubmit={handleSubmit}
+            noValidate
+          >
+            <TextField
+              variant="outlined"
+              margin="normal"
+              required
+              fullWidth
+              id="title"
+              label="Title"
+              name="title"
+              autoComplete="title"
+              autoFocus
+              value={title}
+              onChange={(e) => setTitle(e.target.value)}
+              sx={{ mb: 3 }}
+            />
+            <TextField
+              variant="outlined"
+              margin="normal"
+              required
+              fullWidth
+              id="description"
+              label="Description"
+              name="description"
+              autoComplete="description"
+              multiline
+              rows={3}
+              value={description}
+              onChange={(e) => setDescription(e.target.value)}
+            />
+            <Box>
+              <Typography variant="body2" mt={2} mb={1} fontWeight={600}>Content</Typography>
+              <ReactQuill 
                 theme="snow"
-                  value={content}
-                  // modules={modules}
-                 // formats={formats}
-                  onChange={handleQuillChange}
-                  placeholder="Enter the description here..."
-                />
-              </div>
-
-              <Grid container justifyContent="flex-end">
-                <Grid item>
-                  <Button
-                    type="submit"
-                    variant="contained"
-                    color="primary"
-                    sx={{ mt: 3, mb: 2 }}
-                  >
-                    Submit
-                  </Button>
-                </Grid>
-              </Grid>
+                value={content}
+                onChange={handleQuillChange}
+                placeholder="Enter the description here..."
+              />
             </Box>
-          </Paper>
-        </Grow>
-      </Container>
-    </Fade>
+
+            <Grid2 container justifyContent="flex-end">
+              <Grid2>
+                <Button
+                  type="submit"
+                  variant="contained"
+                  color="primary"
+                  sx={{ mt: 3, mb: 2 }}
+                >
+                  Submit
+                </Button>
+              </Grid2>
+            </Grid2>
+          </Box>
+        </StyledPaper>
+    </Container>
   );
 };
 
