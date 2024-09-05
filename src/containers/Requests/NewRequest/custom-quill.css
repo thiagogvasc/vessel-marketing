@@ -1,0 +1,19 @@
+.custom-quill .ql-editor {
+  background-color: #f4f4f4; /* Editor background color */
+  min-height: 200px; /* Minimum height */
+}
+
+.custom-quill .ql-container {
+  border: none;
+}
+
+.custom-quill .ql-toolbar { 
+  border: none;
+  border-bottom: 1px solid rgba(var(--mui-palette-common-onBackgroundChannel) / 0.23);
+}
+
+.custom-quill {
+  border: 1px solid rgba(var(--mui-palette-common-onBackgroundChannel) / 0.23);
+  border-radius: 4px;
+  overflow: hidden;
+}
